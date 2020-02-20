@@ -1,5 +1,5 @@
 %{
-
+char* buffstr;
 int token_count = 0;
 
 #define YY_DECL int alpha_yylex(void * yylval)
@@ -43,17 +43,22 @@ struct alpha_token_t* print_list(){
 }
 
 %}
-
+%x String
 %option noyywrap
 %option yylineno
 
-INTEGER				[1-9]
+INTEGER				([1-9][0-9]*)
+FLOAT					(0{1}|([1-9]*))\.[0-9]+
+IDENTIFIER    [a-zA-Z][a-zA-Z0-9]*
+STRING				(\".\")
 
 
 %%
 
-/* KEYWORDS */
-"if"     	{ token_count++; add_alpha_token(token_count, "KEYWORD IF", "if", yylineno); }
+
+
+
+"if"     		{ token_count++; add_alpha_token(token_count, "KEYWORD IF", "if", yylineno); }
 "else"     	{ token_count++; add_alpha_token(token_count, "KEYWORD ELSE", "else", yylineno); }
 "while"    	{ token_count++; add_alpha_token(token_count, "KEYWORD WHILE", "while", yylineno); }
 "for"     	{ token_count++; add_alpha_token(token_count, "KEYWORD FOR", "for", yylineno); }
@@ -63,13 +68,13 @@ INTEGER				[1-9]
 "continue"  { token_count++; add_alpha_token(token_count, "KEYWORD CONTINUE", "continue", yylineno); }
 "and"     	{ token_count++; add_alpha_token(token_count, "KEYWORD AND", "and", yylineno); }
 "not"     	{ token_count++; add_alpha_token(token_count, "KEYWORD NOT", "not", yylineno); }
-"or"     	{ token_count++; add_alpha_token(token_count, "KEYWORD OR", "or", yylineno); }
+"or"     		{ token_count++; add_alpha_token(token_count, "KEYWORD OR", "or", yylineno); }
 "local"    	{ token_count++; add_alpha_token(token_count, "KEYWORD LOCAL", "local", yylineno); }
 "true"     	{ token_count++; add_alpha_token(token_count, "KEYWORD TRUE", "true", yylineno); }
 "false"     { token_count++; add_alpha_token(token_count, "KEYWORD FALSE", "false", yylineno); }
 "nil"     	{ token_count++; add_alpha_token(token_count, "KEYWORD NIL", "nil", yylineno); }
 
-/* TELESTES */
+
 "="     	{ token_count++; add_alpha_token(token_count, "OPERATOR EQUALS", "=", yylineno); }
 "+"     	{ token_count++; add_alpha_token(token_count, "OPERATOR PLUS", "+", yylineno); }
 "-"     	{ token_count++; add_alpha_token(token_count, "OPERATOR MINUS", "-", yylineno); }
@@ -88,7 +93,13 @@ INTEGER				[1-9]
 
 "hello"  	{ token_count++; add_alpha_token(token_count, "KEYWORD", "HELLO", yylineno); }
 "haha"   	{ token_count++; add_alpha_token(token_count, "KEYWORD", "HAHA", yylineno); }
-{INTEGER} {	printf("%s\n",yytext );}
+
+
+{FLOAT}				{	token_count++; add_alpha_token(token_count, "FLOAT", yytext, yylineno);}
+{INTEGER} 		{	token_count++; add_alpha_token(token_count, "INTEGER", yytext, yylineno);}
+{IDENTIFIER} 	{	token_count++; add_alpha_token(token_count, "IDENTIFIER", yytext, yylineno);}
+{STRING}			{	token_count++; add_alpha_token(token_count, "STRING", yytext, yylineno);}
+
 
 
 . 			printf("Uknown character: %s at: %d\n", yytext, yylineno);
