@@ -1,6 +1,6 @@
-%{ 
+%{
 
-int token_count = 0; 
+int token_count = 0;
 
 #define YY_DECL int alpha_yylex(void * yylval)
 
@@ -20,18 +20,18 @@ struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int 
 	struct alpha_token_t *tmp = (struct alpha_token_t *) malloc(sizeof(struct alpha_token_t));
 	tmp->token_no = token_num;
 	tmp->type = type;
-	tmp->value = val;
+	tmp->value = strdup(val);
 	tmp->line = line;
 	tmp->next=NULL;
 
 //	printf("ADDING TOKEN TO LIST: type:: %s value %s in line %d \n", tmp->type, tmp->value, tmp->line);
 
 	if(head == NULL) head = tmp;
-	else { 
+	else {
 //		printf("going to the end of the list !!!\n");
 		struct alpha_token_t* curr = head;
 		while(curr->next) curr = curr->next;  //proxwraw mexri to telos th lista
-		curr->next = tmp; 
+		curr->next = tmp;
 	}
 }
 
@@ -44,16 +44,22 @@ struct alpha_token_t* print_list(){
 	}
 }
 
-%} 
+%}
 
 %option noyywrap
 %option yylineno
+
+INTEGER				[1-9]
+
 
 %%
 
 "if"     	{ token_count++; add_alpha_token(token_count, "KEYWORD", "IF", yylineno); }
 "hello"  	{ token_count++; add_alpha_token(token_count, "KEYWORD", "HELLO", yylineno); }
 "haha"   	{ token_count++; add_alpha_token(token_count, "KEYWORD", "HAHA", yylineno); }
+{INTEGER} {	printf("%s\n",yytext );}
+
+
 . 			printf("Uknown character: %s at: %d\n", yytext, yylineno);
 
 \n { }  // MHN TO BGALETE APO DW, EINAI GIA NA YPOLOGIZONTAI SWSTA OI GRAMMES :)
