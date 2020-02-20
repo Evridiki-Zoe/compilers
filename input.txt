@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "dsa"
 "\n\b\t"
 "\\wtf"
@@ -13,3 +14,18 @@ nil
 /
 % break;
 and function()
+=======
+ifdasif 
+lala
+hello
+haha if
+fv \n
+4
+if
+
+
+
+
+if a==b 01gnutr= 12.24 else fDWD=13
+"fs dinf\tfi\nsidasdnsaidnsaindas"
+>>>>>>> 23b94c36c52161f865d98844be181565d8b7241c
