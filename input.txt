@@ -1,7 +1,6 @@
-if if 
+ifdasif 
 lala
 hello
 haha if
 fv \n
 if
-printlist

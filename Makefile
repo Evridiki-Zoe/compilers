@@ -1,14 +1,13 @@
 all:
-	flex --outfile=test.c test.l
-	gcc test.c -o test
-	./test input.txt
+	flex --outfile=al.c al.l
+	gcc al.c -o al
 
 clear:
-	rm test.c
-	rm test
+	rm al.c
+	rm al
 
 test:
-	./test input.txt
+	./al input.txt
 
 compile:
-	gcc test.c -o test
+	gcc al.c -o al
