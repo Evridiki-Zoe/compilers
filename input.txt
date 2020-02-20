@@ -1,6 +1,15 @@
-ifdasif 
-lala
-hello
-haha if
-fv \n
-if
+"dsa"
+"\n\b\t"
+"\\wtf"
+
+++--+-=!====!=
+if{} else {}
+()
+dwdeka
+for
+while
+else
+nil
+/
+% break;
+and function()
