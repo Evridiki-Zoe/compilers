@@ -1,59 +1,38 @@
 %{
-
 int token_count = 0;
-
+char *buff;
 #define YY_DECL int alpha_yylex(void * yylval)
 
-struct alpha_token_t {
-	unsigned int 			line;
-	unsigned int 			token_no;
-	char 					*type;
-	char 					*value;
-	struct alpha_token_t 	*next;
-};
-
-struct alpha_token_t *head = NULL;
-
-void add_alpha_token(int token_num, char* type, char* val, int line) {
-	struct alpha_token_t *tmp = (struct alpha_token_t *) malloc(sizeof(struct alpha_token_t));
-	tmp->token_no = token_num;
-	tmp->type = type;
-	tmp->value = strdup(val);
-	tmp->line = line;
-	tmp->next=NULL;
-
-//	printf("ADDING TOKEN TO LIST: type:: %s value %s in line %d \n", tmp->type, tmp->value, tmp->line);
-
-	if(head == NULL) head = tmp;
-	else {
-//		printf("going to the end of the list !!!\n");
-		struct alpha_token_t* curr = head;
-		while(curr->next) curr = curr->next;  //proxwraw mexri to telos th lista
-		curr->next = tmp;
-	}
-}
-
-int print_list() {
-	struct alpha_token_t* tmp = head;
-	printf("---------------- TOKENS ----------------\n#Line  #Token Value  	Type\n");
-	while( tmp != NULL ){
-		printf("%d:     #%d     \"%s\"	%s \n", tmp->line, tmp->token_no, tmp->value, tmp->type);
-		tmp= tmp->next;
-	}
-	return 0;
-}
+int print_list();
+void add_alpha_token(int token_num, char* type, char* val, int line);
 
 %}
+
 %x String
 %option noyywrap
 %option yylineno
+
 
 INTEGER				([1-9][0-9]*)
 FLOAT				(0{1}|([1-9]*))\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"[^\n"]*\"
 
+START \"
+
+
+%x C
 %%
+
+{START}	  			{ BEGIN(C); buff = malloc(yyleng * sizeof(char)); }
+<C>\"				{ BEGIN(INITIAL); *buff += '\0'; printf("1%s1\n", buff); }
+<C>\\n				{ printf("\n"); *buff += '\n'; }
+<C>\\t				{ printf("\t"); *buff += '\t';  }
+<C>\\\				{ printf("\\"); *buff += '\\'; }
+
+
+
+
 
 "if"     	{ token_count++; add_alpha_token(token_count, "KEYWORD IF", "if", yylineno); }
 "else"     	{ token_count++; add_alpha_token(token_count, "KEYWORD ELSE", "else", yylineno); }
@@ -86,47 +65,27 @@ STRING				\"[^\n"]*\"
 ">="     	{ token_count++; add_alpha_token(token_count, "OPERATOR BIGGER_EQ_THAN", ">=", yylineno); }
 "<="     	{ token_count++; add_alpha_token(token_count, "OPERATOR SMALLER_EQ_THAN", "<=", yylineno); }
 
-"{"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT BRACE", "{", yylineno); }
-"}"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT BRACE", "}", yylineno); }
-"["     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno); }
-"]"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno); }
-"("     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno); }
-")"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); }
 ";"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION SEMICOLON", ";", yylineno); }
 ","     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION COMMA", ",", yylineno); }
 ":"    		{ token_count++; add_alpha_token(token_count, "PUNCTUATION UPDOWN DOTS", ")", yylineno); }
 "::"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION DOUBUPDOWN DOTS", ")", yylineno); }
 "."     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION END DOT", ")", yylineno); }
 ".."     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION DOUBLE_END DOTS", ")", yylineno); }
+"{"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT BRACE", "{", yylineno); }
+"}"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT BRACE", "}", yylineno); }
+"["     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno); }
+"]"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno); }
+"("     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno); }
+")"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); }
+
 
 {FLOAT}			{ token_count++; add_alpha_token(token_count, "FLOAT", yytext, yylineno);}
 {INTEGER} 		{ token_count++; add_alpha_token(token_count, "INTEGER", yytext, yylineno);}
 {IDENTIFIER} 	{ token_count++; add_alpha_token(token_count, "IDENTIFIER", yytext, yylineno);}
-{STRING}		{ token_count++; add_alpha_token(token_count, "STRING", yytext, yylineno);}
-
 
 . 				printf("Uknown character: %s at: %d\n", yytext, yylineno);
-
+\n				{ }
 
 %%
 
-int main(int argc, char *argv[]) {
-	FILE *file;
-
-	if(argc > 1) {
-		if(!(file = fopen(argv[1], "r"))) {
-			fprintf(stderr, "Cannot read file: %s\n", argv[1]);
-		} else {
-			yyin = file;
-		}
-		alpha_yylex(NULL);
-		print_list();
-		fclose(file);
-	} else {
-
-		yyin = stdin;
-		alpha_yylex(NULL);
-	}
-
-	return 0;
-}
+//MAIN

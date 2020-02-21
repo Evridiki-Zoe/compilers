@@ -1,13 +1,10 @@
 all:
-	flex --outfile=al.c al.l
-	gcc al.c -o al
+	flex al.l
+	gcc -o al main.c lex.yy.c
 
 clear:
-	rm al.c
 	rm al
+	rm lex.yy.c
 
 test:
 	./al input.txt
-
-compile:
-	gcc al.c -o al
