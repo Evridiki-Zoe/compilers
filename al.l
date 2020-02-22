@@ -31,6 +31,18 @@ START \"
 <C>\\\				{ printf("\\"); *buff += '\\'; }
 
 
+"//".*                                    { /* DO NOTHING FOR INSIDE */
+                                                token_count++; add_alpha_token(token_count, "ONELINE COMMENT", "single comment", yylineno);
+                                          }
+
+
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */
+                                                token_count++; add_alpha_token(token_count, "MULTILINE COMMENT", "multi comment", yylineno);
+
+                                          }
+
+[/][*]                                    { yy_fatal_error("Unterminated comment"); }
+
 
 
 
