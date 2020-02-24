@@ -38,32 +38,32 @@ STRING				\"
     char tmp;
     while ((c = input()) != EOF) {
 
-    if (c == '\"') {
+        if (c == '\"') {
 
-      add_alpha_token(token_count, "STRING", buff, yylineno);
+        add_alpha_token(token_count, "STRING", buff, yylineno);
+        break;
 
-      return 0;
-    }
-
-    if (c == '\\') {
-
-        char tmp = input();
-
-        if (tmp == 't') {
-          strncat(buff, "\t", 1);
-        } else if (tmp == 'n') {
-          strncat(buff, "\n", 1);
-        } else if (tmp == '\\') {
-          strncat(buff, "\\", 1);
-        } else {
-            strncat(buff, &c, 1);
-            unput(tmp);
         }
 
-    } else   strncat(buff, &c, 1);
+        if (c == '\\') {
+
+            char tmp = input();
+
+            if (tmp == 't') {
+                strncat(buff, "\t", 1);
+            } else if (tmp == 'n') {
+                strncat(buff, "\n", 1);
+            } else if (tmp == '\\') {
+                strncat(buff, "\\", 1);
+            } else {
+                printf("warning: unkown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
+                unput(tmp);
+            }
+        } else   {
+            strncat(buff, &c, 1);
+        }
 
     }
-    printf("kati\n" );
 }
 
 
