@@ -1,6 +1,6 @@
 %{
 int token_count = 0;
-char *buff;
+
 #define YY_DECL int alpha_yylex(void * yylval)
 
 int print_list();
@@ -16,19 +16,29 @@ void add_alpha_token(int token_num, char* type, char* val, int line);
 INTEGER				([1-9][0-9]*)
 FLOAT				(0{1}|([1-9]*))\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
-STRING				\"[^\n"]*\"
+STRING				\"
 
-START \"
 
 
 %x C
 %%
 
-{START}	  			{ BEGIN(C); buff = malloc(yyleng * sizeof(char)); }
-<C>\"				{ BEGIN(INITIAL); *buff += '\0'; printf("1%s1\n", buff); }
-<C>\\n				{ printf("\n"); *buff += '\n'; }
-<C>\\t				{ printf("\t"); *buff += '\t';  }
-<C>\\\				{ printf("\\"); *buff += '\\'; }
+{STRING}	  			{
+      char c;
+      char *buff=malloc(256*sizeof(char));
+      while ((c=input())) {
+
+        if (c=='\"') {
+          break;
+        }
+        printf("%c",c );
+
+        //PERNA TO KATHE C STO BUFF PLZ KAI ANEVASE TO
+
+      }
+
+      printf("buff = %s\n",buff );
+}
 
 
 "//".*                                    { /* DO NOTHING FOR INSIDE */
