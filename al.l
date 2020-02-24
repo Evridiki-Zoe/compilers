@@ -6,6 +6,14 @@ int token_count = 0;
 int print_list();
 void add_alpha_token(int token_num, char* type, char* val, int line);
 
+void yywarning(char *text){
+    printf("Warning in line %d : %s\n",yylineno,text );
+}
+void yyerror(char *text){
+    printf("Error in line %d : %s\n",yylineno,text );
+    exit(0);
+}
+
 %}
 
 %x String
@@ -31,14 +39,32 @@ STRING				\"
     while ((c = input()) != EOF) {
 
     if (c == '\"') {
-        printf("\nbuff = %s\n",buff );
-        break;
-    }
-    strncat(buff, &c, 1); 
 
-        //PERNA TO KATHE C STO BUFF PLZ KAI ANEVASE TO
-        // to anevazw... just wait
+      add_alpha_token(token_count, "STRING", buff, yylineno);
+
+      return 0;
     }
+    if (c=='\\') {
+
+        char tmp=input();
+
+        if (tmp=='t') {
+          strncat(buff, "\t", 1);
+        }
+        else if (tmp=='n') {
+          strncat(buff, "\n", 1);
+        }
+        else if (tmp=='\\') {
+          strncat(buff, "\\", 1);
+        }
+        else yywarning("adespoto backslash");
+
+    }else   strncat(buff, &c, 1);
+
+    }
+    printf("kati\n" );
+
+
 }
 
 
