@@ -1,1 +1,1 @@
-"tab\there new\line\nhere"
+"1\2\\3\n4\there"

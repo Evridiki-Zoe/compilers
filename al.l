@@ -44,27 +44,26 @@ STRING				\"
 
       return 0;
     }
-    if (c=='\\') {
 
-        char tmp=input();
+    if (c == '\\') {
 
-        if (tmp=='t') {
+        char tmp = input();
+
+        if (tmp == 't') {
           strncat(buff, "\t", 1);
-        }
-        else if (tmp=='n') {
+        } else if (tmp == 'n') {
           strncat(buff, "\n", 1);
-        }
-        else if (tmp=='\\') {
+        } else if (tmp == '\\') {
           strncat(buff, "\\", 1);
+        } else {
+            strncat(buff, &c, 1);
+            unput(tmp);
         }
-        else yywarning("adespoto backslash");
 
-    }else   strncat(buff, &c, 1);
+    } else   strncat(buff, &c, 1);
 
     }
     printf("kati\n" );
-
-
 }
 
 
