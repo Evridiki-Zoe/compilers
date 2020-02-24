@@ -23,21 +23,22 @@ STRING				\"
 %x C
 %%
 
-{STRING}	  			{
-      char c;
-      char *buff=malloc(256*sizeof(char));
-      while ((c=input())) {
 
-        if (c=='\"') {
-          break;
-        }
-        printf("%c",c );
+{STRING}	  			{
+    char c;
+    char *buff = malloc(256 * sizeof(char));
+    char tmp;
+    while ((c = input()) != EOF) {
+
+    if (c == '\"') {
+        printf("\nbuff = %s\n",buff );
+        break;
+    }
+    strncat(buff, &c, 1); 
 
         //PERNA TO KATHE C STO BUFF PLZ KAI ANEVASE TO
-
-      }
-
-      printf("buff = %s\n",buff );
+        // to anevazw... just wait
+    }
 }
 
 

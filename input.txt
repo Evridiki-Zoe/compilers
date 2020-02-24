@@ -1,1 +1,1 @@
-"kati \t  dasd asd \n fsim"
+"kati\tdasdasd\nfsim"

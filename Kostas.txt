@@ -4,3 +4,15 @@ Pali kala nomiza tha antalazame kodika apo to fb . :*
 
 το να ανταλλασσουμε κωδικα απο φβ δουλεψε πολυ καλα
 στις βασεις παντως, λεω να το ξανακανουμε :) 
+
+if( c == '\') {
+        if((c = input()) == 'n') {
+            tmp = '\n';
+            strncat(buff, &tmp, 1);
+        } else if(c == 't') {
+            tmp = '\t';
+            strncat(buff, &tmp, 1);
+        } else {
+            unput(c);
+        }
+    }
