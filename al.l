@@ -21,7 +21,7 @@ void yyerror(char *text){
 %option yylineno
 
 
-INTEGER				([1-9][0-9]*)
+INTEGER				([0-9]*)
 FLOAT				(0{1}|([1-9]*))\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
@@ -36,13 +36,16 @@ STRING				\"
     char c;
     char *buff = malloc(256 * sizeof(char));
     char tmp;
-    while ((c = input()) != EOF) {
+    while ((c = input())) {
 
         if (c == '\"') {
 
         add_alpha_token(token_count, "STRING", buff, yylineno);
         break;
 
+        }
+        if (c == '\n') {
+          yywarning("Not Closing string");
         }
 
         if (c == '\\') {
@@ -72,12 +75,59 @@ STRING				\"
                                           }
 
 
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */
-                                                token_count++; add_alpha_token(token_count, "MULTILINE COMMENT", "multi comment", yylineno);
+"/*"         {
+          int from[50];
+          int to[50];
 
-                                          }
+          from[0]=yylineno;
 
-[/][*]                                    { yy_fatal_error("Unterminated comment"); }
+          char c;
+
+          int nestopen=0;
+          int nestclose=-1;
+
+
+
+          while ((c = input())) {
+
+            if (c=='*') {
+                c=input();
+                if (c=='/') {
+                  to[nestopen]=yylineno;
+                  nestclose++;
+                  if (nestopen==nestclose) {
+                        printf("Original comment from %d, to %d\n",from[0],to[0] );
+                        printf("nested from %d , to %d \n",from[1],to[1] );
+                        return 0;
+
+                  }
+
+
+                }
+
+
+            }
+
+            if (c=='/') {
+                c=input();
+                if (c=='*') {
+
+                  from[++nestopen]=yylineno;
+
+
+                }
+
+
+            }
+
+
+          }
+
+
+
+
+}
+
 
 
 
@@ -131,7 +181,7 @@ STRING				\"
 {INTEGER} 		{ token_count++; add_alpha_token(token_count, "INTEGER", yytext, yylineno);}
 {IDENTIFIER} 	{ token_count++; add_alpha_token(token_count, "IDENTIFIER", yytext, yylineno);}
 
-. 				printf("Uknown character: %s at: %d\n", yytext, yylineno);
+. 				yywarning("Undendifined token");
 \n				{ }
 
 %%
