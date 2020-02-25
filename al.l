@@ -36,10 +36,18 @@ STRING				\"
 
 {STRING}	  			{
     char c;
-    char *buff = malloc(sizeof(char));
+    char *buff = malloc(16*sizeof(char));
+	long length=0;
+	long baseofre=16;
     char tmp;
     while ((c = input())) {
+		length++;
+		if (length>baseofre) {
+			baseofre*=2;
+			printf("realloced to %ld\n",baseofre );
+			buff=realloc(buff, baseofre * sizeof(char));
 
+		}
         if (c == '\"') {
             add_alpha_token(++token_count, "STRING", buff, yylineno);
             break;
@@ -63,6 +71,7 @@ STRING				\"
                 unput(tmp);
             }
         } else   {
+
             strncat(buff, &c, 1);
         }
 
@@ -85,7 +94,7 @@ STRING				\"
           char *buff = malloc(2 * sizeof(char));
           char integer_string[32];
 
-          
+
           for (size_t i = 0; i < 50; i++) {
             from[i]=0;
             to[i]=0;
@@ -121,13 +130,15 @@ STRING				\"
                     }
                   break;
                  }
-                }
+			 }else unput(c);
+
             } else if(c == '/') {
                 c = input();
                 if (c == '*') {
 
                   from[++nestopen]=yylineno;
-                }
+			  }else unput(c);
+
             }
           }
 
