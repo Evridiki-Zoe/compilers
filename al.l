@@ -79,124 +79,115 @@ STRING				\"
 "/*"         {
           int from[50];
           int to[50];
+          char c;
+          int nestopen=0;
+          int nestclose=-1;
+          char *buff = malloc(2 * sizeof(char));
+          char integer_string[32];
+
+          
           for (size_t i = 0; i < 50; i++) {
             from[i]=0;
             to[i]=0;
           }
           from[0]=yylineno;
 
-          char c;
-
-          int nestopen=0;
-          int nestclose=-1;
-
           while ((c = input())) {
 
-            if (c=='*') {
-                c=input();
-                if (c=='/') {
-                  to[++nestclose]=yylineno;
-
-
-
-                  if (nestopen==nestclose) {
-                    int tmp=1;
-
-                    printf("multi comment from: %d, to: %d\n",from[0],to[nestopen] );
+            if(c == '*') {
+                c = input();
+                if(c == '/') {
+                  to[++nestclose] = yylineno;
+                  if (nestopen == nestclose) {
+                    int tmp = 1;
+                    sprintf(integer_string, "%d", from[0]);
+                    strcat(buff, integer_string);
+                    strcat(buff, " - ");
+                    sprintf(integer_string, "%d", to[nestopen]);
+                    strcat(buff, integer_string);
+                    add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, from[0]);
 
                     while (from[tmp]!=0) {
+                      integer_string[0] = '\0';
+                      buff[0] = '\0';
 
-                      printf("nested from %d , to %d\n",from[tmp],to[nestopen-(tmp++)] );
-
+                      sprintf(integer_string, "%d", from[tmp]);
+                      strcat(buff, integer_string);
+                      strcat(buff, " - ");
+                      sprintf(integer_string, "%d", to[nestopen - tmp]);
+                      strcat(buff, integer_string);
+                      add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, from[tmp]);
+                      tmp++;
                     }
-
-                  printf("okay\n" );
-
                   break;
                  }
-
-
-
-
                 }
-
-
-            }else  if (c=='/') {
-                c=input();
-                if (c=='*') {
+            } else if(c == '/') {
+                c = input();
+                if (c == '*') {
 
                   from[++nestopen]=yylineno;
-
-
                 }
-
-
             }
-
-
           }
 
           if(nestopen!=nestclose){
 
           yyerror("Multiline comment don't close");
         }
-
-
 }
-
-
-
 
 
 "if"     	{ add_alpha_token(++token_count, "KEYWORD IF", "if", yylineno); }
 "else"     	{ add_alpha_token(++token_count, "KEYWORD ELSE", "else", yylineno); }
-"while"    	{ token_count++; add_alpha_token(token_count, "KEYWORD WHILE", "while", yylineno); }
-"for"     	{ token_count++; add_alpha_token(token_count, "KEYWORD FOR", "for", yylineno); }
-"function"  { token_count++; add_alpha_token(token_count, "KEYWORD FUNCTION", "function", yylineno); }
-"return"    { token_count++; add_alpha_token(token_count, "KEYWORD RETURN", "return", yylineno); }
-"break"    	{ token_count++; add_alpha_token(token_count, "KEYWORD BREAK", "break", yylineno); }
-"continue"  { token_count++; add_alpha_token(token_count, "KEYWORD CONTINUE", "continue", yylineno); }
-"and"     	{ token_count++; add_alpha_token(token_count, "KEYWORD AND", "and", yylineno); }
-"not"     	{ token_count++; add_alpha_token(token_count, "KEYWORD NOT", "not", yylineno); }
-"or"     	{ token_count++; add_alpha_token(token_count, "KEYWORD OR", "or", yylineno); }
-"local"    	{ token_count++; add_alpha_token(token_count, "KEYWORD LOCAL", "local", yylineno); }
-"true"     	{ token_count++; add_alpha_token(token_count, "KEYWORD TRUE", "true", yylineno); }
-"false"     { token_count++; add_alpha_token(token_count, "KEYWORD FALSE", "false", yylineno); }
-"nil"     	{ token_count++; add_alpha_token(token_count, "KEYWORD NIL", "nil", yylineno); }
+"while"    	{ add_alpha_token(++token_count, "KEYWORD WHILE", "while", yylineno); }
+"for"     	{ add_alpha_token(++token_count, "KEYWORD FOR", "for", yylineno); }
+"function"  { add_alpha_token(++token_count, "KEYWORD FUNCTION", "function", yylineno); }
+"return"    { add_alpha_token(++token_count, "KEYWORD RETURN", "return", yylineno); }
+"break"    	{ add_alpha_token(++token_count, "KEYWORD BREAK", "break", yylineno); }
+"continue"  { add_alpha_token(++token_count, "KEYWORD CONTINUE", "continue", yylineno); }
+"and"     	{ add_alpha_token(++token_count, "KEYWORD AND", "and", yylineno); }
+"not"     	{ add_alpha_token(++token_count, "KEYWORD NOT", "not", yylineno); }
+"or"     	{ add_alpha_token(++token_count, "KEYWORD OR", "or", yylineno); }
+"local"    	{ add_alpha_token(++token_count, "KEYWORD LOCAL", "local", yylineno); }
+"true"     	{ add_alpha_token(++token_count, "KEYWORD TRUE", "true", yylineno); }
+"false"     { add_alpha_token(++token_count, "KEYWORD FALSE", "false", yylineno); }
+"nil"     	{ add_alpha_token(++token_count, "KEYWORD NIL", "nil", yylineno); }
 
-"="     	{ token_count++; add_alpha_token(token_count, "OPERATOR EQUALS", "=", yylineno); }
-"+"     	{ token_count++; add_alpha_token(token_count, "OPERATOR PLUS", "+", yylineno); }
-"-"     	{ token_count++; add_alpha_token(token_count, "OPERATOR MINUS", "-", yylineno); }
-"*"     	{ token_count++; add_alpha_token(token_count, "OPERATOR EPI", "*", yylineno); }
-"/"     	{ token_count++; add_alpha_token(token_count, "OPERATOR DIVISION", "/", yylineno); }
-"%"     	{ token_count++; add_alpha_token(token_count, "OPERATOR MOD", "%", yylineno); }
-"=="     	{ token_count++; add_alpha_token(token_count, "OPERATOR EQUALS_EQUALS", "==", yylineno); }
-"!="     	{ token_count++; add_alpha_token(token_count, "OPERATOR NOT_EQUALS", "!=", yylineno); }
-"++"     	{ token_count++; add_alpha_token(token_count, "OPERATOR PLUS_PLUS", "++", yylineno); }
-"--"     	{ token_count++; add_alpha_token(token_count, "OPERATOR MINUS_MINUS", "--", yylineno); }
-">"     	{ token_count++; add_alpha_token(token_count, "OPERATOR BIGGER_THAN", ">", yylineno); }
-"<"     	{ token_count++; add_alpha_token(token_count, "OPERATOR SMALLER_THAN", "<", yylineno); }
-">="     	{ token_count++; add_alpha_token(token_count, "OPERATOR BIGGER_EQ_THAN", ">=", yylineno); }
-"<="     	{ token_count++; add_alpha_token(token_count, "OPERATOR SMALLER_EQ_THAN", "<=", yylineno); }
+"="     	{ add_alpha_token(++token_count, "OPERATOR EQUALS", "=", yylineno); }
+"+"     	{ add_alpha_token(++token_count, "OPERATOR PLUS", "+", yylineno); }
+"-"     	{ add_alpha_token(++token_count, "OPERATOR MINUS", "-", yylineno); }
+"*"     	{ add_alpha_token(++token_count, "OPERATOR EPI", "*", yylineno); }
+"/"     	{ add_alpha_token(++token_count, "OPERATOR DIVISION", "/", yylineno); }
+"%"     	{ add_alpha_token(++token_count, "OPERATOR MOD", "%", yylineno); }
+"=="     	{ add_alpha_token(++token_count, "OPERATOR EQUALS_EQUALS", "==", yylineno); }
+"!="     	{ add_alpha_token(++token_count, "OPERATOR NOT_EQUALS", "!=", yylineno); }
+"++"     	{ add_alpha_token(++token_count, "OPERATOR PLUS_PLUS", "++", yylineno); }
+"--"     	{ add_alpha_token(++token_count, "OPERATOR MINUS_MINUS", "--", yylineno); }
+">"     	{ add_alpha_token(++token_count, "OPERATOR BIGGER_THAN", ">", yylineno); }
+"<"     	{ add_alpha_token(++token_count, "OPERATOR SMALLER_THAN", "<", yylineno); }
+">="     	{ add_alpha_token(++token_count, "OPERATOR BIGGER_EQ_THAN", ">=", yylineno); }
+"<="     	{ add_alpha_token(++token_count, "OPERATOR SMALLER_EQ_THAN", "<=", yylineno); }
 
-";"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION SEMICOLON", ";", yylineno); }
-","     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION COMMA", ",", yylineno); }
-":"    		{ token_count++; add_alpha_token(token_count, "PUNCTUATION UPDOWN DOTS", ")", yylineno); }
-"::"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION DOUBUPDOWN DOTS", ")", yylineno); }
-"."     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION END DOT", ")", yylineno); }
-".."     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION DOUBLE_END DOTS", ")", yylineno); }
-"{"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT BRACE", "{", yylineno); }
-"}"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT BRACE", "}", yylineno); }
-"["     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno); }
-"]"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno); }
-"("     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno); }
-")"     	{ token_count++; add_alpha_token(token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); }
+";"     	{ add_alpha_token(++token_count, "PUNCTUATION SEMICOLON", ";", yylineno); }
+","     	{ add_alpha_token(++token_count, "PUNCTUATION COMMA", ",", yylineno); }
+":"    		{ add_alpha_token(++token_count, "PUNCTUATION UPDOWN DOTS", ")", yylineno); }
+"::"     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBUPDOWN DOTS", ")", yylineno); }
+"."     	{ add_alpha_token(++token_count, "PUNCTUATION END DOT", ")", yylineno); }
+".."     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBLE_END DOTS", ")", yylineno); }
+"{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT BRACE", "{", yylineno); }
+"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACE", "}", yylineno); }
+"["     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno); }
+"]"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno); }
+"("     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno); }
+")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); }
 
 
-{FLOAT}			{ token_count++; add_alpha_token(token_count, "FLOAT", yytext, yylineno);}
-{INTEGER} 		{ token_count++; add_alpha_token(token_count, "INTEGER", yytext, yylineno);}
-{IDENTIFIER} 	{ token_count++; add_alpha_token(token_count, "IDENTIFIER", yytext, yylineno);}
+{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno);}
+{INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno);}
+{IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);}
 
+[ ]+      { }
 . 				yywarning("Undendifined token");
 \n				{ }
 
