@@ -14,6 +14,34 @@ void yyerror(char *text){
     exit(0);
 }
 
+static void skip_multiple_line_comment(void)
+{
+  int c;
+
+  for(;;)
+  { 
+    c = input();
+    switch( c )
+    {
+      case EOF:
+        fprintf(stderr, "Error unclosed comment, expect */\n");
+        exit(-1);
+        goto done;
+      break;
+      case '*':
+        if((c = input()) == '/')
+          goto done;
+        unput(c);
+        break;
+      default:
+        break;
+    }
+  }
+
+    done:
+  /* exit entry */ ;
+}
+
 %}
 
 %x String
@@ -34,15 +62,13 @@ STRING				\"
 
 {STRING}	  			{
     char c;
-    char *buff = malloc(256 * sizeof(char));
+    char *buff = malloc(sizeof(char));
     char tmp;
-    while ((c = input()) != EOF) {
+    while ((c = input())) {
 
         if (c == '\"') {
-
-        add_alpha_token(token_count, "STRING", buff, yylineno);
-        break;
-
+            add_alpha_token(++token_count, "STRING", buff, yylineno);
+            break;
         }
 
         if (c == '\\') {
@@ -68,22 +94,20 @@ STRING				\"
 
 
 "//".*                                    { /* DO NOTHING FOR INSIDE */
-                                                token_count++; add_alpha_token(token_count, "ONELINE COMMENT", "single comment", yylineno);
+                                                add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno);
                                           }
 
-
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */
-                                                token_count++; add_alpha_token(token_count, "MULTILINE COMMENT", "multi comment", yylineno);
-
-                                          }
-
-[/][*]                                    { yy_fatal_error("Unterminated comment"); }
+"/*"              { puts("long comment begins ");
+                    skip_multiple_line_comment();
+                    puts("long comment ends");}
 
 
 
 
-"if"     	{ token_count++; add_alpha_token(token_count, "KEYWORD IF", "if", yylineno); }
-"else"     	{ token_count++; add_alpha_token(token_count, "KEYWORD ELSE", "else", yylineno); }
+
+
+"if"     	{ add_alpha_token(++token_count, "KEYWORD IF", "if", yylineno); }
+"else"     	{ add_alpha_token(++token_count, "KEYWORD ELSE", "else", yylineno); }
 "while"    	{ token_count++; add_alpha_token(token_count, "KEYWORD WHILE", "while", yylineno); }
 "for"     	{ token_count++; add_alpha_token(token_count, "KEYWORD FOR", "for", yylineno); }
 "function"  { token_count++; add_alpha_token(token_count, "KEYWORD FUNCTION", "function", yylineno); }
