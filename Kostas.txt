@@ -16,3 +16,8 @@ if( c == '\') {
             unput(c);
         }
     }
+
+
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */
+                                                add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", "TODO LINES HERE", yylineno);
+                                          }

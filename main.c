@@ -40,10 +40,10 @@ int print_list() {
 
 	printf("---------------- TOKENS ----------------\n#Line  #Token  Value  	   Type\n");
 	while( tmp != NULL ){
-		if(strcmp(tmp->type,"FLOAT") == 0 || strcmp(tmp->type,"INTEGER") == 0 ) {
+		if(strcmp(tmp->type,"FLOAT") == 0 || strcmp(tmp->type,"INTEGER") == 0 || strcmp(tmp->type, "IDENTIFIER") == 0) {
 			printf("%d:     #%d      \"%s\"	   %s %s\n", tmp->line, tmp->token_no, tmp->value, tmp->type, tmp->value);
 		} else if(strcmp(tmp->type,"STRING") == 0) {
-			printf("%d:     #%d      %s	   %s %s\n", tmp->line, tmp->token_no, tmp->value, tmp->type, tmp->value);
+			printf("%d:     #%d      \"%s\"	   %s %s\n", tmp->line, tmp->token_no, tmp->value, tmp->type, tmp->value);
 		} else {
 			printf("%d:     #%d      \"%s\"	   %s\n", tmp->line, tmp->token_no, tmp->value, tmp->type);
 		}
