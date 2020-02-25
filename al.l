@@ -37,17 +37,16 @@ STRING				\"
 {STRING}	  			{
     char c;
     char *buff = malloc(16*sizeof(char));
-	long length=0;
-	long baseofre=16;
+	  long int length = 0;
+	  long int baseofre = 16;
     char tmp;
+    
     while ((c = input())) {
-		length++;
-		if (length>baseofre) {
-			baseofre*=2;
-			printf("realloced to %ld\n",baseofre );
-			buff=realloc(buff, baseofre * sizeof(char));
-
-		}
+		  length++;
+		  if (length > baseofre) {
+			  baseofre *= 2;
+			  buff = realloc(buff, baseofre * sizeof(char));
+	  	}
         if (c == '\"') {
             add_alpha_token(++token_count, "STRING", buff, yylineno);
             break;
@@ -61,13 +60,19 @@ STRING				\"
             char tmp = input();
 
             if (tmp == 't') {
-                strncat(buff, "\t", 1);
+              strcat(buff, "\t");
+
             } else if (tmp == 'n') {
-                strncat(buff, "\n", 1);
+              strcat(buff, "\n");
+
             } else if (tmp == '\\') {
-                strncat(buff, "\\", 1);
+              strcat(buff, "\\");
+
+            } else if (tmp == '\"'){
+              strcat(buff, "\"");
+
             } else {
-                printf("warning: unkown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
+                printf("warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
                 unput(tmp);
             }
         } else   {
@@ -78,12 +83,7 @@ STRING				\"
     }
 }
 
-
-"//".*                                    { /* DO NOTHING FOR INSIDE */
-                                                add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno);
-                                          }
-
-
+"//".*                                    { add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno); }
 
 "/*"         {
           int from[50];
@@ -94,12 +94,11 @@ STRING				\"
           char *buff = malloc(2 * sizeof(char));
           char integer_string[32];
 
-
           for (size_t i = 0; i < 50; i++) {
-            from[i]=0;
-            to[i]=0;
+            from[i] = 0;
+            to[i] = 0;
           }
-          from[0]=yylineno;
+          from[0] = yylineno;
 
           while ((c = input())) {
 
@@ -109,11 +108,13 @@ STRING				\"
                   to[++nestclose] = yylineno;
                   if (nestopen == nestclose) {
                     int tmp = 1;
+
                     sprintf(integer_string, "%d", from[0]);
                     strcat(buff, integer_string);
                     strcat(buff, " - ");
                     sprintf(integer_string, "%d", to[nestopen]);
                     strcat(buff, integer_string);
+
                     add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, from[0]);
 
                     while (from[tmp]!=0) {
@@ -130,7 +131,7 @@ STRING				\"
                     }
                   break;
                  }
-			 }else unput(c);
+			 } else unput(c);
 
             } else if(c == '/') {
                 c = input();
@@ -149,7 +150,7 @@ STRING				\"
 }
 
 
-"if"     	{ add_alpha_token(++token_count, "KEYWORD IF", "if", yylineno); }
+"if"     	  { add_alpha_token(++token_count, "KEYWORD IF", "if", yylineno); }
 "else"     	{ add_alpha_token(++token_count, "KEYWORD ELSE", "else", yylineno); }
 "while"    	{ add_alpha_token(++token_count, "KEYWORD WHILE", "while", yylineno); }
 "for"     	{ add_alpha_token(++token_count, "KEYWORD FOR", "for", yylineno); }
@@ -159,7 +160,7 @@ STRING				\"
 "continue"  { add_alpha_token(++token_count, "KEYWORD CONTINUE", "continue", yylineno); }
 "and"     	{ add_alpha_token(++token_count, "KEYWORD AND", "and", yylineno); }
 "not"     	{ add_alpha_token(++token_count, "KEYWORD NOT", "not", yylineno); }
-"or"     	{ add_alpha_token(++token_count, "KEYWORD OR", "or", yylineno); }
+"or"     	  { add_alpha_token(++token_count, "KEYWORD OR", "or", yylineno); }
 "local"    	{ add_alpha_token(++token_count, "KEYWORD LOCAL", "local", yylineno); }
 "true"     	{ add_alpha_token(++token_count, "KEYWORD TRUE", "true", yylineno); }
 "false"     { add_alpha_token(++token_count, "KEYWORD FALSE", "false", yylineno); }
@@ -182,10 +183,10 @@ STRING				\"
 
 ";"     	{ add_alpha_token(++token_count, "PUNCTUATION SEMICOLON", ";", yylineno); }
 ","     	{ add_alpha_token(++token_count, "PUNCTUATION COMMA", ",", yylineno); }
-":"    		{ add_alpha_token(++token_count, "PUNCTUATION UPDOWN DOTS", ")", yylineno); }
-"::"     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBUPDOWN DOTS", ")", yylineno); }
-"."     	{ add_alpha_token(++token_count, "PUNCTUATION END DOT", ")", yylineno); }
-".."     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBLE_END DOTS", ")", yylineno); }
+":"    		{ add_alpha_token(++token_count, "PUNCTUATION UPDOWN DOTS", ":", yylineno); }
+"::"     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBUPDOWN DOTS", "::", yylineno); }
+"."     	{ add_alpha_token(++token_count, "PUNCTUATION END DOT", ".", yylineno); }
+".."     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBLE_END DOTS", "..", yylineno); }
 "{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT BRACE", "{", yylineno); }
 "}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACE", "}", yylineno); }
 "["     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno); }
@@ -194,12 +195,12 @@ STRING				\"
 ")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); }
 
 
-{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno);}
+{FLOAT}			  { add_alpha_token(++token_count, "FLOAT", yytext, yylineno);}
 {INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno);}
 {IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);}
 
 [ ]+      { }
-. 				yywarning("Undendifined token");
+. 				yywarning("Undefined character");
 \n				{ }
 
 %%
