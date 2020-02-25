@@ -49,7 +49,7 @@ static void skip_multiple_line_comment(void)
 %option yylineno
 
 
-INTEGER				([1-9][0-9]*)
+INTEGER				([0-9]*)
 FLOAT				(0{1}|([1-9]*))\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
@@ -69,6 +69,9 @@ STRING				\"
         if (c == '\"') {
             add_alpha_token(++token_count, "STRING", buff, yylineno);
             break;
+        }
+        if (c == '\n') {
+          yywarning("Not Closing string");
         }
 
         if (c == '\\') {
@@ -101,6 +104,58 @@ STRING				\"
                     skip_multiple_line_comment();
                     puts("long comment ends");}
 
+"/*"         {
+          int from[50];
+          int to[50];
+
+          from[0]=yylineno;
+
+          char c;
+
+          int nestopen=0;
+          int nestclose=-1;
+
+
+
+          while ((c = input())) {
+
+            if (c=='*') {
+                c=input();
+                if (c=='/') {
+                  to[nestopen]=yylineno;
+                  nestclose++;
+                  if (nestopen==nestclose) {
+                        printf("Original comment from %d, to %d\n",from[0],to[0] );
+                        printf("nested from %d , to %d \n",from[1],to[1] );
+                        return 0;
+
+                  }
+
+
+                }
+
+
+            }
+
+            if (c=='/') {
+                c=input();
+                if (c=='*') {
+
+                  from[++nestopen]=yylineno;
+
+
+                }
+
+
+            }
+
+
+          }
+
+
+
+
+}
 
 
 
@@ -155,7 +210,7 @@ STRING				\"
 {INTEGER} 		{ token_count++; add_alpha_token(token_count, "INTEGER", yytext, yylineno);}
 {IDENTIFIER} 	{ token_count++; add_alpha_token(token_count, "IDENTIFIER", yytext, yylineno);}
 
-. 				printf("Uknown character: %s at: %d\n", yytext, yylineno);
+. 				yywarning("Undendifined token");
 \n				{ }
 
 %%
