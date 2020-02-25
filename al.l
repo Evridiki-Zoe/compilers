@@ -78,7 +78,10 @@ STRING				\"
 "/*"         {
           int from[50];
           int to[50];
-
+          for (size_t i = 0; i < 50; i++) {
+            from[i]=0;
+            to[i]=0;
+          }
           from[0]=yylineno;
 
           char c;
@@ -86,29 +89,38 @@ STRING				\"
           int nestopen=0;
           int nestclose=-1;
 
-
-
           while ((c = input())) {
 
             if (c=='*') {
                 c=input();
                 if (c=='/') {
-                  to[nestopen]=yylineno;
-                  nestclose++;
-                  if (nestopen==nestclose) {
-                        printf("Original comment from %d, to %d\n",from[0],to[0] );
-                        printf("nested from %d , to %d \n",from[1],to[1] );
-                        return 0;
+                  to[++nestclose]=yylineno;
 
-                  }
+
+
+                  if (nestopen==nestclose) {
+                    int tmp=1;
+
+                    printf("multi comment from: %d, to: %d\n",from[0],to[nestopen] );
+
+                    while (from[tmp]!=0) {
+
+                      printf("nested from %d , to %d\n",from[tmp],to[nestopen-(tmp++)] );
+
+                    }
+
+                  printf("okay\n" );
+
+                  break;
+                 }
+
+
 
 
                 }
 
 
-            }
-
-            if (c=='/') {
+            }else  if (c=='/') {
                 c=input();
                 if (c=='*') {
 
@@ -123,7 +135,10 @@ STRING				\"
 
           }
 
+          if(nestopen!=nestclose){
 
+          yyerror("Multiline comment don't close");
+        }
 
 
 }
