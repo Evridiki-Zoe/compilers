@@ -13,8 +13,7 @@ void yyerror(char *text){
     printf("Error in line %d : %s\n",yylineno,text );
     exit(0);
 }
-
-
+void commentHandler(int from);
 
 %}
 
@@ -40,7 +39,7 @@ STRING				\"
 	  long int length = 0;
 	  long int baseofre = 16;
     char tmp;
-    
+
     while ((c = input())) {
 		  length++;
 		  if (length > baseofre) {
@@ -83,71 +82,12 @@ STRING				\"
     }
 }
 
-"//".*                                    { add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno); }
 
-"/*"         {
-          int from[50];
-          int to[50];
-          char c;
-          int nestopen=0;
-          int nestclose=-1;
-          char *buff = malloc(2 * sizeof(char));
-          char integer_string[32];
 
-          for (size_t i = 0; i < 50; i++) {
-            from[i] = 0;
-            to[i] = 0;
-          }
-          from[0] = yylineno;
+"//".*                                 	{ add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno); }
 
-          while ((c = input())) {
+"/*"         							{commentHandler(yylineno);	}
 
-            if(c == '*') {
-                c = input();
-                if(c == '/') {
-                  to[++nestclose] = yylineno;
-                  if (nestopen == nestclose) {
-                    int tmp = 1;
-
-                    sprintf(integer_string, "%d", from[0]);
-                    strcat(buff, integer_string);
-                    strcat(buff, " - ");
-                    sprintf(integer_string, "%d", to[nestopen]);
-                    strcat(buff, integer_string);
-
-                    add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, from[0]);
-
-                    while (from[tmp]!=0) {
-                      integer_string[0] = '\0';
-                      buff[0] = '\0';
-
-                      sprintf(integer_string, "%d", from[tmp]);
-                      strcat(buff, integer_string);
-                      strcat(buff, " - ");
-                      sprintf(integer_string, "%d", to[nestopen - tmp]);
-                      strcat(buff, integer_string);
-                      add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, from[tmp]);
-                      tmp++;
-                    }
-                  break;
-                 }
-			 } else unput(c);
-
-            } else if(c == '/') {
-                c = input();
-                if (c == '*') {
-
-                  from[++nestopen]=yylineno;
-			  }else unput(c);
-
-            }
-          }
-
-          if(nestopen!=nestclose){
-
-          yyerror("Multiline comment don't close");
-        }
-}
 
 
 "if"     	  { add_alpha_token(++token_count, "KEYWORD IF", "if", yylineno); }
@@ -204,5 +144,44 @@ STRING				\"
 \n				{ }
 
 %%
+void commentHandler(int from){
+
+	static int nested=0;
+	char c;
+	while ((c = input())) {
+
+		if (c == '*' ) {
+
+			c = input();
+			if ( c == '/') {
+
+				if (nested==0) {
+					printf("ORIGINAL COMMENT from %d , to %d\n",from , yylineno );
+
+					break;
+				}else {
+					printf("NESTED COMMENT from %d , to %d\n",from , yylineno );
+
+					nested--;
+					break;
+				}
+
+			}else unput(c);
+
+		}
+
+		if ( c == '/') {
+			c = input();
+
+			if (c == '*') {
+				nested++;
+				commentHandler(yylineno);
+			}else	unput(c);
+
+		}
+
+
+	}
+}
 
 //MAIN
