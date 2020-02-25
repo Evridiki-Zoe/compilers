@@ -14,37 +14,11 @@ void yyerror(char *text){
     exit(0);
 }
 
-static void skip_multiple_line_comment(void)
-{
-  int c;
 
-  for(;;)
-  { 
-    c = input();
-    switch( c )
-    {
-      case EOF:
-        fprintf(stderr, "Error unclosed comment, expect */\n");
-        exit(-1);
-        goto done;
-      break;
-      case '*':
-        if((c = input()) == '/')
-          goto done;
-        unput(c);
-        break;
-      default:
-        break;
-    }
-  }
-
-    done:
-  /* exit entry */ ;
-}
 
 %}
 
-%x String
+
 %option noyywrap
 %option yylineno
 
@@ -56,7 +30,7 @@ STRING				\"
 
 
 
-%x C
+
 %%
 
 
@@ -100,9 +74,7 @@ STRING				\"
                                                 add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno);
                                           }
 
-"/*"              { puts("long comment begins ");
-                    skip_multiple_line_comment();
-                    puts("long comment ends");}
+
 
 "/*"         {
           int from[50];
