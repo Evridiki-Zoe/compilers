@@ -17,7 +17,6 @@ void commentHandler(int from);
 
 %}
 
-
 %option noyywrap
 %option yylineno
 
@@ -27,17 +26,14 @@ FLOAT				(0{1}|([1-9]*))\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
 
-
-
-
 %%
 
 
 {STRING}	  			{
     char c;
     char *buff = malloc(16*sizeof(char));
-	  long int length = 0;
-	  long int baseofre = 16;
+	long int length = 0;
+	long int baseofre = 16;
     char tmp;
 
     while ((c = input())) {
@@ -135,19 +131,22 @@ STRING				\"
 ")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); }
 
 
-{FLOAT}			  { add_alpha_token(++token_count, "FLOAT", yytext, yylineno);}
+{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno);}
 {INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno);}
 {IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);}
 
-[ ]+      { }
+[ ]+            { }
 . 				yywarning("Undefined character");
 \n				{ }
 
 %%
+
 void commentHandler(int from){
 
 	static int nested=0;
 	char c;
+    char integer_string [5];
+    char *buff = malloc(sizeof(char));
 	while ((c = input())) {
 
 		if (c == '*' ) {
@@ -155,18 +154,29 @@ void commentHandler(int from){
 			c = input();
 			if ( c == '/') {
 
-				if (nested==0) {
-					printf("ORIGINAL COMMENT from %d , to %d\n",from , yylineno );
+				if (nested == 0) {
+                    sprintf(integer_string, "%d", from);
+                    strcat(buff, integer_string);
+                    strcat(buff, " - ");
+                    sprintf(integer_string, "%d", yylineno);
+                    strcat(buff, integer_string);
+                    
+                    add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, yylineno);
 
 					break;
-				}else {
-					printf("NESTED COMMENT from %d , to %d\n",from , yylineno );
-
+				} else {
+                    sprintf(integer_string, "%d", from);
+                    strcat(buff, integer_string);
+                    strcat(buff, " - ");
+                    sprintf(integer_string, "%d", yylineno);
+                    strcat(buff, integer_string);
+                    
+                    add_alpha_token(++token_count, "COMMENT NESTED_COMMENT", buff, yylineno);
 					nested--;
 					break;
 				}
 
-			}else unput(c);
+			} else unput(c);
 
 		}
 
@@ -176,11 +186,8 @@ void commentHandler(int from){
 			if (c == '*') {
 				nested++;
 				commentHandler(yylineno);
-			}else	unput(c);
-
+			} else	unput(c);
 		}
-
-
 	}
 }
 
