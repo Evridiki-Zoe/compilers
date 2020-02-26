@@ -13,7 +13,8 @@ void yyerror(char *text){
     printf("Error in line %d : %s\n",yylineno,text );
     exit(0);
 }
-void commentHandler(int from);
+int commentHandler(int from);
+void stringHandler();
 
 %}
 
@@ -21,68 +22,20 @@ void commentHandler(int from);
 %option yylineno
 
 
-INTEGER				([0-9]*)
+INTEGER				(0{1}|[1-9]*)
 FLOAT				(0{1}|([1-9]*))\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
-
 %%
 
 
-{STRING}	  			{
-    char c;
-    char *buff = malloc(16*sizeof(char));
-	long int length = 0;
-	long int baseofre = 16;
-    char tmp;
 
-    while ((c = input())) {
-		  length++;
-		  if (length > baseofre) {
-			  baseofre *= 2;
-			  buff = realloc(buff, baseofre * sizeof(char));
-	  	}
-        if (c == '\"') {
-            add_alpha_token(++token_count, "STRING", buff, yylineno);
-            break;
-        }
-        if (c == '\n') {
-          yywarning("Not Closing string");
-        }
-
-        if (c == '\\') {
-
-            char tmp = input();
-
-            if (tmp == 't') {
-              strcat(buff, "\t");
-
-            } else if (tmp == 'n') {
-              strcat(buff, "\n");
-
-            } else if (tmp == '\\') {
-              strcat(buff, "\\");
-
-            } else if (tmp == '\"'){
-              strcat(buff, "\"");
-
-            } else {
-                printf("warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
-                unput(tmp);
-            }
-        } else   {
-
-            strncat(buff, &c, 1);
-        }
-
-    }
-}
 
 
 
 "//".*                                 	{ add_alpha_token(++token_count, "COMMENT LINE_COMMENT", "", yylineno); }
 
-"/*"         							{commentHandler(yylineno);	}
+
 
 
 
@@ -134,6 +87,8 @@ STRING				\"
 {FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno);}
 {INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno);}
 {IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);}
+{STRING}	  	{ stringHandler(); }
+"/*"  {commentHandler(yylineno);	}
 
 [ ]+            { }
 . 				yywarning("Undefined character");
@@ -141,7 +96,7 @@ STRING				\"
 
 %%
 
-void commentHandler(int from){
+int commentHandler(int from){
 
 	static int nested=0;
 	char c;
@@ -160,20 +115,20 @@ void commentHandler(int from){
                     strcat(buff, " - ");
                     sprintf(integer_string, "%d", yylineno);
                     strcat(buff, integer_string);
-                    
+
                     add_alpha_token(++token_count, "COMMENT BLOCK_COMMENT", buff, yylineno);
 
-					break;
+					return 0;
 				} else {
                     sprintf(integer_string, "%d", from);
                     strcat(buff, integer_string);
                     strcat(buff, " - ");
                     sprintf(integer_string, "%d", yylineno);
                     strcat(buff, integer_string);
-                    
+
                     add_alpha_token(++token_count, "COMMENT NESTED_COMMENT", buff, yylineno);
 					nested--;
-					break;
+					return 0;
 				}
 
 			} else unput(c);
@@ -189,6 +144,63 @@ void commentHandler(int from){
 			} else	unput(c);
 		}
 	}
+
+	yyerror("Not closing comment");
+	return 0;
 }
+
+void stringHandler(){
+	char c;
+    char *buff = malloc(16*sizeof(char));
+	long int length = 0;
+	long int baseofre = 16;
+    char tmp;
+
+    while ((c = input())) {
+		  length++;
+		  if (length > baseofre) {
+			  baseofre *= 2;
+			  buff = realloc(buff, baseofre * sizeof(char));
+	  	}
+        if (c == '\"') {
+            add_alpha_token(++token_count, "STRING", buff, yylineno);
+            break;
+        }
+        if (c == '\n') {
+          yywarning("Not Closing string");
+        }
+
+        if (c == '\\') {
+
+            char tmp = input();
+
+            if (tmp == 't') {
+              strcat(buff, "\t");
+
+            } else if (tmp == 'n') {
+              strcat(buff, "\n");
+
+            } else if (tmp == '\\') {
+              strcat(buff, "\\");
+
+            } else if (tmp == '\"'){
+              strcat(buff, "\"");
+
+            } else {
+				strcat(buff,"\\");
+				strcat(buff,tmp);
+
+                printf("warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
+                unput(tmp);
+            }
+        } else   {
+
+            strncat(buff, &c, 1);
+        }
+
+    }
+
+}
+
 
 //MAIN
