@@ -1,4 +1,3 @@
-
 %{
 int token_count = 0;
 
@@ -15,7 +14,7 @@ void yyerror(char *text){
     exit(0);
 }
 int commentHandler(int from);
-int stringHandler();
+void stringHandler();
 
 %}
 
@@ -91,7 +90,7 @@ STRING				\"
 {STRING}	  	{ stringHandler(); }
 "/*"  {commentHandler(yylineno);	}
 
-[ \t]+            { }
+[ ]+            { }
 . 				yywarning("Undefined character");
 \n				{ }
 
@@ -150,7 +149,7 @@ int commentHandler(int from){
 	return 0;
 }
 
-int stringHandler(){
+void stringHandler(){
 	char c;
     char *buff = malloc(16*sizeof(char));
 	long int length = 0;
@@ -169,7 +168,6 @@ int stringHandler(){
         }
         if (c == '\n') {
           yywarning("Not Closing string");
-	  return 1; 
         }
 
         if (c == '\\') {
@@ -189,10 +187,10 @@ int stringHandler(){
               strcat(buff, "\"");
 
             } else {
+				strcat(buff,"\\");
+				strcat(buff,tmp);
 
-		strcat(buff,"\\");
-
-                printf("Warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
+                printf("warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
                 unput(tmp);
             }
         } else   {
