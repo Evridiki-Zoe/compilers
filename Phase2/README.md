@@ -8,15 +8,17 @@ Compilers project
 
 <span style = "color: red">Contributors: </span>
 
-    1.  @Evridiki-Zoe
-    2.  @Kampadais
-    3.  @john-zach
+&nbsp;&nbsp;&nbsp;1.&nbsp;&nbsp;&nbsp;[@Evridiki-Zoe](https://github.com/Evridiki-Zoe)
+
+&nbsp;&nbsp;&nbsp;2.&nbsp;&nbsp;&nbsp;[@Kampadais](https://github.com/Kampadais)
+
+&nbsp;&nbsp;&nbsp;3.&nbsp;&nbsp;&nbsp;[@john-zach](https://github.com/john-zach)
 
 Phase 2:
 
 ...
 
-
+wtf(https://github.com/Evridiki-Zoe)
 Task lists:
 
 * [ ] Mercury
