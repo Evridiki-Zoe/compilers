@@ -56,6 +56,7 @@ int print_list() {
 int main(int argc, char *argv[]) {
 	FILE *file;
 
+	
 	if(argc > 1) {
 		if(!(file = fopen(argv[1], "r"))) {
 			fprintf(stderr, "Cannot read file: %s\n", argv[1]);
