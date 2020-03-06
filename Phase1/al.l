@@ -23,8 +23,8 @@ int stringHandler();
 %option yylineno
 
 
-INTEGER				(0{1}|[1-9]*)
-FLOAT				(0{1}|([1-9]*))\.[0-9]+
+INTEGER				([0-9]*)
+FLOAT				([0-9]*)\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
 %%
@@ -103,8 +103,7 @@ int commentHandler(int from){
 	char c;
     char integer_string [5];
     char *buff = malloc(sizeof(char));
-	while ((c = input())) {
-
+	while ((c = input()) != EOF) {
 		if (c == '*' ) {
 
 			c = input();
@@ -157,8 +156,8 @@ int stringHandler(){
 	long int baseofre = 16;
     char tmp;
 
-    while ((c = input())) {
-		  length++;
+    while ((c = input()) != EOF) {
+    		length++;
 		  if (length > baseofre) {
 			  baseofre *= 2;
 			  buff = realloc(buff, baseofre * sizeof(char));
