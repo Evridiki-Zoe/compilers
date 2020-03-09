@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern int alpha_yylex();
+extern struct alpha_token_t * alpha_yylex();
 extern FILE *yyin;
 extern int yylineno;
 extern char *yytext;
@@ -18,7 +18,7 @@ struct alpha_token_t {
 
 struct alpha_token_t *head = NULL;
 
-void add_alpha_token(int token_num, char* type, char* val, int line) {
+struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int line) {
 	struct alpha_token_t *tmp = (struct alpha_token_t *) malloc(sizeof(struct alpha_token_t));
 	tmp->token_no = token_num;
 	tmp->type = type;
@@ -33,6 +33,8 @@ void add_alpha_token(int token_num, char* type, char* val, int line) {
 		while(curr->next) curr = curr->next;  //proxwraw mexri to telos th lista
 		curr->next = tmp;
 	}
+
+	return tmp;
 }
 
 int print_list() {
@@ -53,7 +55,11 @@ int print_list() {
 }
 
 
-int main(int argc, char *argv[]) {
+int main(void) {
+printf("oh hi there\n");
+return yyparse();
+}
+/*int main(int argc, char *argv[]) {
 	FILE *file;
 
 	if(argc > 1) {
@@ -62,7 +68,15 @@ int main(int argc, char *argv[]) {
 		} else {
 			yyin = file;
 		}
-		alpha_yylex(NULL);
+		//alpha_yylex(NULL);
+		struct alpha_token_t* ntoken = alpha_yylex(NULL);
+	        while( ntoken ){
+//			printf("INT TOKEN %d \n", ntoken);
+			printf("MAAAAAAINN %d:     #%d      \"%s\"    %s\n", ntoken->line, ntoken->token_no, ntoken->value, ntoken->type);
+        	        ntoken = alpha_yylex(NULL);
+	        }
+
+
 		print_list();
 		fclose(file);
 	} else {
@@ -73,3 +87,5 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
+*/
+
