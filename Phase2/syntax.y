@@ -11,6 +11,56 @@ extern int yylineno;
 extern char * yyval;
 extern char * yytext;
 
+typedef enum {
+      variable = 0,
+      typical_function_argument = 1,
+      user_func = 2,
+      lib_func = 3
+    } symtype;
+
+
+struct symbol_table_binding{ /*NODE OF THE TABLE*/
+    const char* symbol_name;
+    symtype symbol_type;
+    int line_definition;
+    int scope;
+    struct symbol_table_binding *next;
+};
+
+struct SymTable_struct { /*TABLE*/
+    struct symbol_table_binding* start; /*????????list or hash table????????????????*/
+    int size;
+
+};
+
+struct symbol_table_binding *head_table = NULL;
+
+void insert_symtable(const char* name, symtype sym_type, int line, int scope){
+    struct symbol_table_binding *tmp = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
+    tmp->symbol_name = name;
+    tmp->symbol_type = sym_type;
+    tmp->line_definition = line;
+    tmp->scope = scope;
+    tmp->next = NULL;
+
+    if(head_table == NULL) head_table = tmp;
+  	else {
+  		struct symbol_table_binding* curr = head_table;
+  		while(curr->next) curr = curr->next;  //proxwraw mexri to telos th lista
+  		curr->next = tmp;
+  	}
+
+}
+
+void print_table(){
+/*  struct symbol_table_binding *tmp = head_table;
+
+	while( tmp != NULL ){
+      printf("");
+  }
+*/
+}
+
 %}
 
 /*%glr-parser*/
@@ -64,9 +114,6 @@ extern char * yytext;
 %token STRING
 %token IDENTIFIER
 
-%token COMMENT
-%token START_COMMENT
-%token END_COMMENT
 
 %token exit_cmd
 /*%token <num> number
@@ -89,8 +136,8 @@ extern char * yytext;
 %left	L_PARENTHES R_PARENTHES
 %left	L_CBRANCKET R_CBRANCKET
 
-%nonassoc IF
-%nonassoc ELSE
+%left IF
+%left ELSE
 
 
 %%
