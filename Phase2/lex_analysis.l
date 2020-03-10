@@ -44,7 +44,6 @@ TRUE     "true"
 FALSE    "false"
 NIL      "nil"
 
-
 EQ		"="
 PLUS		"+"
 MINUS		"-"
@@ -77,11 +76,6 @@ INTEGER				([0-9]+)
 FLOAT				([0-9]+)\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
-
-
-COMMENT		"//".*
-START_COMMENT	"/*"
-END_COMMENT	"*/"
 
 %%
 
@@ -133,10 +127,10 @@ END_COMMENT	"*/"
 ")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno);return R_PARENTHES; }
 
 
-{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval=atoi(yytext); return FLOAT;}
-{INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno); yylval=atoi(yytext); return INTEGER;}
-{IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);	yylval = yytext; return IDENTIFIER;}
-{STRING}	  	{ stringHandler(); }
+{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval = atof(yytext); return FLOAT;}
+{INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno); yylval = atoi(yytext); return INTEGER;}
+{IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);	yylval = strdup(yytext); return IDENTIFIER;}
+{STRING}	  	{ stringHandler(); return STRING; } //TODO uparxei periptwsh na einai lathos kai na prepei to return string na brisketai sthn stringHandler
 "/*"  { commentHandler(yylineno);	}
 
 [ \t]+            { }
