@@ -59,15 +59,22 @@ int print_list() {
 
 int main(void) {
 printf("oh hi parser\n");
-insert_hash_table("name",0, 1,2);
-insert_hash_table("name1",2, 1,2);
-insert_hash_table("name3",0, 2,4);
-insert_hash_table("name1",8, 1,2);
-insert_hash_table("name3",9, 2,4);
-insert_hash_table("name3",9, 2,4);
 
+/*init library functions = 3 */
+insert_hash_table("print", 3 , 0, 0);
+insert_hash_table("input", 3 , 0, 0);
+insert_hash_table("objectmemberkeys", 3 , 0, 0);
+insert_hash_table("objecttotalmembers", 3 , 0, 0);
+insert_hash_table("objectcopy", 3 , 0, 0);
+insert_hash_table("totalarguments", 3 , 0, 0);
+insert_hash_table("argument", 3 , 0, 0);
+insert_hash_table("typeof", 3 , 0, 0);
+insert_hash_table("stronum", 3 , 0, 0);
+insert_hash_table("sqrt", 3 , 0, 0);
+insert_hash_table("cos", 3 , 0, 0);
+insert_hash_table("sin", 3 , 0, 0);
 
-print_table();
+//print_table();
 
 return yyparse();
 }
