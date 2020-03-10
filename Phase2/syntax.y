@@ -37,7 +37,6 @@ struct SymTable_struct { /*TABLE*/
 
 struct SymTable_struct *table = NULL;
 
-
 int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, int scope);
 void print_table();
 
@@ -206,12 +205,16 @@ void print_table(){
 %token IDENTIFIER
 
 
-%token exit_cmd
-/*%token <num> number
-%token <id> identifier
-%type <num> program exp term
-%type <id> assignment
-*/
+/*The %union declaration modifies the type of yylval*/
+%union
+{
+    int intValue;
+    float floatValue;
+    char *stringValue;
+}
+%type<intValue> INTEGER
+%type<floatValue> FLOAT
+%type<stringValue> IDENTIFIER
 
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
@@ -367,15 +370,15 @@ funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { printf(RED "funcdef::
          | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block { printf(RED "funcdef:: function id (idlist) block\n" RESET); }
          ;
 
-const    : number { printf("%d\n",($1)); printf(RED "const:: number\n" RESET); }
+const    : number { printf(RED "const:: number\n" RESET); }
          | STRING { printf(RED "const:: str\n" RESET); }
          | NIL { printf(RED "const:: nil\n" RESET); }
          | TRUE { printf(RED "const:: true\n" RESET); }
          | FALSE { printf(RED "const:: false\n" RESET); }
          ;
 
-number   : INTEGER { printf(RED "integer\n" RESET); }
-         | FLOAT { printf(RED "float\n" RESET); }
+number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
+         | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
 idlist   : IDENTIFIER multi_id { printf(RED "idlist:: id multi_id\n" RESET); }
