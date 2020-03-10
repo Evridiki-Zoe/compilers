@@ -1,12 +1,14 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <assert.h>
+#include <string.h>
 
 #define RED   "\x1B[31m"
 #define RESET "\x1B[0m"
 
 int yyerror (char* s);
-
 extern int yylineno;
 extern char * yyval;
 extern char * yytext;
@@ -28,14 +30,18 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 };
 
 struct SymTable_struct { /*TABLE*/
-    struct symbol_table_binding* start; /*????????list or hash table????????????????*/
-    int size;
+    struct symbol_table_binding **pinakas;
+    int total_size;
 
 };
 
-struct symbol_table_binding *head_table = NULL;
+struct SymTable_struct *table = NULL;
 
-void insert_symtable(const char* name, symtype sym_type, int line, int scope){
+
+int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, int scope);
+void print_table();
+
+/*void insert_symtable_binding(const char* name, symtype sym_type, int line, int scope){
     struct symbol_table_binding *tmp = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
     tmp->symbol_name = name;
     tmp->symbol_type = sym_type;
@@ -51,14 +57,99 @@ void insert_symtable(const char* name, symtype sym_type, int line, int scope){
   	}
 
 }
-
-void print_table(){
-/*  struct symbol_table_binding *tmp = head_table;
-
-	while( tmp != NULL ){
-      printf("");
-  }
 */
+
+/*hash function for mapping symbols in table*/
+int hash_function(char *name){
+  size_t ui;
+  unsigned int uiHash = 0U;
+
+  for (ui = 0U; name[ui] != '\0'; ui++)
+          uiHash =uiHash* 65599+ name[ui];
+
+  return uiHash% 100 ;
+}
+
+/*creates a new table if NULL
+and inserts symbol in table*/
+int insert_hash_table(const char* name, symtype sym_type, int line, int scope){
+  /*an den uparxei ftiagmeno table, to ftiaxnw*/
+  if(table == NULL){
+      table = malloc(sizeof(struct SymTable_struct *));
+
+      table->pinakas = malloc(100*sizeof(struct symbol_table_binding*));
+      table->total_size = 0;
+  }
+
+  int mapping = 0;
+  struct symbol_table_binding *newnode;
+  assert(table && name);
+
+  if(SymTable_contains(table, name, sym_type, line, scope) == 1
+          || SymTable_contains(table, name, sym_type, line, scope) == 2)  return 0;
+
+  mapping = hash_function(name);
+
+  newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
+  newnode->symbol_name = name;
+  newnode->symbol_type = sym_type;
+  newnode->line_definition = line;
+  newnode->scope = scope;
+
+
+  newnode->next = table->pinakas[mapping]; /*to bazw sthn arxh ths listas*/
+  table->pinakas[mapping] = newnode;
+  table->total_size++;
+
+  return 1;
+}
+
+/* checks if symbol already exists in table
+returns 1 if symbol exists everything exactly the same
+returns 2 if symbol exists only name the same!
+returns 0 if it doesn't exist
+*/
+int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, int scope){
+    struct symbol_table_binding *check_existance;
+    int hash=0;
+    assert(table && name);
+
+    hash=hash_function(name);/*briskw pou kanei hash to stoixeio*/
+    check_existance= table->pinakas[hash];/*paw se ayth th thesh*/
+
+    /*elegxw an uparxeihdh to stoixeio pou thelw na prosthesw*/
+    while(check_existance){
+            if(strcmp(check_existance->symbol_name, name)==0 ){
+                if(check_existance->symbol_type == sym_type &&
+                      check_existance->line_definition == line &&
+                      check_existance->scope == scope ) return 1;/*uparxei akribws idio*/
+
+            return 2; /*uparxei to idio name alla oxi idia ta upoloipa*/
+            }
+            check_existance=check_existance->next;
+    }
+
+    return 0;
+
+}
+
+/*prints table*/
+void print_table(){
+  int i = 0;
+  if(table == NULL){
+    printf("table is empty");
+    return ;
+  }
+
+  for(i = 0; i < 100; i++ ){
+    printf("printing %d list \n", i);
+    struct symbol_table_binding * curr = table->pinakas[i];
+    while(curr != NULL){
+      printf("name: %s", curr->symbol_name);
+      curr = curr-> next;
+    }
+    printf("\n");
+  }
 }
 
 %}
