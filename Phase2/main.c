@@ -8,6 +8,8 @@ extern int yylineno;
 extern char *yytext;
 extern int token_count;
 
+void print_table();
+
 struct alpha_token_t {
 	unsigned int 			line;
 	unsigned int 			token_no;
@@ -56,7 +58,17 @@ int print_list() {
 
 
 int main(void) {
-printf("oh hi there\n");
+printf("oh hi parser\n");
+insert_hash_table("name",0, 1,2);
+insert_hash_table("name1",2, 1,2);
+insert_hash_table("name3",0, 2,4);
+insert_hash_table("name1",8, 1,2);
+insert_hash_table("name3",9, 2,4);
+insert_hash_table("name3",9, 2,4);
+
+
+print_table();
+
 return yyparse();
 }
 /*int main(int argc, char *argv[]) {
@@ -88,4 +100,3 @@ return yyparse();
 	return 0;
 }
 */
-
