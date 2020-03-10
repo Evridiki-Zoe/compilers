@@ -127,10 +127,10 @@ STRING				\"
 ")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno);return R_PARENTHES; }
 
 
-{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval = atof(yytext); return FLOAT;}
-{INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno); yylval = atoi(yytext); return INTEGER;}
-{IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);	yylval = strdup(yytext); return IDENTIFIER;}
-{STRING}	  	{ stringHandler(); return STRING; } //TODO uparxei periptwsh na einai lathos kai na prepei to return string na brisketai sthn stringHandler
+{FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval.floatValue = atof(yytext); return FLOAT;}
+{INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno); yylval.intValue = atoi(yytext); return INTEGER;}
+{IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);	yylval.stringValue = strdup(yytext); return IDENTIFIER;}
+{STRING}	  	{ stringHandler(); yylval.stringValue = strdup(yytext); return STRING; } //TODO uparxei periptwsh na einai lathos kai na prepei to return string na brisketai sthn stringHandler
 "/*"  { commentHandler(yylineno);	}
 
 [ \t]+            { }
