@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 extern struct alpha_token_t * alpha_yylex();
 extern FILE *yyin;
 extern int yylineno;
 extern char *yytext;
 extern int token_count;
+extern int global_scope; // current scope we are right now, as we do the syntactic analysis
 
 //------------------------- LEX ----------------------------
 void print_table();
@@ -32,7 +34,6 @@ struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int 
 
 	if(head == NULL) head = tmp;
 	else {
-//		printf("going to the end of the list !!!\n");
 		struct alpha_token_t* curr = head;
 		while(curr->next) curr = curr->next;  //proxwraw mexri to telos th lista
 		curr->next = tmp;
@@ -58,7 +59,9 @@ int print_list() {
 	return 0;
 }
 
+
 //------------------------- YACC ---------------------------------
+
 
 typedef enum {
       variable = 0,
@@ -72,7 +75,8 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
     const char* symbol_name;
     symtype symbol_type;
     int line_definition;
-    int scope;
+		bool active;
+		int scope;
     struct symbol_table_binding *next;
 };
 
@@ -84,7 +88,7 @@ struct SymTable_struct { /*TABLE*/
 
 struct SymTable_struct *table = NULL;
 
-int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, int scope);
+int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope);
 void print_table();
 
 /*void insert_symtable_binding(const char* name, symtype sym_type, int line, int scope){
@@ -118,7 +122,7 @@ int hash_function(const char *name){
 
 /*creates a new table if NULL
 and inserts symbol in table*/
-int insert_hash_table(const char* name, symtype sym_type, int line, int scope){
+int insert_hash_table(const char* name, symtype sym_type, int line,bool active, int scope){
   /*an den uparxei ftiagmeno table, to ftiaxnw*/
   if(table == NULL){
       table = malloc(sizeof(struct SymTable_struct *));
@@ -131,8 +135,8 @@ int insert_hash_table(const char* name, symtype sym_type, int line, int scope){
   struct symbol_table_binding *newnode;
   assert(table && name);
 
-  if(SymTable_contains(table, name, sym_type, line, scope) == 1
-          || SymTable_contains(table, name, sym_type, line, scope) == 2)  return 0;
+  if(SymTable_contains(table, name, sym_type, line, active, scope) == 1
+          || SymTable_contains(table, name, sym_type, line, active, scope) == 2)  return 0;
 
   mapping = hash_function(name);
 
@@ -141,7 +145,7 @@ int insert_hash_table(const char* name, symtype sym_type, int line, int scope){
   newnode->symbol_type = sym_type;
   newnode->line_definition = line;
   newnode->scope = scope;
-
+  newnode->active = active;
 
   newnode->next = table->pinakas[mapping]; /*to bazw sthn arxh ths listas*/
   table->pinakas[mapping] = newnode;
@@ -155,7 +159,7 @@ returns 1 if symbol exists everything exactly the same
 returns 2 if symbol exists only name the same!
 returns 0 if it doesn't exist
 */
-int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, int scope){
+int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line,bool active, int scope){
     struct symbol_table_binding *check_existance;
     int hash=0;
     assert(table && name);
@@ -168,6 +172,7 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
             if(strcmp(check_existance->symbol_name, name)==0 ){
                 if(check_existance->symbol_type == sym_type &&
                       check_existance->line_definition == line &&
+											check_existance->active == active &&
                       check_existance->scope == scope ) return 1;/*uparxei akribws idio*/
 
             return 2; /*uparxei to idio name alla oxi idia ta upoloipa*/
@@ -176,6 +181,31 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
     }
 
     return 0;
+
+}
+
+/* MPOREI NA THELEI DIORTHWSH !!!!!!!
+
+finds symbol and sets active status to false*/
+void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_type, int line,bool active, int scope){
+	struct symbol_table_binding *tmp;
+	int hash=0;
+	assert(table && name);
+
+	if(SymTable_contains(table, name, sym_type, line, active, scope) == 0) return; //it doesnt exist
+
+	hash=hash_function(name);/*briskw pou kanei hash to stoixeio*/
+	tmp = table->pinakas[hash];/*paw se ayth th thesh*/
+
+	while(tmp){
+					if(strcmp(tmp->symbol_name, name)==0 &&
+										tmp->symbol_type == sym_type &&
+										tmp->line_definition == line &&
+										tmp->active == active &&
+										tmp->scope == scope ) tmp->active = false; /*set active status to false*/
+
+					tmp=tmp->next;
+	}
 
 }
 
@@ -202,18 +232,18 @@ int main(void) {
 printf("oh hi parser\n");
 
 /*init library functions = 3 */
-insert_hash_table("print", 3 , 0, 0);
-insert_hash_table("input", 3 , 0, 0);
-insert_hash_table("objectmemberkeys", 3 , 0, 0);
-insert_hash_table("objecttotalmembers", 3 , 0, 0);
-insert_hash_table("objectcopy", 3 , 0, 0);
-insert_hash_table("totalarguments", 3 , 0, 0);
-insert_hash_table("argument", 3 , 0, 0);
-insert_hash_table("typeof", 3 , 0, 0);
-insert_hash_table("stronum", 3 , 0, 0);
-insert_hash_table("sqrt", 3 , 0, 0);
-insert_hash_table("cos", 3 , 0, 0);
-insert_hash_table("sin", 3 , 0, 0);
+insert_hash_table("print", 3 , 0, true, 0);
+insert_hash_table("input", 3 , 0, true, 0);
+insert_hash_table("objectmemberkeys", 3 , 0, true, 0);
+insert_hash_table("objecttotalmembers", 3 , 0, true, 0);
+insert_hash_table("objectcopy", 3 , 0, true, 0);
+insert_hash_table("totalarguments", 3 , 0, true, 0);
+insert_hash_table("argument", 3 , 0, true, 0);
+insert_hash_table("typeof", 3 , 0, true, 0);
+insert_hash_table("stronum", 3 , 0, true, 0);
+insert_hash_table("sqrt", 3 , 0, true, 0);
+insert_hash_table("cos", 3 , 0, true, 0);
+insert_hash_table("sin", 3 , 0, true, 0);
 
 //print_table();
 
