@@ -8,6 +8,8 @@
 #define RESET "\x1B[0m"
 
 int yyerror (char* s);
+int global_scope; // current scope we are right now, as we do the syntactic analysis
+
 extern int yylineno;
 extern char * yyval;
 extern char * yytext;
