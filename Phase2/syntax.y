@@ -90,12 +90,12 @@ extern char * yytext;
 %left	MULT DIV MOD
 %right	NOT PPLUS MMINUS
 %left	DOT DOTS
-%left	L_SBRANCKET R_SBRANCKET
+%left	L_SBRACKET R_SBRACKET
 %left	L_PARENTHES R_PARENTHES
-%left	L_CBRANCKET R_CBRANCKET
+%left	L_CBRACKET R_CBRACKET
 
-%left IF
-%left ELSE
+%nonassoc IF
+%nonassoc ELSE
 
 
 %%
@@ -123,8 +123,6 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       ;
 
 /*    expr 	: assignmexpr
-      		| expr AND expr
-      		| expr OR expr
       		| expr PLUS expr {$$ = $1 + $3;}
       		| expr MINUS expr {$$ = $1 - $3;}
       		| expr MULT expr {$$ = $1 * $3;}
@@ -138,6 +136,8 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       		| expr LESS expr
       		| expr GREATER_EQUAL expr
       		| expr LESS_EQUAL expr
+          | expr AND expr
+          | expr OR expr
       		| term
       		;
 
