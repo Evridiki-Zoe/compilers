@@ -11,8 +11,9 @@ extern char *yytext;
 extern int token_count;
 extern int global_scope; // current scope we are right now, as we do the syntactic analysis
 
-//------------------------- LEX ----------------------------
 void print_table();
+
+//------------------------- LEX ----------------------------
 
 struct alpha_token_t {
 	unsigned int 			line;
