@@ -71,7 +71,27 @@ typedef enum {
       lib_func = 3
     } symtype;
 
+//=================mporei na mhn xreiastoun ayta=========================
+struct arguments {
+	const char * name;
+	struct arguments *next;
+};
 
+typedef struct Variable{
+    const char* name;
+		unsigned int line;
+		unsigned int scope;
+
+}Variable;
+
+typedef struct function{
+    const char* name;
+		unsigned int line;
+		unsigned int scope;
+		struct arguments *args_list;
+
+}function;
+//===========================================================
 struct symbol_table_binding{ /*NODE OF THE TABLE*/
     const char* symbol_name;
     symtype symbol_type;
