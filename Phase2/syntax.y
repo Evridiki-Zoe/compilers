@@ -94,8 +94,8 @@ extern char * yytext;
 %left	L_PARENTHES R_PARENTHES
 %left	L_CBRACKET R_CBRACKET
 
-%nonassoc IF
-%nonassoc ELSE
+%left IF
+%left ELSE
 
 
 %%
@@ -103,8 +103,8 @@ extern char * yytext;
 /*description of expected inputs*/
 
 program  :  multi_stmts
-         | /*empty*/		{printf("empty statement\n");}
          ;
+
 
 multi_stmts : stmt multi_stmts
             | /*empty*/
