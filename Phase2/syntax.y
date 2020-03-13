@@ -14,6 +14,7 @@ int global_scope; // current scope we are right now, as we do the syntactic anal
 extern int yylineno;
 extern char * yytext;
 
+void print_table();
 
 %}
 
@@ -246,15 +247,9 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 %%
 
-int yyerror (char* s){
-   printf("%s: at line %d, before token: '%s'\n", s, yylineno, yytext);
-}
-
-
 
 int main(void) {
 
-/*init library functions = 3 */
 insert_hash_table("print", 3 , 0, true, 0);
 insert_hash_table("input", 3 , 0, true, 0);
 insert_hash_table("objectmemberkeys", 3 , 0, true, 0);
