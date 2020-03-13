@@ -210,10 +210,6 @@ int stringHandler(){
             add_alpha_token(++token_count, "STRING", buff, yylineno);
             break;
         }
-        if (c == '\n') {
-          yywarning("Not Closing string");
-	  return 1;
-        }
 
         if (c == '\\') {
 
@@ -244,5 +240,6 @@ int stringHandler(){
         }
 
     }
+	yyerror("Not closing string");
 
 }

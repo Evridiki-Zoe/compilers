@@ -156,7 +156,7 @@ int stringHandler(){
 	long int baseofre = 16;
     char tmp;
 
-    while ((c = input()) != EOF) {
+    while ((c = input()) ) {
     		length++;
 		  if (length > baseofre) {
 			  baseofre *= 2;
@@ -197,6 +197,7 @@ int stringHandler(){
         }
 
     }
+	yyerror("not closing string");
 
 }
 
