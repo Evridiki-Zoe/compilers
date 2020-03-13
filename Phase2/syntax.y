@@ -105,7 +105,6 @@ extern char * yytext;
 program  :  multi_stmts
          ;
 
-
 multi_stmts : stmt multi_stmts
             | /*empty*/
             ;
@@ -122,26 +121,6 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | SEMICOLON { printf(RED "semicolon \n" RESET);}
       ;
 
-/*    expr 	: assignmexpr
-      		| expr PLUS expr {$$ = $1 + $3;}
-      		| expr MINUS expr {$$ = $1 - $3;}
-      		| expr MULT expr {$$ = $1 * $3;}
-      		| expr DIV expr {   if($3 == 0)
-                                  yyerror("divide by zero");
-                              else $$ = $1 / $3; }
-      		| expr MOD expr {$$ = $1 % $3;}
-      		| expr EQUAL expr
-      		| expr NEQUAL expr
-      		| expr GREATER expr
-      		| expr LESS expr
-      		| expr GREATER_EQUAL expr
-      		| expr LESS_EQUAL expr
-          | expr AND expr
-          | expr OR expr
-      		| term
-      		;
-
-*/
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
       | expr op expr { printf(RED " EXPR OP EXPR\n" RESET);}
       | term { printf(RED "TERM \n" RESET);}
@@ -176,7 +155,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 assignmexpr   : lvalue EQ expr { printf(RED "lvalue=expression\n" RESET); }
               ;
 
-primary  :  lvalue { printf(RED "primary:: lvalue\n" RESET); }
+primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | call { printf(RED "primary:: call\n" RESET); }
          | objectdef { printf(RED "primary:: objectdef\n" RESET); }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
@@ -212,11 +191,12 @@ multi_exprs	:  COMMA expr multi_exprs { printf(RED "multiexpr commma expr exprs\
         		|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
         		;
 
-objectdef   :  elist OR  indexed { printf(RED "objectdef:: \n" RESET); }
+objectdef   :  L_SBRACKET elist OR  indexed R_SBRACKET  { printf(RED "objectdef:: \n" RESET); }
             |  /*empty*/ { printf(RED "objectdef:: empty\n" RESET); }
             ;
 
 indexed     : indexedelem  multi_indexedelem { printf(RED "indexed:: indexedelement multi\n" RESET); }
+            | /*empty*/
             ;
 
 multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_indexedelem:: comma indelem multi\n" RESET); }
@@ -226,8 +206,7 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
 indexedelem		: L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
-block   :  L_CBRACKET  R_CBRACKET { printf(RED "block:: {}\n" RESET); }
-        |  L_CBRACKET stmt multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi stmt}\n" RESET); }
+block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {multi stmt}\n" RESET); }
         ;
 
 funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { printf(RED "funcdef:: function (idlist)block\n" RESET); }
