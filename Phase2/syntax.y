@@ -126,7 +126,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
       |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);}
       |  expr MULT expr { printf(RED "expr * expr \n" RESET);}
       |  expr DIV expr { printf(RED "expr / expr \n" RESET);}
-      |  expr MOD expr { printf(RED "expr % expr \n" RESET);}
+      |  expr MOD expr { printf(RED "expr mod expr \n" RESET);}
       |  expr GREATER expr { printf(RED "expr > expr \n" RESET);}
       |  expr GREATER_EQUAL expr { printf(RED "expr >= expr \n" RESET);}
       |  expr LESS expr { printf(RED "expr < expr \n" RESET);}
