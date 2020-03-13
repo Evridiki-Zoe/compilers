@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define RED   "\x1B[31m"
 #define RESET "\x1B[0m"
@@ -249,4 +250,27 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 int yyerror (char* s){
    printf("%s: at line %d, before token: '%s'\n", s, yylineno, yytext);
+}
+
+
+
+int main(void) {
+
+/*init library functions = 3 */
+insert_hash_table("print", 3 , 0, true, 0);
+insert_hash_table("input", 3 , 0, true, 0);
+insert_hash_table("objectmemberkeys", 3 , 0, true, 0);
+insert_hash_table("objecttotalmembers", 3 , 0, true, 0);
+insert_hash_table("objectcopy", 3 , 0, true, 0);
+insert_hash_table("totalarguments", 3 , 0, true, 0);
+insert_hash_table("argument", 3 , 0, true, 0);
+insert_hash_table("typeof", 3 , 0, true, 0);
+insert_hash_table("strtonum", 3 , 0, true, 0);
+insert_hash_table("sqrt", 3 , 0, true, 0);
+insert_hash_table("cos", 3 , 0, true, 0);
+insert_hash_table("sin", 3 , 0, true, 0);
+
+print_table();
+
+return yyparse();
 }
