@@ -191,8 +191,10 @@ multi_exprs	:  COMMA expr multi_exprs { printf(RED "multiexpr commma expr exprs\
         		|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
         		;
 
-objectdef   :  L_SBRACKET elist OR  indexed R_SBRACKET  { printf(RED "objectdef:: \n" RESET); }
-            |  /*empty*/ { printf(RED "objectdef:: empty\n" RESET); }
+
+/*DEN HTAN OR AYTO POU EIXE EKEI*/
+objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET); }
+            |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
             ;
 
 indexed     : indexedelem  multi_indexedelem { printf(RED "indexed:: indexedelement multi\n" RESET); }
@@ -206,7 +208,7 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
 indexedelem		: L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
-block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {multi stmt}\n" RESET); }
+block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi stmt}\n" RESET); }
         ;
 
 funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { printf(RED "funcdef:: function (idlist)block\n" RESET); }
