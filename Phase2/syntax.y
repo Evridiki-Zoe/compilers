@@ -12,7 +12,6 @@ int yyerror (char* s);
 int global_scope; // current scope we are right now, as we do the syntactic analysis
 
 extern int yylineno;
-extern char * yyval;
 extern char * yytext;
 
 
@@ -99,10 +98,9 @@ extern char * yytext;
 %left ELSE
 
 
+
 %%
-
-/*description of expected inputs*/
-
+/*grammar rules*/
 program  :  multi_stmts
          ;
 
