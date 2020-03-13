@@ -122,24 +122,20 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       ;
 
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
-      | expr op expr { printf(RED " EXPR OP EXPR\n" RESET);}
+      |  expr PLUS expr { printf(RED "expr+exp \n" RESET);}
+      |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);}
+      |  expr MULT expr { printf(RED "expr * expr \n" RESET);}
+      |  expr DIV expr { printf(RED "expr / expr \n" RESET);}
+      |  expr MOD expr { printf(RED "expr % expr \n" RESET);}
+      |  expr GREATER expr { printf(RED "expr > expr \n" RESET);}
+      |  expr GREATER_EQUAL expr { printf(RED "expr >= expr \n" RESET);}
+      |  expr LESS expr { printf(RED "expr < expr \n" RESET);}
+      |  expr LESS_EQUAL expr { printf(RED "expr < = expr \n" RESET);}
+      |  expr EQUAL expr { printf(RED "expr == expr \n" RESET);}
+      |  expr NEQUAL expr { printf(RED "expr != expr \n" RESET);}
+      |  expr AND expr { printf(RED "expr and expr \n" RESET);}
+      |  expr OR expr { printf(RED "expr or expr \n" RESET);}
       | term { printf(RED "TERM \n" RESET);}
-      ;
-
-
-op    : PLUS
-      | MINUS
-      | MULT
-      | DIV
-      | MOD
-      | GREATER
-      | GREATER_EQUAL
-      | LESS
-      | LESS_EQUAL
-      | EQUAL
-      | NEQUAL
-      | AND
-      | OR
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
@@ -198,12 +194,11 @@ objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" 
             ;
 
 indexed     : indexedelem  multi_indexedelem { printf(RED "indexed:: indexedelement multi\n" RESET); }
-            | /*empty*/
             ;
 
 multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_indexedelem:: comma indelem multi\n" RESET); }
-    | /*empty*/ { printf(RED "multi_indexedelem:: empty\n" RESET); }
-    ;
+                  | /*empty*/ { printf(RED "multi_indexedelem:: empty\n" RESET); }
+                  ;
 
 indexedelem		: L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
