@@ -17,6 +17,12 @@ void yywarning(char *text){
     printf("Error in line %d : %s\n",yylineno,text );
     exit(0);
 }*/
+
+
+int yyerror (char* s){
+   printf("Error in line %d, before token: '%s'\n", yylineno, yytext);
+}
+
 int commentHandler(int from);
 int stringHandler();
 
@@ -28,7 +34,7 @@ int stringHandler();
 %option noyywrap
 %option yylineno
 
-IF 		   "if"
+IF  	   "if"
 ELSE     "else"
 WHILE    "while"
 FOR      "for"
@@ -193,6 +199,7 @@ int commentHandler(int from){
 	return 0;
 }
 
+
 int stringHandler(){
 	char c;
     char *buff = malloc(16*sizeof(char));
@@ -200,16 +207,17 @@ int stringHandler(){
 	long int baseofre = 16;
     char tmp;
 
-    while ((c = input()) != EOF) {
-		  length++;
+    while ((c = input()) ) {
+    		length++;
 		  if (length > baseofre) {
 			  baseofre *= 2;
 			  buff = realloc(buff, baseofre * sizeof(char));
 	  	}
         if (c == '\"') {
             add_alpha_token(++token_count, "STRING", buff, yylineno);
-            break;
+            return 1;
         }
+
 
         if (c == '\\') {
 
@@ -240,6 +248,6 @@ int stringHandler(){
         }
 
     }
-	yyerror("Not closing string");
+	yyerror("not closing string");
 
 }
