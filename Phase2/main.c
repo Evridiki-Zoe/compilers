@@ -239,6 +239,7 @@ void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_ty
 
 }
 
+
 /*prints table*/
 void print_table(){
   int i = 0;
@@ -248,13 +249,13 @@ void print_table(){
   }
 
   for(i = 0; i < 100; i++ ){
-    printf("printing %d list \n", i);
+    printf("%d::		", i);
     struct symbol_table_binding * curr = table->pinakas[i];
     while(curr != NULL){
 			if(curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)
-      			printf("VARIABLE name: %s", curr->value.func->name);
+      			printf("VARIABLE name: %s, line: %d, scope: %d ", curr->value.var->name, curr->value.var->line, curr->value.var->scope);
 		  if(curr->symbol_type == 3 || curr->symbol_type == 4)
-			 			printf("FUNCTION name: %s", curr->value.func->name);
+			 			printf("FUNCTION name: %s, line: %d, scope: %d ", curr->value.func->name, curr->value.func->line, curr->value.func->scope);
       curr = curr-> next;
     }
     printf("\n");
