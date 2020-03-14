@@ -78,8 +78,8 @@ R_SBRACKET	\]
 L_PARENTHES	\(
 R_PARENTHES	\)
 
-INTEGER				([0-9]+)
-FLOAT				([0-9]+)\.[0-9]+
+INTEGER				([0-9]*)
+FLOAT				([0-9]*)\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
 
