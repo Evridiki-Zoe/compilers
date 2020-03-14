@@ -9,7 +9,7 @@ extern FILE *yyin;
 extern int yylineno;
 extern char *yytext;
 extern int token_count;
-extern int global_scope; // current scope we are right now, as we do the syntactic analysis
+extern int scope; // current scope we are right now, as we do the syntactic analysis
 
 void print_table();
 
