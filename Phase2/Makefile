@@ -1,10 +1,7 @@
 all:
-	flex al.l
-	gcc -o al main.c lex.yy.c
-
-clear:
-	rm al
-	rm lex.yy.c
+	flex lex_analysis.l 
+	yacc -d syntax.y
+	gcc -g lex.yy.c  y.tab.c main.c -o first
 
 test:
-	./al input.txt
+	./first

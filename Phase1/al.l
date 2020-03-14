@@ -1,3 +1,4 @@
+
 %{
 int token_count = 0;
 
@@ -14,7 +15,7 @@ void yyerror(char *text){
     exit(0);
 }
 int commentHandler(int from);
-void stringHandler();
+int stringHandler();
 
 %}
 
@@ -22,8 +23,8 @@ void stringHandler();
 %option yylineno
 
 
-INTEGER				(0{1}|[1-9]*)
-FLOAT				(0{1}|([1-9]*))\.[0-9]+
+INTEGER				([0-9]*)
+FLOAT				([0-9]*)\.[0-9]+
 IDENTIFIER    		[a-zA-Z][a-zA-Z0-9_]*
 STRING				\"
 %%
@@ -90,7 +91,7 @@ STRING				\"
 {STRING}	  	{ stringHandler(); }
 "/*"  {commentHandler(yylineno);	}
 
-[ ]+            { }
+[ \t]+            { }
 . 				yywarning("Undefined character");
 \n				{ }
 
@@ -102,8 +103,7 @@ int commentHandler(int from){
 	char c;
     char integer_string [5];
     char *buff = malloc(sizeof(char));
-	while ((c = input())) {
-
+	while ((c = input()) != EOF) {
 		if (c == '*' ) {
 
 			c = input();
@@ -149,15 +149,15 @@ int commentHandler(int from){
 	return 0;
 }
 
-void stringHandler(){
+int stringHandler(){
 	char c;
     char *buff = malloc(16*sizeof(char));
 	long int length = 0;
 	long int baseofre = 16;
     char tmp;
 
-    while ((c = input())) {
-		  length++;
+    while ((c = input()) ) {
+    		length++;
 		  if (length > baseofre) {
 			  baseofre *= 2;
 			  buff = realloc(buff, baseofre * sizeof(char));
@@ -166,9 +166,7 @@ void stringHandler(){
             add_alpha_token(++token_count, "STRING", buff, yylineno);
             break;
         }
-        if (c == '\n') {
-          yywarning("Not Closing string");
-        }
+
 
         if (c == '\\') {
 
@@ -187,10 +185,10 @@ void stringHandler(){
               strcat(buff, "\"");
 
             } else {
-				strcat(buff,"\\");
-				strcat(buff,tmp);
 
-                printf("warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
+		strcat(buff,"\\");
+
+                printf("Warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
                 unput(tmp);
             }
         } else   {
@@ -199,6 +197,7 @@ void stringHandler(){
         }
 
     }
+	yyerror("not closing string");
 
 }
 
