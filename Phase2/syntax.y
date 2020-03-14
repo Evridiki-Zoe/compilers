@@ -95,7 +95,6 @@ void print_table();
 %left	L_PARENTHES R_PARENTHES
 %left	L_CBRACKET R_CBRACKET
 
-%left IF
 %left ELSE
 
 
@@ -105,7 +104,7 @@ void print_table();
 program  :  multi_stmts
          ;
 
-multi_stmts : stmt multi_stmts
+multi_stmts : stmt multi_stmts {printf("stmt multi_stmt");}
             | /*empty*/
             ;
 
@@ -158,7 +157,7 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue::\n" RESET); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); }
          | LOCAL IDENTIFIER { printf(RED "lvalue:: local id\n" RESET); }
          | DCOLON IDENTIFIER { printf(RED "lvalue:: doublecolon id\n" RESET); }
          | member { printf(RED "lvalue:: member\n" RESET); }
@@ -229,8 +228,8 @@ multi_id  : COMMA IDENTIFIER multi_id { printf(RED "multi_idlists:: comma id mul
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
-ifstmt	: IF L_PARENTHES expr R_PARENTHES stmt { printf(RED "if(exprsession) stmt\n" RESET); }
-        | IF L_PARENTHES expr R_PARENTHES stmt ELSE stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
+ifstmt	: IF L_PARENTHES expr R_PARENTHES stmt ELSE stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
+        | IF L_PARENTHES expr R_PARENTHES stmt { printf(RED "if(exprsession) stmt\n" RESET); }
         ;
 
 
@@ -247,21 +246,21 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 %%
 
-
 int main(void) {
 
-insert_hash_table("print", 3 , 0, true, 0);
-insert_hash_table("input", 3 , 0, true, 0);
-insert_hash_table("objectmemberkeys", 3 , 0, true, 0);
-insert_hash_table("objecttotalmembers", 3 , 0, true, 0);
-insert_hash_table("objectcopy", 3 , 0, true, 0);
-insert_hash_table("totalarguments", 3 , 0, true, 0);
-insert_hash_table("argument", 3 , 0, true, 0);
-insert_hash_table("typeof", 3 , 0, true, 0);
-insert_hash_table("strtonum", 3 , 0, true, 0);
-insert_hash_table("sqrt", 3 , 0, true, 0);
-insert_hash_table("cos", 3 , 0, true, 0);
-insert_hash_table("sin", 3 , 0, true, 0);
+insert_hash_table("print", 4 , 0, true, 0);
+insert_hash_table("input", 4 , 0, true, 0);
+insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+insert_hash_table("objectcopy", 4 , 0, true, 0);
+insert_hash_table("totalarguments", 4 , 0, true, 0);
+insert_hash_table("argument", 4 , 0, true, 0);
+insert_hash_table("typeof", 4 , 0, true, 0);
+insert_hash_table("strtonum", 4 , 0, true, 0);
+insert_hash_table("sqrt", 4 , 0, true, 0);
+insert_hash_table("cos", 4 , 0, true, 0);
+insert_hash_table("cos", 4 , 0, true, 0);
+insert_hash_table("sin", 4 , 0, true, 0);
 
 print_table();
 
