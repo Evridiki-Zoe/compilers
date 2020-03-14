@@ -141,22 +141,25 @@ int insert_hash_table(const char* name, symtype sym_type, int line,bool active, 
   struct symbol_table_binding *newnode;
   assert(table && name);
 
-  if(SymTable_contains(table, name, sym_type, line, active, scope) == 1
-          || SymTable_contains(table, name, sym_type, line, active, scope) == 2)  return 0;
+  if(SymTable_contains(table, name, sym_type, line, active, scope) == 1) {printf("1:: %s already exists\n", name );return 0;}
+    if(SymTable_contains(table, name, sym_type, line, active, scope) == 2)  {printf("2:: %s already exists\n", name );return 0;}
 
   mapping = hash_function(name);
 
   newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
 
 	if(sym_type == 0 || sym_type == 1 || sym_type == 2){ //an einai metavlhth
-	    newnode->value.var = (struct variable *) malloc(sizeof(struct variable));
+		printf("\n mapping in %d\n", mapping );
+	    newnode->value.var = (struct variable *)malloc(sizeof(struct variable));
+			newnode->value.var->name = (char *)malloc(sizeof(char));
 			newnode->value.var->name = name;
-		  newnode->value.var->line = line;
+	  newnode->value.var->line = line;
 		  newnode->value.var->scope = scope;
 
 	}
 	else if(sym_type == 3 || sym_type == 4){ //an einai function
   		newnode->value.func = (struct function *) malloc(sizeof(struct function));
+			newnode->value.func->name = (char *)malloc(sizeof(char));
 			newnode->value.func->name = name;
 		  newnode->value.func->line = line;
 		  newnode->value.func->scope = scope;
@@ -194,8 +197,10 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 								check_existance->value.var->line == line &&
 							  check_existance->active == active &&
 								check_existance->value.var->scope == scope);  return 1;//uparxei akribws idio
+
+					  	return 2; //uparxei to idio name alla oxi idia ta upoloipa
+
 							}
-		        return 2; //uparxei to idio name alla oxi idia ta upoloipa
 		      }
 					else if(sym_type == 3 || sym_type == 4 ){
 						if(strcmp(check_existance->value.func->name, name)==0 ){
@@ -203,8 +208,10 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 								check_existance->value.func->line == line &&
 								check_existance->active == active &&
 								check_existance->value.func->scope == scope)  return 1;//uparxei akribws idio
+
+								return 2; //uparxei to idio name alla oxi idia ta upoloipa
+
 							}
-						return 2; //uparxei to idio name alla oxi idia ta upoloipa
 
 					}
       check_existance=check_existance->next;
@@ -215,7 +222,6 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 }
 
 /* MPOREI NA THELEI DIORTHWSH !!!!!!!
-
 finds symbol and sets active status to false*/
 void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_type, int line,bool active, int scope){
 	struct symbol_table_binding *tmp;
@@ -238,7 +244,6 @@ void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_ty
 	}
 
 }
-
 
 /*prints table*/
 void print_table(){
