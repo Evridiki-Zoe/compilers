@@ -65,12 +65,12 @@ int print_list() {
 
 /*enum for symbol type*/
 typedef enum {
-      global_var = 0,
-			local_var = 1,
-      formal = 2,
-      user_func = 3,
-      lib_func = 4
-    } symtype;
+	global_var = 0,
+	local_var = 1,
+    formal = 2,
+    user_func = 3,
+    lib_func = 4
+} symtype;
 
 
 struct arguments {

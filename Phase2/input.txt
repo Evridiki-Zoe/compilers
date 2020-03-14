@@ -1,5 +1,5 @@
-"line1d \nline2
+ 
 
-line4
+function kati(x,z){ local y=0;}
 
-line6
+::y=2;

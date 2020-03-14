@@ -9,12 +9,19 @@
 #define RESET "\x1B[0m"
 
 int yyerror (char* s);
-int global_scope; // current scope we are right now, as we do the syntactic analysis
+int scope=0; // current scope we are right now, as we do the syntactic analysis
+int numOfArgs=0;
 
 extern int yylineno;
 extern char * yytext;
 
+char** argtable;
 void print_table();
+void arginsert(char* arg);
+void newFunction(char* name, int line,int tmpscope);
+void insertlocalVar(char* name, int line,int tmpscope);
+void insertglobalVar(char* name, int line,int tmpscope);
+
 
 %}
 
@@ -158,8 +165,8 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          ;
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); }
-         | LOCAL IDENTIFIER { printf(RED "lvalue:: local id\n" RESET); }
-         | DCOLON IDENTIFIER { printf(RED "lvalue:: doublecolon id\n" RESET); }
+         | LOCAL IDENTIFIER { insertlocalVar(($2),yylineno,scope);printf("LOCAL VAR :%s\n",($2)); }
+         | DCOLON IDENTIFIER {insertglobalVar(($2),yylineno,0); printf( "lvalue:: doublecolon %s\n",($2) ); }
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
 
@@ -205,8 +212,8 @@ indexedelem		: L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {exp
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi stmt}\n" RESET); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { printf(RED "funcdef:: function (idlist)block\n" RESET); }
-         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block { printf(RED "funcdef:: function id (idlist) block\n" RESET); }
+funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
+         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block {  newFunction(($2),yylineno,scope);printf("komple\n"); }
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -220,11 +227,11 @@ number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
          | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER multi_id { printf(RED "idlist:: id multi_id\n" RESET); }
+idlist   : IDENTIFIER multi_id { arginsert(($1)); }
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
-multi_id  : COMMA IDENTIFIER multi_id { printf(RED "multi_idlists:: comma id multiid\n" RESET); }
+multi_id  : COMMA IDENTIFIER multi_id {  arginsert(($2)); }
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
@@ -246,6 +253,58 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 %%
 
+void insertglobalVar(char* name, int line,int tmpscope){
+	//Lookup an iparxei . An nai komple apla kanei reference , an oxi tin vazoume
+
+	//if(contains...==1) return;
+	//else
+	insert_hash_table(name,0,line,true,scope);
+}
+
+void insertlocalVar(char* name , int line , int scope){
+	//Lookup an iparxei , an oxi insert
+
+	insert_hash_table(name,1,line,true,scope);
+}
+
+
+void arginsert(char *arg){
+	//TODO
+	/*
+	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
+	*/
+	if (numOfArgs==0) {
+			argtable = (char**)malloc(4*sizeof(char*));
+			for (int i = 0; i < 4; i++) {
+				argtable[i]=(char*)malloc(255*sizeof(char));
+			}
+			strcpy(argtable[0],arg);
+			printf("%s\n",argtable[0]);
+
+	}else{
+		strcpy(argtable[numOfArgs],arg);
+		printf("%s\n",argtable[numOfArgs]);
+
+	}
+	numOfArgs++;
+}
+
+void newFunction(char* name , int line, int tmpscope){
+	//TODO
+	//For loop me contains gia numOfArgs kai afto mesa se else
+	//To scope to pernao gia asfaleia apo otan to vriskei
+	insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
+	for (int i = 0; i < numOfArgs; i++) {
+		printf("EDO:%s\n",argtable[i] );
+		insert_hash_table(argtable[i],2,line,true,(tmpscope+1));
+	}
+	for (int i = 0; i < 4; i++) {	// mexri numOfArgs kanonika
+		free(argtable[i]);
+	}
+	free(argtable);
+	numOfArgs=0;
+}
+
 int main(void) {
 
 insert_hash_table("print", 4 , 0, true, 0);
@@ -262,7 +321,8 @@ insert_hash_table("cos", 4 , 0, true, 0);
 insert_hash_table("cos", 4 , 0, true, 0);
 insert_hash_table("sin", 4 , 0, true, 0);
 
-print_table();
 
-return yyparse();
+ yyparse();
+print_table();
+return 0;
 }
