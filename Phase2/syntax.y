@@ -269,9 +269,7 @@ void insertlocalVar(char* name , int line , int scope){
 
 int main(void) {
 
-insert_hash_table("a", 2 , 0, true, 0);
-insert_hash_table("b", 1 , 0, true, 0);
-insert_hash_table("c", 0 , 0, true, 0);
+
 
 insert_hash_table("print", 4 , 0, true, 0);
 insert_hash_table("input", 4 , 0, true, 0);
