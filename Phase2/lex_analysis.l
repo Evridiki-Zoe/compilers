@@ -6,6 +6,7 @@ int token_count = 0;
 
 /*#define YY_DECL struct alpha_token_t* alpha_yylex(void * yylval)*/
 
+int scope; 
 int print_list();
 struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int line);
 
@@ -71,8 +72,8 @@ COLON		\:
 DCOLON		\:\:
 DOT		\.
 DOTS		\.\.
-L_CBRACKET	\{
-R_CBRACKET	\}
+L_CBRACKET	\{  
+R_CBRACKET	\}  
 L_SBRACKET	\[
 R_SBRACKET	\]
 L_PARENTHES	\(
@@ -125,8 +126,8 @@ STRING				\"
 "::"     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBUPDOWN DOTS", "::", yylineno); return DCOLON; }
 "."     	{ add_alpha_token(++token_count, "PUNCTUATION END DOT", ".", yylineno); return DOT; }
 ".."     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBLE_END DOTS", "..", yylineno); return DOTS;}
-"{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT CURLY BRACE", "{", yylineno); return L_CBRACKET;}
-"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT CURLY BRACE", "}", yylineno);return R_CBRACKET; }
+"{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT CURLY BRACE", "{", yylineno); scope++; printf("scope = %d", scope); return L_CBRACKET;}
+"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT CURLY BRACE", "}", yylineno); scope--; printf("scope = %d", scope); return R_CBRACKET; }
 "["     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno);return L_SBRACKET; }
 "]"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno);return R_SBRACKET; }
 "("     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno);return L_PARENTHES; }

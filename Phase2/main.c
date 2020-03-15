@@ -65,11 +65,11 @@ int print_list() {
 
 /*enum for symbol type*/
 typedef enum {
-	global_var = 0,
-	local_var = 1,
+	global = 0,
+	local = 1,
     formal = 2,
-    user_func = 3,
-    lib_func = 4
+    user = 3,
+    library = 4
 } symtype;
 
 
@@ -96,10 +96,10 @@ typedef struct function{
 struct symbol_table_binding{ /*NODE OF THE TABLE*/
     symtype symbol_type;
     union{
-			variable * var;
-			function * func;
-		} value;
-		bool active;
+		variable *var;
+		function *func;
+	} value;
+	bool active;
     struct symbol_table_binding *next;
 };
 
@@ -121,14 +121,14 @@ int hash_function(const char *name){
   unsigned int uiHash = 0U;
 
   for (ui = 0U; name[ui] != '\0'; ui++)
-          uiHash =uiHash* 65599+ name[ui];
+          uiHash = uiHash * 65599 + name[ui];
 
-  return uiHash% 100 ;
+  return uiHash % 100 ;
 }
 
 /*creates a new table if NULL
 and inserts symbol in table*/
-int insert_hash_table(const char* name, symtype sym_type, int line,bool active, int scope){
+int insert_hash_table(const char *name, symtype sym_type, int line, bool active, int scope){
   /*an den uparxei ftiagmeno table, to ftiaxnw*/
   if(table == NULL){
       table = malloc(sizeof(struct SymTable_struct *));
@@ -244,24 +244,55 @@ void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_ty
 
 }
 
+
+char* enum_toString(symtype sym) {
+	if(sym == 0) return "global";
+	else if(sym == 1) return "local";
+	else if(sym == 2) return "formal";
+	else if(sym == 3) return "user";
+	else if(sym == 4) return "library";
+	else return "lathos";
+}
+
 /*prints table*/
 void print_table(){
-  int i = 0;
-  if(table == NULL){
-    printf("table is empty");
-    return ;
-  }
+  	int i = 0;
+  	if(table == NULL){
+    	printf("table is empty\n");
+    	return ;
+  	}
 
-  for(i = 0; i < 100; i++ ){
-    printf("%d::		", i);
-    struct symbol_table_binding * curr = table->pinakas[i];
-    while(curr != NULL){
-			if(curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)
-      			printf("VARIABLE name: %s, line: %d, scope: %d ", curr->value.var->name, curr->value.var->line, curr->value.var->scope);
-		  if(curr->symbol_type == 3 || curr->symbol_type == 4)
-			 			printf("FUNCTION name: %s, line: %d, scope: %d ", curr->value.func->name, curr->value.func->line, curr->value.func->scope);
-      curr = curr-> next;
-    }
-    printf("\n");
-  }
+	printf("\n");
+	for(int scope = 0; scope < 10; scope++) {
+		printf("----------Scope #%d ----------", scope);
+		for(i = 0; i < 100; i++) {
+			struct symbol_table_binding *curr = table->pinakas[i];
+			while(curr != NULL) {
+				if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2) && curr->value.var->scope == scope )
+      				printf("\n \"%s\" [%s variable] (line %d) (scope %d) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope);
+		  		
+				  if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope )
+			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) ", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope);
+      			
+				// if(curr->value.func->scope == 0 || curr->value.var->scope == 0) {
+				// 	printf("\"%s\" [%s function] (line %d) (scope %d)\n", curr->value.func->name);
+				// } 
+				curr = curr-> next;
+			}
+		}
+		printf("\n");		
+	}
+
+//   for(i = 0; i < 100; i++ ){
+//     printf("%d::		", i);
+//     struct symbol_table_binding *curr = table->pinakas[i];
+//     while(curr != NULL){
+// 			if(curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)
+//       			printf("VARIABLE name: %s, line: %d, scope: %d ", curr->value.var->name, curr->value.var->line, curr->value.var->scope);
+// 		  if(curr->symbol_type == 3 || curr->symbol_type == 4)
+// 			 			printf("FUNCTION name: %s, line: %d, scope: %d ", curr->value.func->name, curr->value.func->line, curr->value.func->scope);
+//       curr = curr-> next;
+//     }
+//     printf("\n");
+//   }
 }

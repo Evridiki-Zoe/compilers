@@ -10,10 +10,11 @@
 
 int yyerror (char* s);
 int scope=0; // current scope we are right now, as we do the syntactic analysis
-int numOfArgs=0;
+int numOfArgs = 0;
 
 extern int yylineno;
 extern char * yytext;
+extern int scope;
 
 char** argtable;
 void print_table();
@@ -163,9 +164,9 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); }
-         | LOCAL IDENTIFIER { insertlocalVar(($2),yylineno,scope);printf("LOCAL VAR :%s\n",($2)); }
-         | DCOLON IDENTIFIER {insertglobalVar(($2),yylineno,0); printf( "lvalue:: doublecolon %s\n",($2) ); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertlocalVar(($1), yylineno, scope);  }
+         | LOCAL IDENTIFIER { insertlocalVar(($2), yylineno, scope);printf("LOCAL VAR :%s\n",($2)); }
+         | DCOLON IDENTIFIER { insertglobalVar(($2), yylineno, 0); printf( "lvalue:: doublecolon %s\n",($2) ); }
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
 
@@ -212,7 +213,7 @@ block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi s
         ;
 
 funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
-         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block {  newFunction(($2),yylineno,scope);printf("komple\n"); }
+         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block { newFunction(($2),yylineno,scope);printf("komple\n"); }
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -257,13 +258,15 @@ void insertglobalVar(char* name, int line,int tmpscope){
 
 	//if(contains...==1) return;
 	//else
-	insert_hash_table(name,0,line,true,scope);
+	insert_hash_table(name, 0, line, true, scope);
 }
 
 void insertlocalVar(char* name , int line , int scope){
 	//Lookup an iparxei , an oxi insert
-
-	insert_hash_table(name,1,line,true,scope);
+      if(scope == 0) {
+            insert_hash_table(name, 0, line, true, scope);
+      }
+	insert_hash_table(name, 1, line, true, scope);
 }
 
 
@@ -272,7 +275,7 @@ void arginsert(char *arg){
 	/*
 	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
 	*/
-	if (numOfArgs==0) {
+	if (numOfArgs == 0) {
 			argtable = (char**)malloc(4*sizeof(char*));
 			for (int i = 0; i < 4; i++) {
 				argtable[i]=(char*)malloc(255*sizeof(char));
@@ -280,8 +283,7 @@ void arginsert(char *arg){
       //  printf("malloc axikopoihsh se : %s\n", *argtable);
 			}
 			strcpy(argtable[0],arg);
-	}
-  else{
+	} else{
 
 		strcpy(argtable[numOfArgs],arg);
 
@@ -313,27 +315,26 @@ void newFunction(char* name , int line, int tmpscope){
 
 int main(void) {
 
-insert_hash_table("a", 2 , 0, true, 0);
-insert_hash_table("b", 1 , 0, true, 0);
-insert_hash_table("c", 0 , 0, true, 0);
+      // insert_hash_table("aaa", 2 , 0, true, 0);
+      // insert_hash_table("blol", 1 , 0, true, 0);
+      // insert_hash_table("ctra", 3 , 10, true, 1);
 
-insert_hash_table("print", 4 , 0, true, 0);
-insert_hash_table("input", 4 , 0, true, 0);
-insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
-insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
-insert_hash_table("objectcopy", 4 , 0, true, 0);
-insert_hash_table("totalarguments", 4 , 0, true, 0);
-insert_hash_table("argument", 4 , 0, true, 0);
-insert_hash_table("typeof", 4 , 0, true, 0);
-insert_hash_table("strtonum", 4 , 0, true, 0);
-insert_hash_table("sqrt", 4 , 0, true, 0);
-insert_hash_table("cos", 4 , 0, true, 0);
-insert_hash_table("cos", 4 , 0, true, 0);
-insert_hash_table("sin", 4 , 0, true, 0);
+      insert_hash_table("print", 4 , 0, true, 0);
+      insert_hash_table("input", 4 , 0, true, 0);
+      insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+      insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+      insert_hash_table("objectcopy", 4 , 0, true, 0);
+      insert_hash_table("totalarguments", 4 , 0, true, 0);
+      insert_hash_table("argument", 4 , 0, true, 0);
+      insert_hash_table("typeof", 4 , 0, true, 0);
+      insert_hash_table("strtonum", 4 , 0, true, 0);
+      insert_hash_table("sqrt", 4 , 0, true, 0);
+      insert_hash_table("sin", 4 , 0, true, 0);
+      insert_hash_table("cos", 4 , 0, true, 0);
 
-yyparse();
+      yyparse();
 
-print_table();
+      print_table();
 
-return 1;
+      return 1;
 }
