@@ -1,4 +1,3 @@
-
 %{
 #include "y.tab.h"
 
@@ -6,7 +5,7 @@ int token_count = 0;
 
 /*#define YY_DECL struct alpha_token_t* alpha_yylex(void * yylval)*/
 
-int scope; 
+int scope;
 int print_list();
 struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int line);
 
@@ -72,8 +71,8 @@ COLON		\:
 DCOLON		\:\:
 DOT		\.
 DOTS		\.\.
-L_CBRACKET	\{  
-R_CBRACKET	\}  
+L_CBRACKET	\{
+R_CBRACKET	\}
 L_SBRACKET	\[
 R_SBRACKET	\]
 L_PARENTHES	\(
