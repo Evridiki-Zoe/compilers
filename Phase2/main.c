@@ -256,41 +256,88 @@ void arginsert(char *arg){
 	/*
 	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
 	*/
-	if (numOfArgs==0) {
-			argtable = (char**)malloc(4*sizeof(char*));
-		int i = 0;	
-		for (i = 0; i < 4; i++) {
-				argtable[i]=(char*)malloc(255*sizeof(char));
-
-			}
-			strcpy(argtable[0],arg);
-      insert_hash_table(arg ,2,666,true,666);
-
-	}
-  else{
-
-		strcpy(argtable[numOfArgs],arg);
-    insert_hash_table(arg ,2,666,true,666);
-
-	}
-  	numOfArgs++;
+       if (argtable == NULL) {
+                        printf("table is null malloc \n");
+                        argtable = (char**)malloc(4*sizeof(char*));
+                        int i = 0;
+                        for (i = 0; i < 4; i++) {
+                                argtable[i]=(char*)malloc(255*sizeof(char));
+      //  strcpy(*argtable,"LALA");
+      //  printf("malloc axikopoihsh se : %s\n", *argtable);
+                        }
+        //              strcpy(argtable[0],arg);
+        }
+        if(numOfArgs == 0 ){strcpy(argtable[0],"a0\0"); numOfArgs++; strcpy(argtable[numOfArgs],arg)$
+        else{printf("argggg: %s\n",arg );       strcpy(argtable[numOfArgs],arg);}
+        numOfArgs++;
 }
 
 void newFunction(char* name , int line, int tmpscope){
-	//TODO
-	//For loop me contains gia numOfArgs kai afto mesa se else
-	//To scope to pernao gia asfaleia apo otan to vriskei
-	insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
+        //TODO
+        //For loop me contains gia numOfArgs kai afto mesa se else
+        //To scope to pernao gia asfaleia apo otan to vriskei
+        insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
+  int i = 0;
+  for (i = 1; i < numOfArgs; i++) {
+                printf("\nEDO(%d)  %s\n",i, argtable[i]);
+                insert_hash_table( argtable[i] ,2,line,true,(tmpscope+1));
+  }
 
-  /*psaxnw ta pseudo-arg pou evala prin kai tous bazw swsta line kai Scope*/
+  /*re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ???? */
+  int j = 0;
+        for (j = 0; j< 4; j++) {        // mexri numOfArgs kanonika
+                printf("\nfreeing %s\n",argtable[j]);
+                free(argtable[j]);
+                printf("\nwilly %s\n",argtable[j]);
+
+        }
+        free(argtable);
+        numOfArgs=0;
+
+
+}
+
+
+/*
+void arginsert(char *arg){
+        //TODO
+
+        //Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
+
+        if (numOfArgs==0) {
+                        argtable = (char**)malloc(4*sizeof(char*));
+                        int i = 0;
+                        for (i = 0; i < 4; i++) {
+                                argtable[i]=(char*)malloc(255*sizeof(char));
+
+                        }
+                        strcpy(argtable[0],arg);
+      insert_hash_table(arg ,2,666,true,666);
+
+        }
+  else{
+
+                strcpy(argtable[numOfArgs],arg);
+    insert_hash_table(arg ,2,666,true,666);
+
+        }
+        numOfArgs++;
+}
+void newFunction(char* name , int line, int tmpscope){
+        //TODO
+        //For loop me contains gia numOfArgs kai afto mesa se else
+        //To scope to pernao gia asfaleia apo otan to vriskei
+        insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
+
+  //psaxnw ta pseudo-arg pou evala prin kai tous bazw swsta line kai Scope
   int i = 0;
   for (i = 0; i < numOfArgs; i++) {
 
     int mapping = hash_function(argtable[i]);
     struct symbol_table_binding *tmp = table->pinakas[mapping];//paw se ayth th thesh
     while(tmp){
-      if(tmp->symbol_type == 2 && strcmp(tmp->value.var->name,argtable[i])==0 && tmp->value.var->scope == 666 && tmp->value.var->line == 666){
-			    tmp->value.var->line = line;
+      if(tmp->symbol_type == 2 && strcmp(tmp->value.var->name,argtable[i])==0 && tmp->value.var->sco$
+                            tmp->value.var->line = line;
           tmp->value.var->scope = (tmpscope+1);
           break;
       }
@@ -299,18 +346,18 @@ void newFunction(char* name , int line, int tmpscope){
 
   }
 
-  /*re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ???? */
+//re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ????
   int j = 0;
-	for (j = 0; j< 4; j++) {	// mexri numOfArgs kanonika
-		free(argtable[j]);
-	}
-	free(argtable);
-	numOfArgs=0;
+        for (j = 0; j< 4; j++) {        // mexri numOfArgs kanonika
+                free(argtable[j]);
+        }
+        free(argtable);
+        numOfArgs=0;
 
 
 }
 
-
+*/
 char* enum_toString(symtype sym) {
 	if(sym == 0) return "global";
 	else if(sym == 1) return "local";
