@@ -13,5 +13,4 @@ clear:
 	rm y.tab.c
 	rm y.tab.h
 	rm lex.yy.c
-	rm lex.c
 	

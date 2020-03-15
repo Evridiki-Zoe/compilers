@@ -163,7 +163,7 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          ;
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertlocalVar(($1), yylineno, scope);  }
-         | LOCAL IDENTIFIER { insertlocalVar(($2), yylineno, scope);printf("LOCAL VAR :%s\n",($2)); }
+         | LOCAL IDENTIFIER { insertlocalVar(($2), yylineno, scope); }
          | DCOLON IDENTIFIER { insertglobalVar(($2), yylineno, 0); printf( "lvalue:: doublecolon %s\n",($2) ); }
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
@@ -204,14 +204,14 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
                   | /*empty*/ { printf(RED "multi_indexedelem:: empty\n" RESET); }
                   ;
 
-indexedelem		: L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
+indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi stmt}\n" RESET); }
         ;
 
 funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
-         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block { newFunction(($2),yylineno,scope);printf("komple\n"); }
+         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block { newFunction( $2, yylineno, scope); }
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -225,15 +225,15 @@ number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
          | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER multi_id { arginsert(($1)); }
+idlist   : IDENTIFIER { argumentF( $1, yylineno, scope); } multi_id {  arginsert(($1)); }
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
-multi_id  : COMMA IDENTIFIER multi_id { arginsert(($2)); }
+multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, scope); } multi_id
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
-ifstmt	: IF L_PARENTHES expr R_PARENTHES stmt ELSE stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
+ifstmt  : IF L_PARENTHES expr R_PARENTHES stmt ELSE stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
         | IF L_PARENTHES expr R_PARENTHES stmt { printf(RED "if(exprsession) stmt\n" RESET); }
         ;
 
@@ -268,28 +268,23 @@ void insertlocalVar(char* name , int line , int scope){
 }
 
 int main(void) {
+            
+      insert_hash_table("print", 4 , 0, true, 0);
+      insert_hash_table("input", 4 , 0, true, 0);
+      insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+      insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+      insert_hash_table("objectcopy", 4 , 0, true, 0);
+      insert_hash_table("totalarguments", 4 , 0, true, 0);
+      insert_hash_table("argument", 4 , 0, true, 0);
+      insert_hash_table("typeof", 4 , 0, true, 0);
+      insert_hash_table("strtonum", 4 , 0, true, 0);
+      insert_hash_table("sqrt", 4 , 0, true, 0);
+      insert_hash_table("cos", 4 , 0, true, 0);
+      insert_hash_table("sin", 4 , 0, true, 0);
 
-insert_hash_table("a", 2 , 0, true, 0);
-insert_hash_table("b", 1 , 0, true, 0);
-insert_hash_table("c", 0 , 0, true, 0);
+      yyparse();
 
-insert_hash_table("print", 4 , 0, true, 0);
-insert_hash_table("input", 4 , 0, true, 0);
-insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
-insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
-insert_hash_table("objectcopy", 4 , 0, true, 0);
-insert_hash_table("totalarguments", 4 , 0, true, 0);
-insert_hash_table("argument", 4 , 0, true, 0);
-insert_hash_table("typeof", 4 , 0, true, 0);
-insert_hash_table("strtonum", 4 , 0, true, 0);
-insert_hash_table("sqrt", 4 , 0, true, 0);
-insert_hash_table("cos", 4 , 0, true, 0);
-insert_hash_table("cos", 4 , 0, true, 0);
-insert_hash_table("sin", 4 , 0, true, 0);
+      print_table();
 
-yyparse();
-
-print_table();
-
-return 0;
+      return 0;
 }
