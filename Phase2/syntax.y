@@ -4,7 +4,6 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
-#include <unistd.h> // notice this! you need it!
 
 #define RED   "\x1B[31m"
 #define RESET "\x1B[0m"
@@ -227,11 +226,11 @@ number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
          | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER multi_id { printf("inserting arg in list with name %s\n", $<stringValue>1);  arginsert(($1)); }
+idlist   : IDENTIFIER multi_id { arginsert(($1)); }
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
-multi_id  : COMMA IDENTIFIER multi_id {   printf("inserting arg in list with name %s\n", $2); arginsert(($2)); }
+multi_id  : COMMA IDENTIFIER multi_id { arginsert(($2)); }
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
@@ -268,7 +267,7 @@ void insertlocalVar(char* name , int line , int scope){
 }
 
 
-void arginsert( char *arg){
+void arginsert(char *arg){
 	//TODO
 	/*
 	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
@@ -276,13 +275,12 @@ void arginsert( char *arg){
 	if (numOfArgs==0) {
 			argtable = (char**)malloc(4*sizeof(char*));
 			for (int i = 0; i < 4; i++) {
-				argtable[i]=(char*)calloc(255, sizeof(char));
+				argtable[i]=(char*)malloc(255*sizeof(char));
       //  strcpy(*argtable,"LALA");
       //  printf("malloc axikopoihsh se : %s\n", *argtable);
 			}
 			strcpy(argtable[0],arg);
 	}
-  else if(numOfArgs == 4){printf("\nTELL ME WHY YOU NOT WORKING YOU SCUM\n\n");}
   else{
 
 		strcpy(argtable[numOfArgs],arg);
@@ -301,15 +299,23 @@ void newFunction(char* name , int line, int tmpscope){
 		printf("EDO  %s\n", argtable[i]);
 		insert_hash_table( argtable[i] ,2,line,true,(tmpscope+1));
   }
+
+  /*re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ???? */
 /*  int j = 0;
 	for (j = 0; j< 4; j++) {	// mexri numOfArgs kanonika
 		free((char*)argtable[j]);
 	}
 	free((char*)argtable);
 	numOfArgs=0;
-*/}
+*/
+
+}
 
 int main(void) {
+
+insert_hash_table("a", 2 , 0, true, 0);
+insert_hash_table("b", 1 , 0, true, 0);
+insert_hash_table("c", 0 , 0, true, 0);
 
 insert_hash_table("print", 4 , 0, true, 0);
 insert_hash_table("input", 4 , 0, true, 0);
