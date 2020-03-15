@@ -5,3 +5,12 @@ all:
 
 test:
 	./first
+
+test1:
+	./first < input.txt
+clear:
+	rm first
+	rm y.tab.c
+	rm y.tab.h
+	rm lex.yy.c
+	
