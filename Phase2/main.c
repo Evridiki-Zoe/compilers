@@ -89,7 +89,7 @@ typedef struct function{
     const char* name;
 		unsigned int line;
 		unsigned int scope;
-		struct arguments *args_list;
+		///struct arguments *args_list;
 
 }function;
 
@@ -141,15 +141,14 @@ int insert_hash_table(const char* name, symtype sym_type, int line,bool active, 
   struct symbol_table_binding *newnode;
   assert(table && name);
 
-  if(SymTable_contains(table, name, sym_type, line, active, scope) == 1) {printf("1:: %s already exists\n", name );return 0;}
-    if(SymTable_contains(table, name, sym_type, line, active, scope) == 2)  {printf("2:: %s already exists\n", name );return 0;}
+  if(SymTable_contains(table, name, sym_type, line, active, scope) == 1 ||
+			SymTable_contains(table, name, sym_type, line, active, scope) == 2)  {printf("%s already exists\n", name );return 0;}
 
   mapping = hash_function(name);
 
   newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
 
 	if(sym_type == 0 || sym_type == 1 || sym_type == 2){ //an einai metavlhth
-		printf("\n mapping in %d\n", mapping );
 	    newnode->value.var = (struct variable *)malloc(sizeof(struct variable));
 			newnode->value.var->name = (char *)malloc(sizeof(char));
 			newnode->value.var->name = name;
@@ -196,7 +195,7 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 							  if(check_existance->symbol_type == sym_type &&
 								check_existance->value.var->line == line &&
 							  check_existance->active == active &&
-								check_existance->value.var->scope == scope);  return 1;//uparxei akribws idio
+								check_existance->value.var->scope == scope)  return 1;//uparxei akribws idio
 
 					  	return 2; //uparxei to idio name alla oxi idia ta upoloipa
 
