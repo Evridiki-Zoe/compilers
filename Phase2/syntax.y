@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h> // notice this! you need it!
 
 #define RED   "\x1B[31m"
 #define RESET "\x1B[0m"
@@ -75,7 +76,6 @@ void insertglobalVar(char* name, int line,int tmpscope);
 %token FLOAT
 %token STRING
 %token IDENTIFIER
-
 
 /*The %union declaration modifies the type of yylval*/
 %union
@@ -227,11 +227,11 @@ number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
          | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER multi_id { arginsert(($1)); }
+idlist   : IDENTIFIER multi_id { printf("inserting arg in list with name %s\n", $<stringValue>1);  arginsert(($1)); }
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
-multi_id  : COMMA IDENTIFIER multi_id {  arginsert(($2)); }
+multi_id  : COMMA IDENTIFIER multi_id {   printf("inserting arg in list with name %s\n", $2); arginsert(($2)); }
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
@@ -268,7 +268,7 @@ void insertlocalVar(char* name , int line , int scope){
 }
 
 
-void arginsert(char *arg){
+void arginsert( char *arg){
 	//TODO
 	/*
 	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
@@ -276,17 +276,19 @@ void arginsert(char *arg){
 	if (numOfArgs==0) {
 			argtable = (char**)malloc(4*sizeof(char*));
 			for (int i = 0; i < 4; i++) {
-				argtable[i]=(char*)malloc(255*sizeof(char));
+				argtable[i]=(char*)calloc(255, sizeof(char));
+      //  strcpy(*argtable,"LALA");
+      //  printf("malloc axikopoihsh se : %s\n", *argtable);
 			}
 			strcpy(argtable[0],arg);
-			printf("%s\n",argtable[0]);
+	}
+  else if(numOfArgs == 4){printf("\nTELL ME WHY YOU NOT WORKING YOU SCUM\n\n");}
+  else{
 
-	}else{
 		strcpy(argtable[numOfArgs],arg);
-		printf("%s\n",argtable[numOfArgs]);
 
 	}
-	numOfArgs++;
+  	numOfArgs++;
 }
 
 void newFunction(char* name , int line, int tmpscope){
@@ -294,16 +296,18 @@ void newFunction(char* name , int line, int tmpscope){
 	//For loop me contains gia numOfArgs kai afto mesa se else
 	//To scope to pernao gia asfaleia apo otan to vriskei
 	insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
-	for (int i = 0; i < numOfArgs; i++) {
-		printf("EDO:%s\n",argtable[i] );
-		insert_hash_table(argtable[i],2,line,true,(tmpscope+1));
+  int i = 0;
+  for (i = 0; i < numOfArgs; i++) {
+		printf("EDO  %s\n", argtable[i]);
+		insert_hash_table( argtable[i] ,2,line,true,(tmpscope+1));
+  }
+/*  int j = 0;
+	for (j = 0; j< 4; j++) {	// mexri numOfArgs kanonika
+		free((char*)argtable[j]);
 	}
-	for (int i = 0; i < 4; i++) {	// mexri numOfArgs kanonika
-		free(argtable[i]);
-	}
-	free(argtable);
+	free((char*)argtable);
 	numOfArgs=0;
-}
+*/}
 
 int main(void) {
 
@@ -321,8 +325,9 @@ insert_hash_table("cos", 4 , 0, true, 0);
 insert_hash_table("cos", 4 , 0, true, 0);
 insert_hash_table("sin", 4 , 0, true, 0);
 
+yyparse();
 
- yyparse();
 print_table();
-return 0;
+
+return 1;
 }
