@@ -9,12 +9,12 @@
 #define RESET "\x1B[0m"
 
 int yyerror (char* s);
-int scope=0; // current scope we are right now, as we do the syntactic analysis
 int numOfArgs = 0;
 
 extern int yylineno;
 extern char * yytext;
 extern int scope;
+
 
 char** argtable;
 void print_table();
@@ -22,8 +22,6 @@ void arginsert(char* arg);
 void newFunction(char* name, int line,int tmpscope);
 void insertlocalVar(char* name, int line,int tmpscope);
 void insertglobalVar(char* name, int line,int tmpscope);
-
-
 %}
 
 /*%glr-parser*/
@@ -269,72 +267,29 @@ void insertlocalVar(char* name , int line , int scope){
 	insert_hash_table(name, 1, line, true, scope);
 }
 
-
-void arginsert(char *arg){
-	//TODO
-	/*
-	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
-	*/
-	if (numOfArgs == 0) {
-			argtable = (char**)malloc(4*sizeof(char*));
-			for (int i = 0; i < 4; i++) {
-				argtable[i]=(char*)malloc(255*sizeof(char));
-      //  strcpy(*argtable,"LALA");
-      //  printf("malloc axikopoihsh se : %s\n", *argtable);
-			}
-			strcpy(argtable[0],arg);
-	} else{
-
-		strcpy(argtable[numOfArgs],arg);
-
-	}
-  	numOfArgs++;
-}
-
-void newFunction(char* name , int line, int tmpscope){
-	//TODO
-	//For loop me contains gia numOfArgs kai afto mesa se else
-	//To scope to pernao gia asfaleia apo otan to vriskei
-	insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
-  int i = 0;
-  for (i = 0; i < numOfArgs; i++) {
-		printf("EDO  %s\n", argtable[i]);
-		insert_hash_table( argtable[i] ,2,line,true,(tmpscope+1));
-  }
-
-  /*re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ???? */
-/*  int j = 0;
-	for (j = 0; j< 4; j++) {	// mexri numOfArgs kanonika
-		free((char*)argtable[j]);
-	}
-	free((char*)argtable);
-	numOfArgs=0;
-*/
-
-}
-
 int main(void) {
 
-      // insert_hash_table("aaa", 2 , 0, true, 0);
-      // insert_hash_table("blol", 1 , 0, true, 0);
-      // insert_hash_table("ctra", 3 , 10, true, 1);
+insert_hash_table("a", 2 , 0, true, 0);
+insert_hash_table("b", 1 , 0, true, 0);
+insert_hash_table("c", 0 , 0, true, 0);
 
-      insert_hash_table("print", 4 , 0, true, 0);
-      insert_hash_table("input", 4 , 0, true, 0);
-      insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
-      insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
-      insert_hash_table("objectcopy", 4 , 0, true, 0);
-      insert_hash_table("totalarguments", 4 , 0, true, 0);
-      insert_hash_table("argument", 4 , 0, true, 0);
-      insert_hash_table("typeof", 4 , 0, true, 0);
-      insert_hash_table("strtonum", 4 , 0, true, 0);
-      insert_hash_table("sqrt", 4 , 0, true, 0);
-      insert_hash_table("sin", 4 , 0, true, 0);
-      insert_hash_table("cos", 4 , 0, true, 0);
+insert_hash_table("print", 4 , 0, true, 0);
+insert_hash_table("input", 4 , 0, true, 0);
+insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+insert_hash_table("objectcopy", 4 , 0, true, 0);
+insert_hash_table("totalarguments", 4 , 0, true, 0);
+insert_hash_table("argument", 4 , 0, true, 0);
+insert_hash_table("typeof", 4 , 0, true, 0);
+insert_hash_table("strtonum", 4 , 0, true, 0);
+insert_hash_table("sqrt", 4 , 0, true, 0);
+insert_hash_table("cos", 4 , 0, true, 0);
+insert_hash_table("cos", 4 , 0, true, 0);
+insert_hash_table("sin", 4 , 0, true, 0);
 
-      yyparse();
+yyparse();
 
-      print_table();
+print_table();
 
-      return 1;
+return 1;
 }
