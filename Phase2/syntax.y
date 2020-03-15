@@ -291,5 +291,5 @@ yyparse();
 
 print_table();
 
-return 1;
+return 0;
 }
