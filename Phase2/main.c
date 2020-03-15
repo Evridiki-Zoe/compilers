@@ -258,7 +258,8 @@ void arginsert(char *arg){
 	*/
 	if (numOfArgs==0) {
 			argtable = (char**)malloc(4*sizeof(char*));
-			for (int i = 0; i < 4; i++) {
+		int i = 0;	
+		for (i = 0; i < 4; i++) {
 				argtable[i]=(char*)malloc(255*sizeof(char));
 
 			}
@@ -328,7 +329,8 @@ void print_table(){
   	}
 
 	printf("\n");
-	for(int scope = 0; scope < 10; scope++) {
+	int scope = 0;
+	for(scope = 0; scope < 10; scope++) {
 		printf("----------Scope #%d ----------", scope);
 		for(i = 0; i < 100; i++) {
 			struct symbol_table_binding *curr = table->pinakas[i];
