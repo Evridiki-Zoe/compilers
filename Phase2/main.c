@@ -11,6 +11,13 @@ extern char *yytext;
 extern int token_count;
 extern int scope; // current scope we are right now, as we do the syntactic analysis
 
+
+extern char** argtable;
+extern int numOfArgs;
+void print_table();
+void arginsert(char* arg);
+void newFunction(char* name, int line,int tmpscope);
+
 void print_table();
 
 //------------------------- LEX ----------------------------
@@ -244,6 +251,64 @@ void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_ty
 
 }
 
+void arginsert(char *arg){
+	//TODO
+	/*
+	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
+	*/
+	if (numOfArgs==0) {
+			argtable = (char**)malloc(4*sizeof(char*));
+			for (int i = 0; i < 4; i++) {
+				argtable[i]=(char*)malloc(255*sizeof(char));
+
+			}
+			strcpy(argtable[0],arg);
+      insert_hash_table(arg ,2,666,true,666);
+
+	}
+  else{
+
+		strcpy(argtable[numOfArgs],arg);
+    insert_hash_table(arg ,2,666,true,666);
+
+	}
+  	numOfArgs++;
+}
+
+void newFunction(char* name , int line, int tmpscope){
+	//TODO
+	//For loop me contains gia numOfArgs kai afto mesa se else
+	//To scope to pernao gia asfaleia apo otan to vriskei
+	insert_hash_table(name,3,line,true,tmpscope); //Thelei kai ton pinaka argtable.
+
+  /*psaxnw ta pseudo-arg pou evala prin kai tous bazw swsta line kai Scope*/
+  int i = 0;
+  for (i = 0; i < numOfArgs; i++) {
+
+    int mapping = hash_function(argtable[i]);
+    struct symbol_table_binding *tmp = table->pinakas[mapping];//paw se ayth th thesh
+    while(tmp){
+      if(tmp->symbol_type == 2 && strcmp(tmp->value.var->name,argtable[i])==0 && tmp->value.var->scope == 666 && tmp->value.var->line == 666){
+			    tmp->value.var->line = line;
+          tmp->value.var->scope = (tmpscope+1);
+          break;
+      }
+      tmp = tmp->next;
+    }
+
+  }
+
+  /*re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ???? */
+  int j = 0;
+	for (j = 0; j< 4; j++) {	// mexri numOfArgs kanonika
+		free(argtable[j]);
+	}
+	free(argtable);
+	numOfArgs=0;
+
+
+}
+
 
 char* enum_toString(symtype sym) {
 	if(sym == 0) return "global";
@@ -270,17 +335,17 @@ void print_table(){
 			while(curr != NULL) {
 				if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2) && curr->value.var->scope == scope )
       				printf("\n \"%s\" [%s variable] (line %d) (scope %d) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope);
-		  		
+
 				  if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope )
 			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) ", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope);
-      			
+
 				// if(curr->value.func->scope == 0 || curr->value.var->scope == 0) {
 				// 	printf("\"%s\" [%s function] (line %d) (scope %d)\n", curr->value.func->name);
-				// } 
+				// }
 				curr = curr-> next;
 			}
 		}
-		printf("\n");		
+		printf("\n");
 	}
 
 //   for(i = 0; i < 100; i++ ){
