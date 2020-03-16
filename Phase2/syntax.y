@@ -14,7 +14,7 @@ extern int yylineno;
 extern char * yytext;
 extern int scope;
 
-char** argtable;
+char** table;
 void print_table();
 
 int newFunction(char* name, int line,int tmpscope);
@@ -164,7 +164,11 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( $1, yylineno, scope);  }
          | LOCAL IDENTIFIER { insertVar( $2, yylineno, scope); }
-         | DCOLON IDENTIFIER { /* TODO */ insertVar( $2, yylineno, scope); printf( "lvalue:: doublecolon %s\n",($2) ); }
+         | DCOLON IDENTIFIER { if(SymTable_contains(table, $2, 1, yylineno, scope) == 0) {
+                  printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
+                  exit(EXIT_FAILURE);
+            }
+            printf( "lvalue:: doublecolon\n"); }
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
 
