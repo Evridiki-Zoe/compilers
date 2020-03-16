@@ -10,13 +10,14 @@ extern int yylineno;
 extern char *yytext;
 extern int token_count;
 extern int scope; // current scope we are right now, as we do the syntactic analysis
+int lastActiveFunc = 0;
 
 extern char **argtable;
 extern int numOfArgs;
 
 void print_table();
 void arginsert(char* arg);
-void newFunction(char* name, int line,int tmpscope);
+int newFunction(char* name, int line,int tmpscope);
 
 void print_table();
 
@@ -72,40 +73,39 @@ int print_list() {
 
 /*enum for symbol type*/
 typedef enum {
-	global = 0,
-	local = 1,
-    formal = 2,
-    user = 3,
-    library = 4
+	global 		= 0,
+	local 		= 1,
+    formal 		= 2,
+    user 		= 3,
+    library 	= 4
 } symtype;
 
 
 struct arguments {
-	const char * name;
-	struct arguments *next;
+	const char 			*name;
+	struct arguments 	*next;
 };
 
 typedef struct variable{
-    const char* name;
-	unsigned int line;
-	unsigned int scope;
+    const char		*name;
+	unsigned int 	line;
+	unsigned int 	scope;
 } variable;
 
 typedef struct function{
-    const char* name;
-	unsigned int line;
-	unsigned int scope;
- 	struct arguments *args_list;
-
+    const char			*name;
+	unsigned int 		line;
+	unsigned int 		scope;
+ 	struct arguments 	*args_list;
 } function;
 
 struct symbol_table_binding{ /*NODE OF THE TABLE*/
-    symtype symbol_type;
+    symtype 		symbol_type;
     union{
-		variable *var;
-		function *func;
+		variable 	*var;
+		function 	*func;
 	} value;
-	bool active;
+	bool 			active;
     struct symbol_table_binding *next;
 };
 
@@ -140,14 +140,11 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 	if(table == NULL){
 		table = malloc(sizeof(struct SymTable_struct *));
 
-		table->pinakas = malloc(100*sizeof(struct symbol_table_binding*));
+		table->pinakas = malloc(100 * sizeof(struct symbol_table_binding*));
 		table->total_size = 0;
 	}
 
 	assert(table && name);
-
-	if(SymTable_contains(table, name, sym_type, line, active, scope) == 1 ||
-				SymTable_contains(table, name, sym_type, line, active, scope) == 2)  {printf("%s already exists\n", name );return 0;}
 
 	mapping = hash_function(name);
 
@@ -242,38 +239,87 @@ void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_ty
 
 }
 
-void arginsert(char *arg){
-	//TODO
-	/*
-	Idanika realloc kai static metavliti gia itterate (allios pointers). tora mexri 4 orismata.
-	*/
-	if (numOfArgs == 0) {
-		argtable = (char**)malloc(4*sizeof(char*));
-		int i = 0;	
-		for (i = 0; i < 4; i++) {
-				argtable[i]=(char*)malloc(255*sizeof(char));
+int argumentF(char *name, int line, int scope) {
+	struct symbol_table_binding *tmp;
+	struct arguments *newArg = NULL;
 
-			}
-			strcpy(argtable[0],arg);
-      insert_hash_table(arg ,2,666,true,666);
+	assert(table && name);
+	
+	newArg = (struct arguments *)malloc(sizeof(struct arguments));
+	newArg->name = name;
+	
+	tmp = table->pinakas[lastActiveFunc];
 
-	} else {
+	// if(SymTable_contains(table, name, 2, line, 1, scope) == 1 ||
+	// 			SymTable_contains(table, name, 2, line, 1, scope) == 2)  {			
+	// 	printf("Error: Duplicate argument name \"%s\" in function \"%s\" in line: %d.\n", name, tmp->value.func->name, yylineno);
+	// 	exit(EXIT_FAILURE);
+	// }
 
-		strcpy(argtable[numOfArgs],arg);
-    	insert_hash_table(arg ,2,666,true,666);
+	while(tmp->value.func->args_list != NULL) {
+		if(strcmp(tmp->value.func->args_list->name, name) == 0) {
+			printf("Error: Duplicate argument: %s in function: %s in line: %d\n", name, tmp->value.func->name, yylineno);
+			exit(EXIT_FAILURE);
+		}
+
+		tmp->value.func->args_list = tmp->value.func->args_list->next;
 	}
-  	numOfArgs++;
+
+	newArg->next = table->pinakas[lastActiveFunc]->value.func->args_list;
+	tmp->value.func->args_list = newArg;
+	
+	insert_hash_table(name, 2, line, true, scope);
+
+	return 0;
 }
 
-void argumentF(char *name, int line, int scope) {
-	insert_hash_table(name, 2, line, true, scope);
-}
-void newFunction(char* name , int line, int tmpscope){
-	int mapping = -1, i = 0;
+int newFunction(char* name , int line, int tmpscope){
+	struct symbol_table_binding *newnode;
+	int mapping = 0;
+	/*an den uparxei ftiagmeno table, to ftiaxnw*/
+	if(table == NULL){
+		table = malloc(sizeof(struct SymTable_struct *));
+
+		table->pinakas = malloc(100 * sizeof(struct symbol_table_binding*));
+		table->total_size = 0;
+	}
+	assert(table && name);
+
+	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
+            || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
+            || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
+            || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
+		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
+		exit(EXIT_FAILURE);
+	}  
+
+	if(SymTable_contains(table, name, 3, line, 1, scope) == 1 ||
+				SymTable_contains(table, name, 3, line, 1, scope) == 2)  {
+		printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno); 
+		exit(EXIT_FAILURE);
+	}
+
+	mapping = hash_function(name);
+	lastActiveFunc = mapping;
+
+	newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
+	newnode->value.func = (struct function *) malloc(sizeof(struct function));
+	newnode->value.func->name = (char *)malloc(sizeof(char));
+	newnode->value.func->name = name;
+	newnode->value.func->line = line;
+	newnode->value.func->scope = scope;
+	newnode->value.func->args_list = NULL;
+	newnode->active = 1;
+	newnode->symbol_type = 3;
+
+	newnode->next = table->pinakas[mapping]; /*to bazw sthn arxh ths listas*/
+	table->pinakas[mapping] = newnode;
+	table->total_size++;
+
 	//TODO
 	//For loop me contains gia numOfArgs kai afto mesa se else
 	//To scope to pernao gia asfaleia apo otan to vriskei
-	insert_hash_table(name, 3, line, true, tmpscope); //Thelei kai ton pinaka argtable.
+	//insert_hash_table(name, 3, line, true, tmpscope); //Thelei kai ton pinaka argtable.
 
   	/*psaxnw ta pseudo-arg pou evala prin kai tous bazw swsta line kai Scope*/
 	// for (i = 0; i < numOfArgs; i++) {
@@ -297,6 +343,31 @@ void newFunction(char* name , int line, int tmpscope){
 	// }
 	// free(argtable);
 	// numOfArgs = 0;
+	return 0;
+}
+
+void insertglobalVar(char* name, int line,int tmpscope){
+	//Lookup an iparxei . An nai komple apla kanei reference , an oxi tin vazoume
+
+	//if(contains...==1) return;
+	//else
+	insert_hash_table(name, 0, line, true, scope);
+}
+
+void insertVar(char* name , int line , int scope){
+
+    if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
+            || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
+            || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
+            || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
+		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
+		exit(EXIT_FAILURE);
+	}  
+	//Lookup an iparxei , an oxi insert
+      if(scope == 0) {
+            insert_hash_table(name, 1, line, true, scope);
+      }
+	insert_hash_table(name, 1, line, true, scope);
 }
 
 char* enum_toString(symtype sym) {
@@ -317,7 +388,6 @@ void print_table(){
     	return ;
   	}
 
-	printf("\n");
 	for(scope = 0; scope < 10; scope++) {
 		printf("----------Scope #%d ----------", scope);
 		for(i = 0; i < 100; i++) {
@@ -326,8 +396,14 @@ void print_table(){
 				if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2) && curr->value.var->scope == scope )
       				printf("\n \"%s\" [%s variable] (line %d) (scope %d) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope);
 
-				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope )
+				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope ) {
 			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) ", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope);
+					//printf gia oti mpikan swsta <3
+					// while(curr->value.func->args_list != NULL) {
+					// 	printf("arg: %s\n", curr->value.func->args_list->name);
+					// 	curr->value.func->args_list = curr->value.func->args_list->next;
+					// }
+				}
 
 				curr = curr-> next;
 			}

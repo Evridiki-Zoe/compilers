@@ -9,25 +9,25 @@
 #define RESET "\x1B[0m"
 
 int yyerror (char* s);
-int numOfArgs = 0;
 
 extern int yylineno;
 extern char * yytext;
 extern int scope;
 
-
 char** argtable;
 void print_table();
-void arginsert(char* arg);
-void newFunction(char* name, int line,int tmpscope);
-void insertlocalVar(char* name, int line,int tmpscope);
-void insertglobalVar(char* name, int line,int tmpscope);
+
+int newFunction(char* name, int line,int tmpscope);
+int argumentF(char *name, int line, int scope);
+int insert_hash_table(char *name, int sym_type, int line, bool active, int scope);
+
+void insertVar(char* name, int line,int tmpscope);
 %}
 
 /*%glr-parser*/
 %start program /*indicates starting rule*/
-%token IF
-%token  ELSE
+%token      IF
+%token      ELSE
 %token	WHILE
 %token	FOR
 %token	FUNCTION
@@ -82,25 +82,25 @@ void insertglobalVar(char* name, int line,int tmpscope);
     float floatValue;
     char *stringValue;
 }
-%type<intValue> INTEGER
-%type<floatValue> FLOAT
-%type<stringValue> IDENTIFIER
+%type<intValue>         INTEGER
+%type<floatValue>       FLOAT
+%type<stringValue>      IDENTIFIER
 
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
-%left	AND OR
+%left	      AND OR
 %nonassoc	EQUAL NEQUAL
 %nonassoc	GREATER GREATER_EQUAL LESS LESS_EQUAL
-%left	PLUS MINUS
-%left	MULT DIV MOD
+%left	      PLUS MINUS
+%left	      MULT DIV MOD
 %right	NOT PPLUS MMINUS
-%left	DOT DOTS
-%left	L_SBRACKET R_SBRACKET
-%left	L_PARENTHES R_PARENTHES
-%left	L_CBRACKET R_CBRACKET
+%left	      DOT DOTS
+%left	      L_SBRACKET R_SBRACKET
+%left	      L_PARENTHES R_PARENTHES
+%left	      L_CBRACKET R_CBRACKET
 
-%left ELSE
+%left       ELSE
 
 
 
@@ -162,9 +162,9 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertlocalVar(($1), yylineno, scope);  }
-         | LOCAL IDENTIFIER { insertlocalVar(($2), yylineno, scope); }
-         | DCOLON IDENTIFIER { insertglobalVar(($2), yylineno, 0); printf( "lvalue:: doublecolon %s\n",($2) ); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( $1, yylineno, scope);  }
+         | LOCAL IDENTIFIER { insertVar( $2, yylineno, scope); }
+         | DCOLON IDENTIFIER { /* TODO */ insertVar( $2, yylineno, scope); printf( "lvalue:: doublecolon %s\n",($2) ); }
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
 
@@ -191,7 +191,6 @@ multi_exprs	:  COMMA expr multi_exprs { printf(RED "multiexpr commma expr exprs\
         		|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
         		;
 
-
 /*DEN HTAN OR AYTO POU EIXE EKEI*/
 objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET); }
             |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
@@ -211,7 +210,7 @@ block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi s
         ;
 
 funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
-         | FUNCTION IDENTIFIER L_PARENTHES idlist R_PARENTHES block { newFunction( $2, yylineno, scope); }
+         | FUNCTION IDENTIFIER  { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -225,7 +224,7 @@ number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
          | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER { argumentF( $1, yylineno, scope); } multi_id {  arginsert(($1)); }
+idlist   : IDENTIFIER { argumentF( $1, yylineno, scope); } multi_id
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
@@ -236,7 +235,6 @@ multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, scope); } multi_id
 ifstmt  : IF L_PARENTHES expr R_PARENTHES stmt ELSE stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
         | IF L_PARENTHES expr R_PARENTHES stmt { printf(RED "if(exprsession) stmt\n" RESET); }
         ;
-
 
 whilestmt	: WHILE L_PARENTHES expr R_PARENTHES stmt { printf(RED "while(expr) stmt\n" RESET); }
     			;
@@ -251,36 +249,21 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 %%
 
-void insertglobalVar(char* name, int line,int tmpscope){
-	//Lookup an iparxei . An nai komple apla kanei reference , an oxi tin vazoume
-
-	//if(contains...==1) return;
-	//else
-	insert_hash_table(name, 0, line, true, scope);
-}
-
-void insertlocalVar(char* name , int line , int scope){
-	//Lookup an iparxei , an oxi insert
-      if(scope == 0) {
-            insert_hash_table(name, 0, line, true, scope);
-      }
-	insert_hash_table(name, 1, line, true, scope);
-}
 
 int main(void) {
             
-      insert_hash_table("print", 4 , 0, true, 0);
-      insert_hash_table("input", 4 , 0, true, 0);
-      insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
-      insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
-      insert_hash_table("objectcopy", 4 , 0, true, 0);
-      insert_hash_table("totalarguments", 4 , 0, true, 0);
-      insert_hash_table("argument", 4 , 0, true, 0);
-      insert_hash_table("typeof", 4 , 0, true, 0);
-      insert_hash_table("strtonum", 4 , 0, true, 0);
-      insert_hash_table("sqrt", 4 , 0, true, 0);
-      insert_hash_table("cos", 4 , 0, true, 0);
-      insert_hash_table("sin", 4 , 0, true, 0);
+      // insert_hash_table("print", 4 , 0, true, 0);
+      // insert_hash_table("input", 4 , 0, true, 0);
+      // insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+      // insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+      // insert_hash_table("objectcopy", 4 , 0, true, 0);
+      // insert_hash_table("totalarguments", 4 , 0, true, 0);
+      // insert_hash_table("argument", 4 , 0, true, 0);
+      // insert_hash_table("typeof", 4 , 0, true, 0);
+      // insert_hash_table("strtonum", 4 , 0, true, 0);
+      // insert_hash_table("sqrt", 4 , 0, true, 0);
+      // insert_hash_table("cos", 4 , 0, true, 0);
+      // insert_hash_table("sin", 4 , 0, true, 0);
 
       yyparse();
 
