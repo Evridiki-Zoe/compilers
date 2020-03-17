@@ -102,8 +102,6 @@ void insertVar(char* name, int line,int tmpscope);
 
 %left       ELSE
 
-
-
 %%
 /*grammar rules*/
 program  :  multi_stmts
@@ -192,8 +190,8 @@ elist   : expr multi_exprs { printf(RED "elist:: \n" RESET); }
         ;
 
 multi_exprs	:  COMMA expr multi_exprs { printf(RED "multiexpr commma expr exprs\n" RESET); }
-        		|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
-        		;
+        	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
+      	;
 
 /*DEN HTAN OR AYTO POU EIXE EKEI*/
 objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET); }
@@ -214,7 +212,7 @@ block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi s
         ;
 
 funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
-         | FUNCTION IDENTIFIER  { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block
+         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -228,7 +226,7 @@ number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
          | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER { argumentF( $1, yylineno, scope); } multi_id
+idlist   : IDENTIFIER { printf("EDW2"); argumentF( $1, yylineno, scope); } multi_id
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 

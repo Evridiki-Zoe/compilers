@@ -214,30 +214,6 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
     return 0;
 }
 
-/* MPOREI NA THELEI DIORTHWSH !!!!!!!
-finds symbol and sets active status to false*/
-void hide_symbol(struct SymTable_struct *table, const char *name, symtype sym_type, int line,bool active, int scope){
-	struct symbol_table_binding *tmp;
-	int hash = 0;
-	assert(table && name);
-
-	if(SymTable_contains(table, name, sym_type, line, active, scope) == 0) return; //it doesnt exist
-
-	hash = hash_function(name);//briskw pou kanei hash to stoixeio
-	tmp = table->pinakas[hash];//paw se ayth th thesh
-
-	while(tmp){
-		if( strcmp(tmp->value.func->name, name) == 0 &&
-				tmp->symbol_type == sym_type &&
-				tmp->value.func->line == line &&
-				tmp->active == active &&
-				tmp->value.func->scope == scope) tmp->active = false; //set active status to false
-
-				tmp = tmp->next;
-	}
-
-}
-
 int argumentF(char *name, int line, int scope) {
 	struct symbol_table_binding *tmp;
 	struct arguments *newArg = NULL;
@@ -265,7 +241,7 @@ int argumentF(char *name, int line, int scope) {
 	}
 
 	newArg->next = table->pinakas[lastActiveFunc]->value.func->args_list;
-	tmp->value.func->args_list = newArg;
+	table->pinakas[lastActiveFunc]->value.func->args_list = newArg;
 	
 	insert_hash_table(name, 2, line, true, scope);
 
@@ -286,13 +262,13 @@ int newFunction(char* name , int line, int tmpscope){
 	assert(table && name);
 
 	/* SHADOWING OF LIBRARY FUNCTION */
-	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
-            || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
-            || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
-            || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
-		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
-		exit(EXIT_FAILURE);
-	}  
+	// if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
+    //         || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
+    //         || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
+    //         || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
+	// 	printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
+	// 	exit(EXIT_FAILURE);
+	// }
 
 	/* DUPLICATE FUNCTION  */
 	flag = SymTable_contains(table, name, 3, line, 1, scope);
@@ -327,33 +303,6 @@ int newFunction(char* name , int line, int tmpscope){
 	table->pinakas[mapping] = newnode;
 	table->total_size++;
 
-	//TODO
-	//For loop me contains gia numOfArgs kai afto mesa se else
-	//To scope to pernao gia asfaleia apo otan to vriskei
-	//insert_hash_table(name, 3, line, true, tmpscope); //Thelei kai ton pinaka argtable.
-
-  	/*psaxnw ta pseudo-arg pou evala prin kai tous bazw swsta line kai Scope*/
-	// for (i = 0; i < numOfArgs; i++) {
-
-	// 	mapping = hash_function(argtable[i]);
-	// 	struct symbol_table_binding *tmp = table->pinakas[mapping];//paw se ayth th thesh
-	// 	while(tmp){
-	// 		if(tmp->symbol_type == 2 && strcmp(tmp->value.var->name,argtable[i]) == 0 && tmp->value.var->scope == 666 && tmp->value.var->line == 666){
-	// 					tmp->value.var->line = line;
-	// 			tmp->value.var->scope = (tmpscope + 1);
-	// 			break;
-	// 		}
-	// 		tmp = tmp->next;
-	// 	}
-	// }
-
-	// /*re malaka pernas pointer se ayto ton pinaka kai meta pas kai ton kaneis free ???? */
-	// int j = 0;
-	// for (j = 0; j< 4; j++) {	// mexri numOfArgs kanonika
-	// 	free(argtable[j]);
-	// }
-	// free(argtable);
-	// numOfArgs = 0;
 	return 0;
 }
 
@@ -376,13 +325,13 @@ void insertVar(char* name , int line , int scope){
 	}
 	assert(table && name);
     
-	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
-            || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
-            || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
-            || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
-		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
-		exit(EXIT_FAILURE);
-	} 
+	// if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
+    //         || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
+    //         || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
+    //         || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
+	// 	printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
+	// 	exit(EXIT_FAILURE);
+	// } 
 
 	flag = SymTable_contains(table, name, 1, line, 1, scope);
 	if(flag == 3) {
@@ -428,10 +377,17 @@ void print_table(){
 				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope ) {
 			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) ", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope);
 					//printf gia oti mpikan swsta <3
-					// while(curr->value.func->args_list != NULL) {
-					// 	printf("arg: %s\n", curr->value.func->args_list->name);
-					// 	curr->value.func->args_list = curr->value.func->args_list->next;
-					// }
+					printf("func name: %s ", curr->value.func->name);
+					struct arguments *tmp = curr->value.func->args_list;
+					//printf("arg1 %s arg2 %s",tmp->name, tmp->next->name);
+					while(tmp != NULL) {
+						printf("args %s\n", tmp->name);
+						tmp = tmp->next;
+					}
+					while(curr->value.func->args_list != NULL) {
+						printf("args: %s\n", curr->value.func->args_list->name);
+						curr->value.func->args_list = curr->value.func->args_list->next;
+					}
 				}
 				curr = curr-> next;
 			}
