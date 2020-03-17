@@ -193,12 +193,12 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 			if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope == scope && \
 				existance->symbol_type != sym_type ) {
 				return 3;
-			} else if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope != scope ) { 
+			} else if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope != scope ) {
 				return 2;
 			} else if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope == scope) {
 				return 1;
 			}
-			
+
 		} else if(sym_type == 3){
 			// idio onoma kai scope
 			if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope == scope && \
@@ -213,19 +213,30 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
     return 0;
 }
 
+void hide_symbols(int scope){
+	int i;
+	for(i = 0; i < 100; i++ ){
+	  struct symbol_table_binding *curr = table->pinakas[i];
+	  while(curr != NULL){
+			  if(curr->value.var->scope == scope && curr->value.var->scope!=0 ) curr->active=false;
+			  curr = curr-> next;
+	  }
+	}
+}
+
 int argumentF(char *name, int line, int scope) {
 	struct symbol_table_binding *tmp;
 	struct arguments *newArg = NULL;
 
 	assert(table && name);
-	
+
 	newArg = (struct arguments *)malloc(sizeof(struct arguments));
 	newArg->name = name;
-	
+
 	tmp = table->pinakas[lastActiveFunc];
 
 	// if(SymTable_contains(table, name, 2, line, 1, scope) == 1 ||
-	// 			SymTable_contains(table, name, 2, line, 1, scope) == 2)  {			
+	// 			SymTable_contains(table, name, 2, line, 1, scope) == 2)  {
 	// 	printf("Error: Duplicate argument name \"%s\" in function \"%s\" in line: %d.\n", name, tmp->value.func->name, yylineno);
 	// 	exit(EXIT_FAILURE);
 	// }
@@ -241,9 +252,9 @@ int argumentF(char *name, int line, int scope) {
 
 	newArg->next = table->pinakas[lastActiveFunc]->value.func->args_list;
 	table->pinakas[lastActiveFunc]->value.func->args_list = newArg;
-	
+
 	insert_hash_table(name, 2, line, true, scope);
-  
+
 	return 0;
 }
 
@@ -272,16 +283,16 @@ int newFunction(char* name , int line, int tmpscope){
 	/* DUPLICATE FUNCTION  */
 	flag = SymTable_contains(table, name, 3, line, 1, scope);
 	if(flag == 3) {
-		printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno); 
+		printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno);
 	 	exit(EXIT_FAILURE);
 	} else if(flag == 1) {
-		printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno); 
+		printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno);
 	 	exit(EXIT_FAILURE);
-	} 
+	}
 
 	// if(SymTable_contains(table, name, 3, line, 1, scope) == 1 ||
 	// 			SymTable_contains(table, name, 3, line, 1, scope) == 2)  {
-	// 	printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno); 
+	// 	printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno);
 	// 	exit(EXIT_FAILURE);
 	// }
 
@@ -323,23 +334,23 @@ void insertVar(char* name , int line , int scope){
 		table->total_size = 0;
 	}
 	assert(table && name);
-    
+
 	// if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
     //         || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
     //         || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
     //         || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
 	// 	printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
 	// 	exit(EXIT_FAILURE);
-	// } 
+	// }
 
 	flag = SymTable_contains(table, name, 1, line, 1, scope);
 	if(flag == 3) {
-		printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno); 
+		printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno);
 	 	exit(EXIT_FAILURE);
 	} else if(flag == 1) {
-		printf("Error: Duplicate variable name: \"%s\" in line: %d\n", name, yylineno); 
+		printf("Error: Duplicate variable name: \"%s\" in line: %d\n", name, yylineno);
 	 	exit(EXIT_FAILURE);
-	} 
+	}
 
 	//Lookup an iparxei , an oxi insert
 	if(scope == 0) {

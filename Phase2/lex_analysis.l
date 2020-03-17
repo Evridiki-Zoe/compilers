@@ -126,7 +126,7 @@ STRING				\"
 "."     	{ add_alpha_token(++token_count, "PUNCTUATION END DOT", ".", yylineno); return DOT; }
 ".."     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBLE_END DOTS", "..", yylineno); return DOTS;}
 "{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT CURLY BRACE", "{", yylineno); scope++; return L_CBRACKET;}
-"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT CURLY BRACE", "}", yylineno); scope--; return R_CBRACKET; }
+"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT CURLY BRACE", "}", yylineno);hide_symbols(scope--); return R_CBRACKET; }
 "["     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno);return L_SBRACKET; }
 "]"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno);return R_SBRACKET; }
 "("     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno); scope++; return L_PARENTHES; }

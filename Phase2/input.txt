@@ -1,2 +1,2 @@
-function kati(x,h,rr){ local y=0;}
+function kati(x,h,rr){ }
 ::y=2;
