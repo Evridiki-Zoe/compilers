@@ -125,12 +125,12 @@ STRING				\"
 "::"     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBUPDOWN DOTS", "::", yylineno); return DCOLON; }
 "."     	{ add_alpha_token(++token_count, "PUNCTUATION END DOT", ".", yylineno); return DOT; }
 ".."     	{ add_alpha_token(++token_count, "PUNCTUATION DOUBLE_END DOTS", "..", yylineno); return DOTS;}
-"{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT CURLY BRACE", "{", yylineno); scope++; printf("scope = %d", scope); return L_CBRACKET;}
-"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT CURLY BRACE", "}", yylineno); scope--; printf("scope = %d", scope); return R_CBRACKET; }
+"{"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT CURLY BRACE", "{", yylineno); scope++; return L_CBRACKET;}
+"}"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT CURLY BRACE", "}", yylineno); scope--; return R_CBRACKET; }
 "["     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT BRACKET", "[", yylineno);return L_SBRACKET; }
 "]"     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT BRACKET", "]", yylineno);return R_SBRACKET; }
-"("     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno);return L_PARENTHES; }
-")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno);return R_PARENTHES; }
+"("     	{ add_alpha_token(++token_count, "PUNCTUATION LEFT PARENTHESIS", "(", yylineno); scope++; return L_PARENTHES; }
+")"     	{ add_alpha_token(++token_count, "PUNCTUATION RIGHT PARENTHESIS", ")", yylineno); scope--; return R_PARENTHES; }
 
 
 {FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval.floatValue = atof(yytext); return FLOAT;}
