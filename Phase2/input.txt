@@ -1,2 +1,3 @@
-function kati(x,h,rr){ }
-::y=2;
+function y(){}
+y;
+
