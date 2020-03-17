@@ -14,9 +14,12 @@ extern int yylineno;
 extern char * yytext;
 extern int scope;
 
+char *result;
+int unnamedFuncs = 0;
+
 char** table;
 void print_table();
-
+int global_exists(const char *name);
 int newFunction(char* name, int line,int tmpscope);
 int argumentF(char *name, int line, int scope);
 int insert_hash_table(char *name, int sym_type, int line, bool active, int scope);
@@ -124,7 +127,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       ;
 
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
-      |  expr PLUS expr { printf(RED "expr+exp \n" RESET);}
+      |  expr PLUS expr { printf(RED "expr + exp \n" RESET);}
       |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);}
       |  expr MULT expr { printf(RED "expr * expr \n" RESET);}
       |  expr DIV expr { printf(RED "expr / expr \n" RESET);}
@@ -150,7 +153,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue EQ expr { printf(RED "lvalue=expression\n" RESET); }
+assignmexpr   : lvalue EQ expr { printf(RED "lvalue = expression\n" RESET); }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -162,11 +165,11 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( $1, yylineno, scope);  }
          | LOCAL IDENTIFIER { insertVar( $2, yylineno, scope); }
-         | DCOLON IDENTIFIER { if(SymTable_contains(table, $2, 1, yylineno, scope) == 0) {
+         | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
             }
-            printf( "lvalue:: doublecolon\n"); }
+            printf(  "lvalue:: doublecolon\n");}
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
 
@@ -211,7 +214,7 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi stmt}\n" RESET); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
+funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope - 1);} idlist R_PARENTHES block
          | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block
          ;
 
@@ -222,11 +225,11 @@ const    : number { printf(RED "const:: number\n" RESET); }
          | FALSE { printf(RED "const:: false\n" RESET); }
          ;
 
-number   : INTEGER { printf("%d\n",($1)); printf(RED "integer\n" RESET); }
-         | FLOAT { printf("%f\n",($1)); printf(RED "float\n" RESET); }
+number   : INTEGER { printf(RED "integer\n" RESET); }
+         | FLOAT { printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER { printf("EDW2"); argumentF( $1, yylineno, scope); } multi_id
+idlist   : IDENTIFIER { argumentF( $1, yylineno, scope); } multi_id
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
