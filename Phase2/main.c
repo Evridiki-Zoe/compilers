@@ -145,7 +145,6 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 	}
 
 	assert(table && name);
-
 	mapping = hash_function(name);
 
 	newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
@@ -244,7 +243,7 @@ int argumentF(char *name, int line, int scope) {
 	table->pinakas[lastActiveFunc]->value.func->args_list = newArg;
 	
 	insert_hash_table(name, 2, line, true, scope);
-
+  
 	return 0;
 }
 
