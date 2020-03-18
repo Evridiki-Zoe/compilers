@@ -13,5 +13,7 @@ yolo = 3;
     ::yolo = 1;
 }
 
-function h() {}
 h(d,c);
+
+
+function print = 1;
