@@ -28,6 +28,10 @@ int insert_hash_table(char *name, int sym_type, int line, bool active, int scope
 
 
 void insertVar(char* name, int line,int tmpscope);
+
+
+void make_not_accessible(int scope);
+void make_accessible_again(int scope);
 %}
 
 /*%glr-parser*/
@@ -217,8 +221,8 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET{printf("MPIKA STO BLOCK\n" );} multi_stmts R_CBRACKET { printf( "VGIKA APO TO BLOCKblock:: {stmt multi stmt}\n" ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block
-         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block
+funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
+         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES { make_not_accessible(scope+1); }  block {make_accessible_again(scope+1);}
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -260,6 +264,9 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 int main(void) {
 
+      insert_hash_table("a", 1, 1, true, 0);
+      insert_hash_table("b", 2, 1, true, 0);
+      insert_hash_table("c", 3, 1, true, 0);
       // insert_hash_table("print", 4 , 0, true, 0);
       // insert_hash_table("input", 4 , 0, true, 0);
       // insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
@@ -279,3 +286,4 @@ int main(void) {
 
       return 0;
 }
+
