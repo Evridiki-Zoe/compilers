@@ -108,8 +108,8 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 		function 	*func;
 	} value;
 	bool 			active;
-	bool			access;
-    struct symbol_table_binding *next;
+	bool accessible ;
+  struct symbol_table_binding *next;
 };
 
 struct SymTable_struct { /*TABLE*/
@@ -126,6 +126,63 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 //int SymTable_contains(const char *name, symtype sym_type, int scope);
 int insertLocalVar( char* name, int line, int scope);
 void print_table();
+
+
+
+
+
+
+void make_not_accessible(int curr_scope){
+	int i = 0;
+			for(i = 0; i < 100; i++) {
+				struct symbol_table_binding *curr = table->pinakas[i];
+				while(curr != NULL) {
+							if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
+									if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
+											curr->accessible = 0;
+									}
+									else {
+										curr = curr->next ;
+									}
+						}
+						else{
+								curr = curr->next ;
+						}
+				}
+
+			}
+
+//printf("NOT ACCESSIBLE\n");
+//print_table();
+}
+
+void make_accessible_again(int curr_scope){
+	int i = 0;
+			for(i = 0; i < 100; i++) {
+				struct symbol_table_binding *curr = table->pinakas[i];
+				while(curr != NULL) {
+					if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
+							if(  curr->accessible == 0 &&  curr->value.var->scope<curr_scope ){
+									curr->accessible = 1;
+							}
+							else {
+								curr = curr->next ;
+							}
+				}
+				else{
+						curr = curr->next ;
+				}
+
+				}
+
+			}
+
+//printf("AGAIN ACCESSIBLE\n");
+//print_table();
+
+}
+
+
 
 
 /*hash function for mapping symbols in table*/
@@ -163,7 +220,6 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 		newnode->value.func->line = line;
 		newnode->value.func->scope = scope;
 		newnode->value.func->args_list = NULL;
-		newnode->access=true;
 	}
 
 	newnode->active = active;
@@ -462,6 +518,7 @@ char* enum_toString(symtype sym) {
 	else return "lathos";
 }
 
+
 /*prints table*/
 void print_table(){
   	int i = 0, scope = 0;
@@ -477,16 +534,22 @@ void print_table(){
 			struct symbol_table_binding *curr = table->pinakas[i];
 			while(curr != NULL) {
 				if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2) && curr->value.var->scope == scope )
-      				printf("\n \"%s\" [%s variable] (line %d) (scope %d) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope);
+      				printf("\n \"%s\" [%s variable] (line %d) (scope %d) (active %d) (accessible %d) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope, curr->active, curr->accessible);
 
 				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope ) {
-			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) ", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope);
+			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) (active %d)", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope, curr->active);
 					//printf gia oti mpikan swsta <3
-					// struct arguments *tmp = curr->value.func->args_list;
-					// while(tmp != NULL) {
-					// 	printf("args %s\n", tmp->name);
-					// 	tmp = tmp->next;
-					// }
+					printf("func name: %s ", curr->value.func->name);
+					struct arguments *tmp = curr->value.func->args_list;
+					//printf("arg1 %s arg2 %s",tmp->name, tmp->next->name);
+					while(tmp != NULL) {
+						printf("args %s\n", tmp->name);
+						tmp = tmp->next;
+					}
+					while(curr->value.func->args_list != NULL) {
+						printf("args: %s\n", curr->value.func->args_list->name);
+						curr->value.func->args_list = curr->value.func->args_list->next;
+					}
 				}
 				curr = curr-> next;
 			}
