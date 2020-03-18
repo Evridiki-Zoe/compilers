@@ -18,7 +18,6 @@ extern int numOfArgs;
 void print_table();
 void arginsert(char* arg);
 int newFunction(char* name, int line,int tmpscope);
-
 void print_table();
 
 //------------------------- LEX ----------------------------
@@ -106,6 +105,7 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 		function 	*func;
 	} value;
 	bool 			active;
+	bool			access;
     struct symbol_table_binding *next;
 };
 
@@ -116,9 +116,12 @@ struct SymTable_struct { /*TABLE*/
 
 struct SymTable_struct *table = NULL;
 
-int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope);
 int searchValue(struct arguments *head, char *key);
 
+int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope);
+
+//int SymTable_contains(const char *name, symtype sym_type, int scope);
+int insertLocalVar( char* name, int line, int scope);
 void print_table();
 
 
@@ -164,6 +167,7 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 		newnode->value.func->line = line;
 		newnode->value.func->scope = scope;
 		newnode->value.func->args_list = NULL;
+		newnode->access=true;
 	}
 
 	newnode->active = active;
@@ -221,38 +225,36 @@ int contains_Func(const char *name, symtype symtype, bool active, int scope) {
  * an den yparxei return 0;
  */
 int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope){
-    struct symbol_table_binding *existance;
+    struct symbol_table_binding *curr;
     int hash = 0;
     assert(table && name);
 
     hash = hash_function(name);//briskw pou kanei hash to stoixeio
-    existance = table->pinakas[hash];//paw se ayth th thesh
+    curr = table->pinakas[hash];//paw se ayth th thesh
 
 	//elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
-    while(existance){
-		if(sym_type == 0 || sym_type == 1 || sym_type == 2){
-			if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope == scope && \
-				existance->symbol_type != sym_type ) {
+    while(curr){
+		if (strcmp(curr->value.var->name,name)==0 && scope == curr->value.var->scope ) {
+			printf("%d  -- %d\n",curr->symbol_type,sym_type);
+			if (curr->symbol_type==sym_type) return 1;
+			else {
+				printf("Conflicting types of %s in line %d \n",name , yylineno );
+				exit(EXIT_FAILURE);
+
+			// idio onoma kai scope
+			if( strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == scope && \
+				curr->symbol_type != sym_type ) {
 				return 3;
-			} else if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope != scope ) {
+			} else if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope != scope){
 				return 2;
-			} else if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope == scope) {
+			} else if( strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope ) 
 				return 1;
 			}
+    	curr = curr->next;
+    return 0;	
+	}
 
-		} else if(sym_type == 3){
-			// idio onoma kai scope
-			if( strcmp(existance->value.var->name, name) == 0 && existance->value.var->scope == scope && \
-				existance->symbol_type != sym_type ) {
-				return 3;
-			} else if(strcmp(existance->value.func->name, name) == 0 && existance->value.func->scope != scope){
-				return 2;
-			} else if( strcmp(existance->value.func->name, name) == 0 && existance->value.func->scope == scope ) 
-				return 1;
-		}
-      existance = existance->next;
-    }
-    return 0;
+}
 }
 
 void hide_symbols(int scope){
@@ -327,15 +329,29 @@ int newFunction(char* name , int line, int scope){
 		exit(EXIT_FAILURE);
 	}
 
+//TODO
 	/* DUPLICATE FUNCTION  */
-	flag = SymTable_contains(table, name, 3, line, 1, scope);
-	if(flag == 3) {
-		printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno);
-	 	exit(EXIT_FAILURE);
-	} else if(flag == 1) {
-		printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno);
-	 	exit(EXIT_FAILURE);
-	}
+	// flag = SymTable_contains(table, name, 3, line, 1, scope);
+	// if(flag == 3) {
+	// 	printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno);
+	//  	exit(EXIT_FAILURE);
+	// } else if(flag == 1) {
+	// 	printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno);
+	//  	exit(EXIT_FAILURE);
+	// }
+	// flag = SymTable_contains(table, name, 3, line, 1);
+	// if(flag == 3) {
+	// 	printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno);
+	//  	exit(EXIT_FAILURE);
+	// } else if(flag == 1) {
+	// 	printf("Error: Duplicate function name: \"%s\" in line: %d\n", name, yylineno);
+	//  	exit(EXIT_FAILURE);
+	// }
+
+
+// if (SymTable_contains(name,3,scope)) {
+// 	return 0;
+// }
 
 	mapping = hash_function(name);
 	lastActiveFunc = mapping;
@@ -367,9 +383,11 @@ int searchValue(struct arguments *head, char *key) {
 
 	return 0;
 }
-void insertVar(char* name , int line , int scope){
-	int flag = -1;
 
+
+int insertVar(char* name , int line , int scope){
+	int flag = 1;
+	struct symbol_table_binding *curr;
 	if(table == NULL){
 		table = malloc(sizeof(struct SymTable_struct *));
 
@@ -378,28 +396,107 @@ void insertVar(char* name , int line , int scope){
 	}
 	assert(table && name);
 
-	// if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
-    //         || strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
-    //         || strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
-    //         || strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
-	// 	printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
-	// 	exit(EXIT_FAILURE);
-	// }
+	int hash = 0;
+	if (scope==0) flag=0;
+	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
+			|| strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
+			|| strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
+			|| strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
+		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
+		exit(EXIT_FAILURE);
+}
+	hash = hash_function(name);//briskw pou kanei hash to stoixeio
+	curr = table->pinakas[hash];//paw se ayth th thesh
 
-	flag = SymTable_contains(table, name, 1, line, 1, scope);
-	if(flag == 3) {
-		printf("Error: Redefinition of name: \"%s\" in line: %d\n", name, yylineno);
-	 	exit(EXIT_FAILURE);
-	} else if(flag == 1) {
-		printf("Error: Duplicate variable name: \"%s\" in line: %d\n", name, yylineno);
-	 	exit(EXIT_FAILURE);
+
+	while(curr){
+		if (strcmp(curr->value.var->name,name)==0 && scope == curr->value.var->scope && curr->active==true ) {
+			printf("%d  -- %d\n",curr->symbol_type,flag);
+			if (curr->symbol_type!=flag){
+
+				printf("Conflicting types of %s in line %d \n",name , yylineno );
+				exit(EXIT_FAILURE);
+
+			}else return 0;
+
+		}
+		curr = curr->next;
 	}
 
-	//Lookup an iparxei , an oxi insert
+	curr = table->pinakas[hash];//paw se ayth th thesh
+
+	while(curr){
+		if (strcmp(curr->value.var->name,name)==0 && curr->active==true && curr->value.var->scope!=0) {
+				printf("Cannot access  %s in line %d \n",curr->value.var->name , curr->value.var->line );
+				exit(EXIT_FAILURE);
+
+			 return 0;
+
+		}
+		curr = curr->next;
+	}
+
+	curr = table->pinakas[hash];//paw se ayth th thesh
+
+	while(curr){
+		if (strcmp(curr->value.var->name,name)==0 && curr->active==true && curr->value.var->scope==0) {
+
+			 return 0;
+
+		}
+		curr = curr->next;
+	}
+
 	if(scope == 0) {
 		insert_hash_table(name, 0, line, true, scope);
 	} else insert_hash_table(name, 1, line, true, scope);
 }
+
+
+int insertLocalVar( char* name, int line, int scope){
+	int flag=1;
+	struct symbol_table_binding *curr;
+    int hash = 0;
+	if(table == NULL){
+		table = malloc(sizeof(struct SymTable_struct *));
+
+		table->pinakas = malloc(100 * sizeof(struct symbol_table_binding*));
+		table->total_size = 0;
+	}
+    assert(table && name);
+	if (scope==0) flag=0;
+	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
+			|| strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
+			|| strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
+			|| strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
+		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
+		exit(EXIT_FAILURE);
+}
+    hash = hash_function(name);//briskw pou kanei hash to stoixeio
+    curr = table->pinakas[hash];//paw se ayth th thesh
+
+	//elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
+    while(curr){
+		if (strcmp(curr->value.var->name,name)==0 && scope == curr->value.var->scope && curr->active==true ) {
+			printf("%d  -- %d\n",curr->symbol_type,flag);
+			if (curr->symbol_type!=flag){
+
+				printf("Conflicting types of %s in line %d \n",name , yylineno );
+				exit(EXIT_FAILURE);
+
+			}else return 0;
+
+		}
+    	curr = curr->next;
+    }
+
+		insert_hash_table(name, flag, line, true, scope);
+
+
+    return 0;
+
+}
+
 
 char* enum_toString(symtype sym) {
 	if(sym == 0) return "global";

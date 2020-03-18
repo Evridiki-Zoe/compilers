@@ -20,9 +20,12 @@ int unnamedFuncs = 0;
 char** table;
 void print_table();
 int global_exists(const char *name);
+int num=0;
+
 int newFunction(char* name, int line,int tmpscope);
 int argumentF(char *name, int line, int scope);
 int insert_hash_table(char *name, int sym_type, int line, bool active, int scope);
+
 
 void insertVar(char* name, int line,int tmpscope);
 %}
@@ -164,8 +167,8 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          ;
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( $1, yylineno, scope);  }
-         | LOCAL IDENTIFIER { insertVar( $2, yylineno, scope); }
-         | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
+         | LOCAL IDENTIFIER { insertLocalVar( $2, yylineno, scope); } 
+         |  DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
             }
@@ -211,10 +214,10 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
 indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
-block   :  L_CBRACKET multi_stmts R_CBRACKET { printf(RED "block:: {stmt multi stmt}\n" RESET); }
+block   :  L_CBRACKET{printf("MPIKA STO BLOCK\n" );} multi_stmts R_CBRACKET { printf( "VGIKA APO TO BLOCKblock:: {stmt multi stmt}\n" ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope - 1);} idlist R_PARENTHES block
+funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block
          | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block
          ;
 
@@ -229,11 +232,11 @@ number   : INTEGER { printf(RED "integer\n" RESET); }
          | FLOAT { printf(RED "float\n" RESET); }
          ;
 
-idlist   : IDENTIFIER { argumentF( $1, yylineno, scope); } multi_id
+idlist   : IDENTIFIER { argumentF( $1, yylineno, (scope + 1)); } multi_id
          | /*empty*/ { printf(RED "idlist:: empty\n" RESET); }
          ;
 
-multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, scope); } multi_id
+multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, (scope+1)); } multi_id
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
@@ -256,7 +259,7 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
 
 
 int main(void) {
-            
+
       // insert_hash_table("print", 4 , 0, true, 0);
       // insert_hash_table("input", 4 , 0, true, 0);
       // insert_hash_table("objectmemberkeys", 4 , 0, true, 0);

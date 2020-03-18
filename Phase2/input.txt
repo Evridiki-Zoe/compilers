@@ -1,13 +1,17 @@
-function (b) {
+function a(A,B) {
+    local x = 9;
 
+   {
+       local x = 1;
+   }
 }
 
+yolo = 3;
 
 {
-    function (b,c) {
-
-    }
+    yolo = 2;
+    ::yolo = 1;
 }
 
-
-print(a,b);
+function h() {}
+h(d,c);
