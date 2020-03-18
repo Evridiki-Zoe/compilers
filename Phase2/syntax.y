@@ -29,15 +29,11 @@ int insert_hash_table(char *name, int sym_type, int line, bool active, int scope
 
 int localVar(const char *name, int line, int scope);
 
-<<<<<<< HEAD
-int insertVar(const char* name, int line,int tmpscope);
-=======
-void insertVar(char* name, int line,int tmpscope);
+void insertVar(const char* name, int line,int tmpscope);
 
 
 void make_not_accessible(int scope);
 void make_accessible_again(int scope);
->>>>>>> 14b59905161a0829d64140363f26f64b4435dc58
 %}
 
 /*%glr-parser*/
@@ -227,14 +223,8 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-<<<<<<< HEAD
 funcdef  : FUNCTION  { TMP++; }L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block { TMP--;}    
-         | FUNCTION { TMP++; } IDENTIFIER { newFunction( $3, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block { TMP--;}
-=======
-funcdef  : FUNCTION L_PARENTHES idlist R_PARENTHES block { newFunction("OTI THELETE",yylineno,scope);printf("Komple adeio onoma\n"); }
-         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES { make_not_accessible(scope+1); }  block {make_accessible_again(scope+1);}
->>>>>>> 14b59905161a0829d64140363f26f64b4435dc58
-         ;
+         | FUNCTION { TMP++; } IDENTIFIER { newFunction( $3, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block { TMP--; make_accessible_again(scope+1);}
 
 const    : number { printf(RED "const:: number\n" RESET); }
          | STRING { printf(RED "const:: str\n" RESET); }
@@ -269,36 +259,4 @@ returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
     			| RETURN SEMICOLON  { printf(RED "return; \n" RESET);}
     			;
 
-<<<<<<< HEAD
 %%
-=======
-
-%%
-
-
-int main(void) {
-
-      insert_hash_table("a", 1, 1, true, 0);
-      insert_hash_table("b", 2, 1, true, 0);
-      insert_hash_table("c", 3, 1, true, 0);
-      // insert_hash_table("print", 4 , 0, true, 0);
-      // insert_hash_table("input", 4 , 0, true, 0);
-      // insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
-      // insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
-      // insert_hash_table("objectcopy", 4 , 0, true, 0);
-      // insert_hash_table("totalarguments", 4 , 0, true, 0);
-      // insert_hash_table("argument", 4 , 0, true, 0);
-      // insert_hash_table("typeof", 4 , 0, true, 0);
-      // insert_hash_table("strtonum", 4 , 0, true, 0);
-      // insert_hash_table("sqrt", 4 , 0, true, 0);
-      // insert_hash_table("cos", 4 , 0, true, 0);
-      // insert_hash_table("sin", 4 , 0, true, 0);
-
-      yyparse();
-
-      print_table();
-
-      return 0;
-}
-
->>>>>>> 14b59905161a0829d64140363f26f64b4435dc58
