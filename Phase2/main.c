@@ -149,8 +149,8 @@ void make_not_accessible(int curr_scope){
 
 			}
 
-printf("NOT ACCESSIBLE\n");
-print_table();
+//printf("NOT ACCESSIBLE\n");
+//print_table();
 }
 
 void make_accessible_again(int curr_scope){
@@ -174,8 +174,8 @@ void make_accessible_again(int curr_scope){
 
 			}
 
-printf("AGAIN ACCESSIBLE\n");
-print_table();
+//printf("AGAIN ACCESSIBLE\n");
+//print_table();
 
 }
 
