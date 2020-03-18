@@ -1,19 +1,8 @@
-function a(A,B) {
-    local x = 9;
+a = 1;
+function ok() {
 
-   {
-       local x = 1;
-   }
+
+    function b(lol){
+        a = 2;
+    }
 }
-
-yolo = 3;
-
-{
-    yolo = 2;
-    ::yolo = 1;
-}
-
-h(d,c);
-
-
-function print = 1;

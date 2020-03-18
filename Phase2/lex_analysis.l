@@ -14,6 +14,7 @@ void yywarning(char *text){
 }
 
 void hide_symbols(int scope);
+
 /*void yyerror(char *text){
     printf("Error in line %d : %s\n",yylineno,text );
     exit(0);
