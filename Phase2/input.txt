@@ -1,8 +1,10 @@
-a = 1;
+
 function ok() {
+    a= 1;
 
-
-    function b(lol){
+{
         a = 2;
     }
-}
+
+ }
+

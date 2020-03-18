@@ -428,50 +428,42 @@ int insertVar(char* name , int line , int scope){
 	hash = hash_function(name);//briskw pou kanei hash to stoixeio
 	
 	/* 
-	 * check gia reference anamesa se synartiseis
+	 * check locally gia reference, ok
 	 * 
-	 * meta checkarw globally
+	 * meta check an yparxei ws synartisi, ERROR
 	 * 
-	 * alliws einai ERROR
+	 * meta globally, ok
+	 * 
+	 * meta an einai anamesa se synartisi, ERROR
+	 * 
+	 * alliws einai GG
 	 */
 	tmp = table->pinakas[lastActiveFunc];
 	curr = table->pinakas[hash];//paw se ayth th thesh
 	while(curr){
-		if (strcmp(curr->value.var->name, name) == 0 && scope > tmp->value.func->scope ){
+
+		// yparxei locally
+		if (strcmp(curr->value.var->name, name) == 0 && scope > tmp->value.func->scope && tmp->value.func->scope < curr->value.var->scope){
 			return 0;
-		} else if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {
+
+			// yparxei ws synartisi
+		} else if(strcmp(curr->value.var->name, name) == 0 && curr->symbol_type == 3){	 
+			printf("Conflicting type of \"%s\" in line: %d\n", name, yylineno);
+			exit(EXIT_FAILURE);
+		
+				// yparxei globally
+		} else  if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {			
+			return 0;
+
+			// yparxei anamesa synartisi
+		} else if (strcmp(curr->value.var->name, name) == 0 && scope > tmp->value.func->scope && tmp->value.func->scope >= curr->value.var->scope){
 			printf("Cannot access \"%s\" in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 			exit(EXIT_FAILURE);
 		}
+
 		curr = curr->next;
 	}
 
-	// curr = table->pinakas[hash];//paw se ayth th thesh
-	// while(curr){
-	// 	if (strcmp(curr->value.var->name,name)==0 && scope == curr->value.var->scope && curr->active==true ) {
-	// 		printf("%d  -- %d\n",curr->symbol_type,flag);
-	// 		if (curr->symbol_type!=flag){
-
-	// 			printf("Conflicting types of %s in line %d \n",name , yylineno );
-	// 			exit(EXIT_FAILURE);
-
-	// 		}else return 0;
-
-	// 	}
-	// 	curr = curr->next;
-	// }
-
-	
-
-	/* check gia reference GLOBALLY */
-	// curr = table->pinakas[hash];//paw se ayth th thesh
-	// while(curr){
-	// 	if (strcmp(curr->value.var->name,name) == 0 && curr->active == true && curr->value.var->scope == 0) {
-	// 		return 0;
-	// 	}
-	// 	curr = curr->next;
-	// }
-	
 	insert_hash_table(name, flag, line, true, scope);
 }
 
@@ -539,17 +531,12 @@ void print_table(){
 				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope ) {
 			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) (active %d)", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope, curr->active);
 					//printf gia oti mpikan swsta <3
-					printf("func name: %s ", curr->value.func->name);
-					struct arguments *tmp = curr->value.func->args_list;
-					//printf("arg1 %s arg2 %s",tmp->name, tmp->next->name);
-					while(tmp != NULL) {
-						printf("args %s\n", tmp->name);
-						tmp = tmp->next;
-					}
-					while(curr->value.func->args_list != NULL) {
-						printf("args: %s\n", curr->value.func->args_list->name);
-						curr->value.func->args_list = curr->value.func->args_list->next;
-					}
+					// struct arguments *tmp = curr->value.func->args_list;
+					// //printf("arg1 %s arg2 %s",tmp->name, tmp->next->name);
+					// while(tmp != NULL) {
+					// 	printf("args %s\n", tmp->name);
+					// 	tmp = tmp->next;
+					// }
 				}
 				curr = curr-> next;
 			}
