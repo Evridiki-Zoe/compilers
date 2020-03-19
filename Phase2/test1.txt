@@ -1,16 +1,1 @@
-{
-    function kappa(a,b) {
-        a = 2;
-        b = 4;
-
-        {
-            a = 3; //OK;
-        }
-    }
-
-    function lol(kappa) {
-        function lol() { // OK
-           local d = 1;
-        }
-    }
-}
+print = 2;

@@ -438,7 +438,7 @@ int insertVar(char* name , int line , int scope){
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR
 	 *
-	 *  meta check an yparxei ws synartisi, ERROR
+	 * meta check an yparxei ws synartisi, ERROR
 	 * 
 	 * meta globally, ok
 	 * 
@@ -450,8 +450,8 @@ int insertVar(char* name , int line , int scope){
 	while(curr){
 
 		// yparxei locally i anamesa se synartisi
-		if (strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope <= scope){
-
+		if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
+			
 			if(tmp != NULL) {
 				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
 					printf("Cannot access \"%s\" in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );

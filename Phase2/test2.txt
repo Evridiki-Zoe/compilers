@@ -1,1 +1,6 @@
-local d = 1;
+{
+a=1;
+
+{
+function a(){}
+}

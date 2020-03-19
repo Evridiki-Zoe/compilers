@@ -163,7 +163,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue { check_for_funcname($1); } EQ expr {  printf(RED "lvalue = expression\n" RESET); }
+assignmexpr   : lvalue { check_for_funcname(yylval.stringValue); } EQ expr {  printf(RED "lvalue = expression\n" RESET); }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
