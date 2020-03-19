@@ -190,44 +190,22 @@ int hash_function(const char *name){
   return uiHash % 100 ;
 }
 
-void check_for_funcname(const char* name){
+void check_for_funcname(char* lvalue_name){
 	int i = 0 ;
-	
-	assert(name);
+	assert(lvalue_name);
+	for(i = 0; i < 100; i++){
+			struct symbol_table_binding *curr = table->pinakas[i];
+			while(curr != NULL) {
+						if(curr->symbol_type == 3 || curr->symbol_type == 4){
+							if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+								 printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+							   exit(1);
+							 }
+				   }
 
-	int mapping = hash_function(name);
-	struct symbol_table_binding *curr = table->pinakas[mapping];
-
-	// while(curr) {
-	// 	if(strcmp(name, curr->value.func->name) == 0) {
-	// 		if(curr->symbol_type == 3 || curr->symbol_type == 4) {
-	// 			printf("den kserwww\n");
-	// 		}
-	// 	}
-	// 	if(curr->symbol_type == 3 || curr->symbol_type == 4) {
-	// 		if(strcmp(name, curr->value.func->name) == 0 && curr->symbol_type != 1) {
-	// 			printf("WTF, onoma: %s kai type: %d\n", name, curr->symbol_type);
-	// 			printf("Error: Cannot assign value to user/library function \"%s\" in line: \"%d\"\n", name, yylineno);
-	// 			exit(EXIT_FAILURE);
-	// 		}
-	// 	}
-	// 	curr = curr->next;
-	// }
-
-	// for(i = 0; i < 100; i++){ // wtf????????
-	// 		struct symbol_table_binding *curr = table->pinakas[i];
-	// 		while(curr != NULL) {
-	// 					if(curr->symbol_type == 3 || curr->symbol_type == 4){
-	// 						//char * name = curr->value.func->name;
-	// 						if(strcmp(lvalue_name, curr->value.func->name) == 0) {
-	// 							printf("Error: you are trying to assign a value to a user/library function\n");
-	// 						   	exit(1);
-	// 						}
-	// 			   }
-
-	// 	     curr = curr->next;
-	// 		}
-	// }
+		     curr = curr->next;
+			}
+	}
 
 }
 
@@ -245,7 +223,7 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 	newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
 
 	if(sym_type == 0 || sym_type == 1 || sym_type == 2){ //an einai metavlhth
-		
+
 		newnode->value.var = (struct variable *)malloc(sizeof(struct variable));
 		newnode->value.var->name = (char *)malloc(sizeof(char));
 		newnode->value.var->name = name;
@@ -439,13 +417,13 @@ int insertVar(char* name , int line , int scope){
 	 * meta an yparxei synartisi anamesa, ERROR
 	 *
 	 *  meta check an yparxei ws synartisi, ERROR
-	 * 
+	 *
 	 * meta globally, ok
-	 * 
+	 *
 	 * alliws einai GG kai kanoume insert
  	 */
 	tmp = table->pinakas[lastActiveFunc];
-	
+
 	curr = table->pinakas[hash];//paw se ayth th thesh
 	while(curr){
 
