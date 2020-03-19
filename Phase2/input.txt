@@ -1,4 +1,4 @@
-
+cos = 9;
 function ok() {
     a= 1;
 
