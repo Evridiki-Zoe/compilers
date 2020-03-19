@@ -215,11 +215,8 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-<<<<<<< HEAD
-assignmexpr   : lvalue { check_for_funcname(yylval.stringValue); } EQ expr {  printf(RED "lvalue = expression\n" RESET); }
-=======
 assignmexpr   : lvalue  EQ expr {  printf(RED "lvalue = expression\n" RESET);
-                                  if($1 == NULL){ /**/}
+                                  if($1 == NULL){ }
                                   else{
                                         char *token;
                                         /* get the first token */
@@ -232,7 +229,6 @@ assignmexpr   : lvalue  EQ expr {  printf(RED "lvalue = expression\n" RESET);
                                         }
                                   }
                           }
->>>>>>> 8f9176318c6265a2989e0d11046b2cfb4d359a60
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -252,7 +248,7 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET);
 
                         insertVar( $1, yylineno, scope);  }
          | LOCAL IDENTIFIER { printf(RED "lvalue:: local identifier\n" RESET);  localVar( $2, yylineno, scope); }
-         |  DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
+         | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
             }

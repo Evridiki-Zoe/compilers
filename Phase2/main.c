@@ -124,42 +124,14 @@ int insertLocalVar( char* name, int line, int scope);
 void print_table();
 
 
-
-
-
-
 void make_not_accessible(int curr_scope){
 	int i = 0;
-			for(i = 0; i < 100; i++) {
-				struct symbol_table_binding *curr = table->pinakas[i];
-				while(curr != NULL) {
-							if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
-									if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
-											curr->accessible = 0;
-									}
-									else {
-										curr = curr->next ;
-									}
-						}
-						else{
-								curr = curr->next ;
-						}
-				}
-
-			}
-
-//printf("NOT ACCESSIBLE\n");
-//print_table();
-}
-
-void make_accessible_again(int curr_scope){
-	int i = 0;
-			for(i = 0; i < 100; i++) {
-				struct symbol_table_binding *curr = table->pinakas[i];
-				while(curr != NULL) {
+	for(i = 0; i < 100; i++) {
+		struct symbol_table_binding *curr = table->pinakas[i];
+		while(curr != NULL) {
 					if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
-							if(  curr->accessible == 0 &&  curr->value.var->scope<curr_scope ){
-									curr->accessible = 1;
+							if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
+									curr->accessible = 0;
 							}
 							else {
 								curr = curr->next ;
@@ -168,10 +140,34 @@ void make_accessible_again(int curr_scope){
 				else{
 						curr = curr->next ;
 				}
+		}
 
-				}
+	}
 
-			}
+//printf("NOT ACCESSIBLE\n");
+//print_table();
+}
+
+void make_accessible_again(int curr_scope){
+	int i = 0;
+	for(i = 0; i < 100; i++) {
+		struct symbol_table_binding *curr = table->pinakas[i];
+		while(curr != NULL) {
+			if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
+					if(  curr->accessible == 0 &&  curr->value.var->scope < curr_scope ){
+							curr->accessible = 1;
+					}
+					else {
+						curr = curr->next ;
+					}
+		}
+		else{
+				curr = curr->next ;
+		}
+
+		}
+
+	}
 
 //printf("AGAIN ACCESSIBLE\n");
 //print_table();
@@ -427,26 +423,55 @@ int insertVar(char* name , int line , int scope){
 	curr = table->pinakas[hash];//paw se ayth th thesh
 	while(curr){
 
-		// yparxei locally i anamesa se synartisi
-		if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
-			
+		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag  ) {
 			if(tmp != NULL) {
 				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
 					printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 					exit(EXIT_FAILURE);
 				}
 			}
+			//OK REFERENCE sto akrivos idio scope
 			return 0;
-
-			// yparxei ws synartisi
-		} else if(strcmp(curr->value.var->name, name) == 0 && curr->symbol_type == 3){
-			printf("Conflicting type of \"%s\" in line: %d\n", name, yylineno);
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type != flag && curr->value.func->scope == scope ) {
+			printf("Cannot change value of \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 			exit(EXIT_FAILURE);
 
-				// yparxei globally
-		} else  if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type != flag && curr->value.var->scope != 0) {
+			printf("illigal opws leei kai o kwstas\n");
+			exit(EXIT_FAILURE);
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type == flag && curr->value.var->scope != 0 ) {
+			printf("reference amanesa, oti kai an simainei auto. :)\n");
+			return 0;
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type != flag && curr->value.var->scope != 0) {
+			printf("error allos typos anamesa sto global kai auto to scope");
+			exit(EXIT_FAILURE);
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type == flag && curr->value.var->scope == 0) {
+			printf("ok yparxei globbally");
+			return 0;
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type != flag && curr->value.var->scope == 0) {
+			printf("yparxei globally ws synartisi probably error, basika einai ok");
 			return 0;
 		}
+		// yparxei locally i anamesa se synartisi
+		// if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
+			
+		// 	if(tmp != NULL) {
+		// 		if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
+		// 			printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+		// 			exit(EXIT_FAILURE);
+		// 		}
+		// 	}
+		// 	return 0;
+
+		// 	// yparxei ws synartisi
+		// } else if(strcmp(curr->value.var->name, name) == 0 && curr->symbol_type == 3){
+		// 	printf("Conflicting type of \"%s\" in line: %d\n", name, yylineno);
+		// 	exit(EXIT_FAILURE);
+
+		// 		// yparxei globally
+		// } else  if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {
+		// 	return 0;
+		// }
 
 		curr = curr->next;
 	}
