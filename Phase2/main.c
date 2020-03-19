@@ -182,7 +182,24 @@ void make_accessible_again(int curr_scope){
 
 }
 
+void check_for_funcname(char* lvalue_name){
+	int i = 0 ;
+	for(i = 0; i < 100; i++){
+			struct symbol_table_binding *curr = table->pinakas[i];
+			while(curr != NULL) {
+						if(curr->symbol_type == 3 || curr->symbol_type == 4){
+							//char * name = curr->value.func->name;
+							if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+								 printf("Error: you are trying to assign a value to a user/library function\n");
+							   exit(1);
+							 }
+				   }
 
+		     curr = curr->next;
+			}
+	}
+
+}
 
 
 /*hash function for mapping symbols in table*/
@@ -229,14 +246,14 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 	table->pinakas[mapping] = newnode;
 	table->total_size++;
 
-  	return 1;
+  return 1;
 }
 
 
 int global_exists(const char *name) {
 	struct symbol_table_binding *curr;
 	int mapping = 0;
-	
+
 	assert(name);
 
 	mapping = hash_function(name);
@@ -257,7 +274,7 @@ int global_exists(const char *name) {
 int contains_Func(const char *name, int scope) {
 	struct symbol_table_binding *curr;
 	int mapping = 0;
-	
+
 	assert(name);
 
 	mapping = hash_function(name);
@@ -300,11 +317,11 @@ int SymTable_contains(struct SymTable_struct *table, const char *name, symtype s
 				return 3;
 			} else if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope != scope){
 				return 2;
-			} else if( strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope ) 
+			} else if( strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope )
 				return 1;
 			}
     	curr = curr->next;
-    return 0;	
+    return 0;
 	}
 
 }
@@ -426,20 +443,22 @@ int insertVar(char* name , int line , int scope){
 	// }
 
 	hash = hash_function(name);//briskw pou kanei hash to stoixeio
-	
-	/* 
+
+	/*
 	 * check locally gia reference, ok
-	 * 
+	 *
 	 * meta check an yparxei ws synartisi, ERROR
-	 * 
+	 *
 	 * meta globally, ok
-	 * 
+	 *
 	 * meta an einai anamesa se synartisi, ERROR
-	 * 
+	 *
 	 * alliws einai GG
 	 */
+	 printf("[rin to lastActiveFunc]\n" );
 	tmp = table->pinakas[lastActiveFunc];
 	curr = table->pinakas[hash];//paw se ayth th thesh
+	if(curr == NULL){ printf("EIMAI NULL KAI DEN ME ELEGXE KANEIS\n" );}
 	while(curr){
 
 		// yparxei locally
@@ -447,12 +466,12 @@ int insertVar(char* name , int line , int scope){
 			return 0;
 
 			// yparxei ws synartisi
-		} else if(strcmp(curr->value.var->name, name) == 0 && curr->symbol_type == 3){	 
+		} else if(strcmp(curr->value.var->name, name) == 0 && curr->symbol_type == 3){
 			printf("Conflicting type of \"%s\" in line: %d\n", name, yylineno);
 			exit(EXIT_FAILURE);
-		
+
 				// yparxei globally
-		} else  if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {			
+		} else  if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {
 			return 0;
 
 			// yparxei anamesa synartisi
@@ -472,7 +491,7 @@ int localVar(const char* name, int line, int scope){
 	int flag = 1;
 	struct symbol_table_binding *curr;
     int hash = 0;
-	
+
     assert(table && name);
 	if (scope == 0) flag = 0;
 	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
@@ -554,18 +573,18 @@ int main(void) {
 		table->pinakas = malloc(100 * sizeof(struct symbol_table_binding*));
 		table->total_size = 0;
 	}
-	// insert_hash_table("print", 4 , 0, true, 0);
-	// insert_hash_table("input", 4 , 0, true, 0);
-	// insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
-	// insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
-	// insert_hash_table("objectcopy", 4 , 0, true, 0);
-	// insert_hash_table("totalarguments", 4 , 0, true, 0);
-	// insert_hash_table("argument", 4 , 0, true, 0);
-	// insert_hash_table("typeof", 4 , 0, true, 0);
-	// insert_hash_table("strtonum", 4 , 0, true, 0);
-	// insert_hash_table("sqrt", 4 , 0, true, 0);
-	// insert_hash_table("cos", 4 , 0, true, 0);
-	// insert_hash_table("sin", 4 , 0, true, 0);
+ insert_hash_table("print", 4 , 0, true, 0);
+ insert_hash_table("input", 4 , 0, true, 0);
+ insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+ insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+ insert_hash_table("objectcopy", 4 , 0, true, 0);
+ insert_hash_table("totalarguments", 4 , 0, true, 0);
+ insert_hash_table("argument", 4 , 0, true, 0);
+ insert_hash_table("typeof", 4 , 0, true, 0);
+ insert_hash_table("strtonum", 4 , 0, true, 0);
+ insert_hash_table("sqrt", 4 , 0, true, 0);
+ insert_hash_table("cos", 4 , 0, true, 0);
+ insert_hash_table("sin", 4 , 0, true, 0);
 
 	yyparse();
 
