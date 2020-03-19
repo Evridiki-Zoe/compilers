@@ -163,9 +163,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue EQ expr { printf(RED "lvalue = expression\n" RESET);
-                check_for_funcname($1);
-              }
+assignmexpr   : lvalue { check_for_funcname($1); } EQ expr {  printf(RED "lvalue = expression\n" RESET); }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -175,8 +173,8 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); /*insertVar( $1, yylineno, scope);*/  }
-         | LOCAL IDENTIFIER { localVar( $2, yylineno, scope); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( $1, yylineno, scope);  }
+         | LOCAL IDENTIFIER { printf(RED "lvalue:: local identifier\n" RESET); localVar( $2, yylineno, scope); }
          |  DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);

@@ -178,25 +178,6 @@ void make_accessible_again(int curr_scope){
 
 }
 
-void check_for_funcname(char* lvalue_name){
-	int i = 0 ;
-	for(i = 0; i < 100; i++){
-			struct symbol_table_binding *curr = table->pinakas[i];
-			while(curr != NULL) {
-						if(curr->symbol_type == 3 || curr->symbol_type == 4){
-							//char * name = curr->value.func->name;
-							if(strcmp(lvalue_name,curr->value.func->name) == 0) {
-								 printf("Error: you are trying to assign a value to a user/library function\n");
-							   exit(1);
-							 }
-				   }
-
-		     curr = curr->next;
-			}
-	}
-
-}
-
 
 /*hash function for mapping symbols in table*/
 int hash_function(const char *name){
@@ -208,6 +189,49 @@ int hash_function(const char *name){
 
   return uiHash % 100 ;
 }
+
+void check_for_funcname(const char* name){
+	int i = 0 ;
+	
+	assert(name);
+
+	int mapping = hash_function(name);
+	struct symbol_table_binding *curr = table->pinakas[mapping];
+
+	// while(curr) {
+	// 	if(strcmp(name, curr->value.func->name) == 0) {
+	// 		if(curr->symbol_type == 3 || curr->symbol_type == 4) {
+	// 			printf("den kserwww\n");
+	// 		}
+	// 	}
+	// 	if(curr->symbol_type == 3 || curr->symbol_type == 4) {
+	// 		if(strcmp(name, curr->value.func->name) == 0 && curr->symbol_type != 1) {
+	// 			printf("WTF, onoma: %s kai type: %d\n", name, curr->symbol_type);
+	// 			printf("Error: Cannot assign value to user/library function \"%s\" in line: \"%d\"\n", name, yylineno);
+	// 			exit(EXIT_FAILURE);
+	// 		}
+	// 	}
+	// 	curr = curr->next;
+	// }
+
+	// for(i = 0; i < 100; i++){ // wtf????????
+	// 		struct symbol_table_binding *curr = table->pinakas[i];
+	// 		while(curr != NULL) {
+	// 					if(curr->symbol_type == 3 || curr->symbol_type == 4){
+	// 						//char * name = curr->value.func->name;
+	// 						if(strcmp(lvalue_name, curr->value.func->name) == 0) {
+	// 							printf("Error: you are trying to assign a value to a user/library function\n");
+	// 						   	exit(1);
+	// 						}
+	// 			   }
+
+	// 	     curr = curr->next;
+	// 		}
+	// }
+
+}
+
+
 
 /*creates a new table if NULL
 and inserts symbol in table*/
@@ -221,16 +245,19 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 	newnode = (struct symbol_table_binding *) malloc(sizeof(struct symbol_table_binding));
 
 	if(sym_type == 0 || sym_type == 1 || sym_type == 2){ //an einai metavlhth
+		
 		newnode->value.var = (struct variable *)malloc(sizeof(struct variable));
 		newnode->value.var->name = (char *)malloc(sizeof(char));
 		newnode->value.var->name = name;
 		newnode->value.var->line = line;
+		newnode->symbol_type = sym_type;
 		newnode->value.var->scope = scope;
 	} else if(sym_type == 3 || sym_type == 4){ //an einai function
 		newnode->value.func = (struct function *) malloc(sizeof(struct function));
 		newnode->value.func->name = (char *)malloc(sizeof(char));
 		newnode->value.func->name = name;
 		newnode->value.func->line = line;
+		newnode->symbol_type = sym_type;
 		newnode->value.func->scope = scope;
 		newnode->value.func->args_list = NULL;
 	}
@@ -320,7 +347,7 @@ int argumentF(const char *name, int line, int scope) {
 		printf("Function you are trying to add formal argument doesnt exist, wtf.");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	if(searchValue((struct arguments *)tmp->value.func->args_list, name) == 1) {
 		printf("Error: Duplicate argument: \"%s\" in function: \"%s\" in line: %d\n", name, tmp->value.func->name, yylineno);
 	 	exit(EXIT_FAILURE);
@@ -420,7 +447,6 @@ int insertVar(char* name , int line , int scope){
 	tmp = table->pinakas[lastActiveFunc];
 	
 	curr = table->pinakas[hash];//paw se ayth th thesh
-	if(curr == NULL){ printf("EIMAI NULL KAI DEN ME ELEGXE KANEIS\n" );}
 	while(curr){
 
 		// yparxei locally i anamesa se synartisi
@@ -446,7 +472,6 @@ int insertVar(char* name , int line , int scope){
 
 		curr = curr->next;
 	}
-
 	insert_hash_table(name, flag, line, true, scope);
 }
 
@@ -458,20 +483,22 @@ int localVar(const char* name, int line, int scope){
 
     assert(table && name);
 	if (scope == 0) flag = 0;
+
 	if( strcmp(name, "print") == 0 || strcmp(name, "input") == 0 || strcmp(name, "objectmemberkeys") == 0 || strcmp(name, "objectcopy") == 0 \
 			|| strcmp(name, "objectdef") == 0 || strcmp(name, "objecttotalmembers") == 0|| strcmp(name, "totalarguments") == 0 \
 			|| strcmp(name, "argument") == 0 || strcmp(name, "typeof") == 0 || strcmp(name, "strtonum") == 0 \
 			|| strcmp(name, "sqrt") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "sin") == 0 ) {
 		printf("Error Shadowing library function \"%s\" in line %d\n", name, yylineno);
 		exit(EXIT_FAILURE);
-}
+	}
+
     hash = hash_function(name);//briskw pou kanei hash to stoixeio
     curr = table->pinakas[hash];//paw se ayth th thesh
 
-	//elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
+	// elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
     while(curr){
 		if (strcmp(curr->value.var->name, name) == 0 && scope == curr->value.var->scope && curr->active == true ) {
-			if (curr->symbol_type != 1){
+			if (curr->symbol_type == 3 || curr->symbol_type == 4){
 				printf("Conflicting types of \"%s\" in line: %d \n",name , yylineno );
 				exit(EXIT_FAILURE);
 
@@ -537,18 +564,19 @@ int main(void) {
 		table->pinakas = malloc(100 * sizeof(struct symbol_table_binding*));
 		table->total_size = 0;
 	}
- insert_hash_table("print", 4 , 0, true, 0);
- insert_hash_table("input", 4 , 0, true, 0);
- insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
- insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
- insert_hash_table("objectcopy", 4 , 0, true, 0);
- insert_hash_table("totalarguments", 4 , 0, true, 0);
- insert_hash_table("argument", 4 , 0, true, 0);
- insert_hash_table("typeof", 4 , 0, true, 0);
- insert_hash_table("strtonum", 4 , 0, true, 0);
- insert_hash_table("sqrt", 4 , 0, true, 0);
- insert_hash_table("cos", 4 , 0, true, 0);
- insert_hash_table("sin", 4 , 0, true, 0);
+
+	insert_hash_table("print", 4 , 0, true, 0);
+	insert_hash_table("input", 4 , 0, true, 0);
+	insert_hash_table("objectmemberkeys", 4 , 0, true, 0);
+	insert_hash_table("objecttotalmembers", 4 , 0, true, 0);
+	insert_hash_table("objectcopy", 4 , 0, true, 0);
+	insert_hash_table("totalarguments", 4 , 0, true, 0);
+	insert_hash_table("argument", 4 , 0, true, 0);
+	insert_hash_table("typeof", 4 , 0, true, 0);
+	insert_hash_table("strtonum", 4 , 0, true, 0);
+	insert_hash_table("sqrt", 4 , 0, true, 0);
+	insert_hash_table("cos", 4 , 0, true, 0);
+	insert_hash_table("sin", 4 , 0, true, 0);
 
 	yyparse();
 
