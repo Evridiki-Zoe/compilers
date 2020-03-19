@@ -432,7 +432,7 @@ int insertVar(char* name , int line , int scope){
 
 			if(tmp != NULL) {
 				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
-					printf("Cannot access \"%s\" in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+					printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 					exit(EXIT_FAILURE);
 				}
 			}
