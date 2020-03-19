@@ -156,14 +156,83 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | MINUS expr { printf(RED " - expression \n" RESET); }
       | NOT expr { printf(RED "NOT expression\n" RESET); }
-      | PPLUS lvalue { printf(RED "++lvalue\n" RESET); }
-      | lvalue PPLUS { printf(RED "lvalue++\n" RESET); }
-      | MMINUS lvalue { printf(RED "--lvalue\n" RESET); }
-      | lvalue MMINUS { printf(RED "lvalue--\n" RESET); }
+      | PPLUS lvalue { printf(RED "++lvalue\n" RESET);
+                              if($2 == NULL){ /**/}
+                              else{
+                                    char *token;
+                                    /* get the first token */
+                                    token = strtok($2, " ");
+                                    if(strcmp(token,"sketoid") == 0) {
+
+                                        char * idname;
+                                        idname = strtok(NULL, " ");
+                                        check_for_funcname(idname);
+                                    }
+                              }
+                      }
+      | lvalue PPLUS { printf(RED "lvalue++\n" RESET);
+                              if($1 == NULL){ /**/}
+                              else{
+                                    char *token;
+                                    /* get the first token */
+                                    token = strtok($1, " ");
+                                    if(strcmp(token,"sketoid") == 0) {
+
+                                        char * idname;
+                                        idname = strtok(NULL, " ");
+                                        check_for_funcname(idname);
+                                    }
+                              }
+                        }
+      | MMINUS lvalue { printf(RED "--lvalue\n" RESET);
+                            if($2 == NULL){ /**/}
+                            else{
+                                  char *token;
+                                  /* get the first token */
+                                  token = strtok($2, " ");
+                                  if(strcmp(token,"sketoid") == 0) {
+
+                                      char * idname;
+                                      idname = strtok(NULL, " ");
+                                      check_for_funcname(idname);
+                                  }
+                            }
+                      }
+      | lvalue MMINUS { printf(RED "lvalue--\n" RESET);
+                            if($1 == NULL){ /**/}
+                            else{
+                                  char *token;
+                                  /* get the first token */
+                                  token = strtok($1, " ");
+                                  if(strcmp(token,"sketoid") == 0) {
+
+                                      char * idname;
+                                      idname = strtok(NULL, " ");
+                                      check_for_funcname(idname);
+                                  }
+                            }
+                      }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
+<<<<<<< HEAD
 assignmexpr   : lvalue { check_for_funcname(yylval.stringValue); } EQ expr {  printf(RED "lvalue = expression\n" RESET); }
+=======
+assignmexpr   : lvalue  EQ expr {  printf(RED "lvalue = expression\n" RESET);
+                                  if($1 == NULL){ /**/}
+                                  else{
+                                        char *token;
+                                        /* get the first token */
+                                        token = strtok($1, " ");
+                                        if(strcmp(token,"sketoid") == 0) {
+
+                                            char * idname;
+                                            idname = strtok(NULL, " ");
+                                            check_for_funcname(idname);
+                                        }
+                                  }
+                          }
+>>>>>>> 8f9176318c6265a2989e0d11046b2cfb4d359a60
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -173,8 +242,16 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( $1, yylineno, scope);  }
-         | LOCAL IDENTIFIER { printf(RED "lvalue:: local identifier\n" RESET); localVar( $2, yylineno, scope); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET);
+                        /*pernaw to "sketoid + idvalue" sto lvalue gia na to xrhsimopoihsw meta gia thn check*/
+                        char * whole = malloc(sizeof(char)*(strlen($1)+7+1)); //7 gia to sketoid, 1 gia to \0
+                        strcpy(whole,"sketoid ");
+                        char* id = yylval.stringValue;
+                        strcat(whole, id);
+                        $$ = whole;
+
+                        insertVar( $1, yylineno, scope);  }
+         | LOCAL IDENTIFIER { printf(RED "lvalue:: local identifier\n" RESET);  localVar( $2, yylineno, scope); }
          |  DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
@@ -224,7 +301,7 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block    
+funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block
          | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block { make_accessible_again(scope+1);}
 
 const    : number { printf(RED "const:: number\n" RESET); }
