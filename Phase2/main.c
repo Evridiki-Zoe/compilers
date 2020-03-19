@@ -246,6 +246,25 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
   return 1;
 }
 
+int check_if_exists_already(const char *name, int scope) {
+	struct symbol_table_binding *curr;
+	int mapping = 0;
+
+	assert(name);
+
+	mapping = hash_function(name);
+	curr = table->pinakas[mapping];
+
+
+	while(curr) {
+		if(strcmp(curr->value.func->name, name) == 0) {
+			return 0;
+		} 
+	}
+
+	
+	insert_hash_table(name, 3, yylineno, 1, scope);
+} 
 
 int global_exists(const char *name) {
 	struct symbol_table_binding *curr;
@@ -432,19 +451,19 @@ int insertVar(char* name , int line , int scope){
 			}
 			//OK REFERENCE sto akrivos idio scope
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type != flag && curr->value.func->scope == scope ) {
-			printf("Cannot change value of \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
-			exit(EXIT_FAILURE);
+		// } else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type != flag && curr->value.func->scope == scope ) {
+		// 	printf("Cannot change value of \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+		// 	//exit(EXIT_FAILURE);
 
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type != flag && curr->value.var->scope != 0) {
 			printf("illigal opws leei kai o kwstas\n");
 			exit(EXIT_FAILURE);
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type == flag && curr->value.var->scope != 0 ) {
-			printf("reference amanesa, oti kai an simainei auto. :)\n");
+			printf("reference amanesa, oti kai an simainei auto. auto einai ok :)\n");
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type != flag && curr->value.var->scope != 0) {
-			printf("error allos typos anamesa sto global kai auto to scope");
-			exit(EXIT_FAILURE);
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->symbol_type != flag && curr->value.var->scope != 0) {
+			printf("error allos typos anamesa sto global kai auto to scope basika auto einai ok\n");
+			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type == flag && curr->value.var->scope == 0) {
 			printf("ok yparxei globbally");
 			return 0;

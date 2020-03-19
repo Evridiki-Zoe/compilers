@@ -262,7 +262,7 @@ member   : lvalue DOT IDENTIFIER { printf(RED "member:: lvalue.id \n" RESET); }
          | call L_SBRACKET expr R_SBRACKET { printf(RED "member:: call[expression]\n" RESET); }
          ;
 
-call   : call L_PARENTHES elist R_PARENTHES { isFunction = 3; printf(RED "call:: call (elist)\n" RESET); }
+call   : call L_PARENTHES elist R_PARENTHES { check_if_exists_already(yylval.stringValue, scope); printf(RED "call:: call (elist)\n" RESET); }
        | lvalue callsuffix { printf(RED "call:: lvalue callsuffix\n" RESET); }
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES { printf(RED "call:: (funcdef)(elist)\n" RESET); }
        ;
