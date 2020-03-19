@@ -12,11 +12,8 @@ extern char *yytext;
 extern int token_count;
 extern int scope; // current scope we are right now, as we do the syntactic analysis
 
+extern int isFunction;
 int lastActiveFunc = 0;
-
-int TMP;
-extern char **argtable;
-extern int numOfArgs;
 
 void print_table();
 int argumentF(const char *name, int line, int scope);
@@ -123,7 +120,6 @@ int searchValue(struct arguments *head, const char *key);
 
 int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope);
 
-//int SymTable_contains(const char *name, symtype sym_type, int scope);
 int insertLocalVar( char* name, int line, int scope);
 void print_table();
 
@@ -272,44 +268,6 @@ int contains_Func(const char *name, int scope) {
 	}
 }
 
-/* idio onoma kai scope return 1;
- * idio onoma, diaforetiko scope return 2;
- * idio onoma, idio scope kai diaforetiko type return 3;
- * an den yparxei return 0;
- */
-int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope){
-    struct symbol_table_binding *curr;
-    int hash = 0;
-    assert(table && name);
-
-    hash = hash_function(name);//briskw pou kanei hash to stoixeio
-    curr = table->pinakas[hash];//paw se ayth th thesh
-
-	//elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
-    while(curr){
-		if (strcmp(curr->value.var->name,name)==0 && scope == curr->value.var->scope ) {
-			printf("%d  -- %d\n",curr->symbol_type,sym_type);
-			if (curr->symbol_type==sym_type) return 1;
-			else {
-				printf("Conflicting types of %s in line %d \n",name , yylineno );
-				exit(EXIT_FAILURE);
-
-			// idio onoma kai scope
-			if( strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == scope && \
-				curr->symbol_type != sym_type ) {
-				return 3;
-			} else if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope != scope){
-				return 2;
-			} else if( strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope ) 
-				return 1;
-			}
-    	curr = curr->next;
-    return 0;	
-	}
-
-}
-}
-
 void hide_symbols(int scope){
 	int i;
 	for(i = 0; i < 100; i++ ){
@@ -429,36 +387,38 @@ int insertVar(char* name , int line , int scope){
 	
 	/* 
 	 * check locally gia reference, ok
-	 * 
-	 * meta check an yparxei ws synartisi, ERROR
+	 * meta an yparxei synartisi anamesa, ERROR
+	 *
+	 *  meta check an yparxei ws synartisi, ERROR
 	 * 
 	 * meta globally, ok
 	 * 
-	 * meta an einai anamesa se synartisi, ERROR
-	 * 
-	 * alliws einai GG
-	 */
+	 * alliws einai GG kai kanoume insert
+ 	 */
 	tmp = table->pinakas[lastActiveFunc];
+	
 	curr = table->pinakas[hash];//paw se ayth th thesh
 	while(curr){
 
-		// yparxei locally
-		if (strcmp(curr->value.var->name, name) == 0 && scope > tmp->value.func->scope && tmp->value.func->scope < curr->value.var->scope){
+		// yparxei locally i anamesa se synartisi
+		if (strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope <= scope){
+
+			if(tmp != NULL) {
+				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
+					printf("Cannot access \"%s\" in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+					exit(EXIT_FAILURE);
+				}
+			}
 			return 0;
 
 			// yparxei ws synartisi
 		} else if(strcmp(curr->value.var->name, name) == 0 && curr->symbol_type == 3){	 
 			printf("Conflicting type of \"%s\" in line: %d\n", name, yylineno);
 			exit(EXIT_FAILURE);
-		
+
 				// yparxei globally
 		} else  if(strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == 0) {			
 			return 0;
-
-			// yparxei anamesa synartisi
-		} else if (strcmp(curr->value.var->name, name) == 0 && scope > tmp->value.func->scope && tmp->value.func->scope >= curr->value.var->scope){
-			printf("Cannot access \"%s\" in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
-			exit(EXIT_FAILURE);
 		}
 
 		curr = curr->next;

@@ -1,10 +1,7 @@
+function a() {
+    ok = 1;
 
-function ok() {
-    a= 1;
-
-{
-        a = 2;
+    function b() {
+        ok = 2;
     }
-
- }
-
+}
