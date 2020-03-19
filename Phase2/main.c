@@ -133,7 +133,7 @@ void make_not_accessible(int curr_scope){
 			for(i = 0; i < 100; i++) {
 				struct symbol_table_binding *curr = table->pinakas[i];
 				while(curr != NULL) {
-							if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
+							if((curr->symbol_type == 1 || curr->symbol_type == 2)){  //edw DEN PREPEI na exei to 0, giati tis global den thelw na tis xalaw
 									if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
 											curr->accessible = 0;
 									}
@@ -157,7 +157,7 @@ void make_accessible_again(int curr_scope){
 			for(i = 0; i < 100; i++) {
 				struct symbol_table_binding *curr = table->pinakas[i];
 				while(curr != NULL) {
-					if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
+					if(( curr->symbol_type == 1 || curr->symbol_type == 2)){ //edw DEN PREPEI na exei to 0, giati tis global den thelw na tis xalaw
 							if(  curr->accessible == 0 &&  curr->value.var->scope<curr_scope ){
 									curr->accessible = 1;
 							}
@@ -207,6 +207,7 @@ void check_for_funcname(char* lvalue_name){
 			}
 	}
 
+
 }
 
 
@@ -242,6 +243,7 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 
 	newnode->active = active;
 	newnode->symbol_type = sym_type;
+	newnode->accessible = 1;
 
 	newnode->next = table->pinakas[mapping]; /*to bazw sthn arxh ths listas*/
 	table->pinakas[mapping] = newnode;
@@ -416,23 +418,23 @@ int insertVar(char* name , int line , int scope){
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR
 	 *
-	 * meta check an yparxei ws synartisi, ERROR
-	 * 
+	 *  meta check an yparxei ws synartisi, ERROR
+	 *
 	 * meta globally, ok
 	 *
 	 * alliws einai GG kai kanoume insert
- 	 */
+	 */
 	tmp = table->pinakas[lastActiveFunc];
 
 	curr = table->pinakas[hash];//paw se ayth th thesh
 	while(curr){
 
 		// yparxei locally i anamesa se synartisi
-		if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
-			
+		if (strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope <= scope){
+
 			if(tmp != NULL) {
 				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
-					printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+					printf("Cannot access \"%s\"  defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 					exit(EXIT_FAILURE);
 				}
 			}
