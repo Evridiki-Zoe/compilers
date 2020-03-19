@@ -285,47 +285,6 @@ int contains_Func(const char *name, int scope) {
 	}
 }
 
-<<<<<<< HEAD
-=======
-/* idio onoma kai scope return 1;
- * idio onoma, diaforetiko scope return 2;
- * idio onoma, idio scope kai diaforetiko type return 3;
- * an den yparxei return 0;
- */
-int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope){
-    struct symbol_table_binding *curr;
-    int hash = 0;
-    assert(table && name);
-
-    hash = hash_function(name);//briskw pou kanei hash to stoixeio
-    curr = table->pinakas[hash];//paw se ayth th thesh
-
-	//elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
-    while(curr){
-		if (strcmp(curr->value.var->name,name)==0 && scope == curr->value.var->scope ) {
-			printf("%d  -- %d\n",curr->symbol_type,sym_type);
-			if (curr->symbol_type==sym_type) return 1;
-			else {
-				printf("Conflicting types of %s in line %d \n",name , yylineno );
-				exit(EXIT_FAILURE);
-
-			// idio onoma kai scope
-			if( strcmp(curr->value.var->name, name) == 0 && curr->value.var->scope == scope && \
-				curr->symbol_type != sym_type ) {
-				return 3;
-			} else if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope != scope){
-				return 2;
-			} else if( strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope )
-				return 1;
-			}
-    	curr = curr->next;
-    return 0;
-	}
-
-}
-}
-
->>>>>>> c0b5e686709b37e27e91751c736bf5932d5bba4d
 void hide_symbols(int scope){
 	int i;
 	for(i = 0; i < 100; i++ ){
@@ -355,8 +314,13 @@ int argumentF(const char *name, int line, int scope) {
 	newArg = (struct arguments *)malloc(sizeof(struct arguments));
 	newArg->name = name;
 
-	tmp = table->pinakas[lastActiveFunc];
 
+	tmp = table->pinakas[lastActiveFunc];
+	if(tmp == NULL) {
+		printf("Function you are trying to add formal argument doesnt exist, wtf.");
+		exit(EXIT_FAILURE);
+	}
+	
 	if(searchValue((struct arguments *)tmp->value.func->args_list, name) == 1) {
 		printf("Error: Duplicate argument: \"%s\" in function: \"%s\" in line: %d\n", name, tmp->value.func->name, yylineno);
 	 	exit(EXIT_FAILURE);
@@ -445,7 +409,6 @@ int insertVar(char* name , int line , int scope){
 
 	/*
 	 * check locally gia reference, ok
-<<<<<<< HEAD
 	 * meta an yparxei synartisi anamesa, ERROR
 	 *
 	 *  meta check an yparxei ws synartisi, ERROR
@@ -454,18 +417,6 @@ int insertVar(char* name , int line , int scope){
 	 * 
 	 * alliws einai GG kai kanoume insert
  	 */
-=======
-	 *
-	 * meta check an yparxei ws synartisi, ERROR
-	 *
-	 * meta globally, ok
-	 *
-	 * meta an einai anamesa se synartisi, ERROR
-	 *
-	 * alliws einai GG
-	 */
-	 printf("[rin to lastActiveFunc]\n" );
->>>>>>> c0b5e686709b37e27e91751c736bf5932d5bba4d
 	tmp = table->pinakas[lastActiveFunc];
 	
 	curr = table->pinakas[hash];//paw se ayth th thesh
