@@ -163,15 +163,9 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-<<<<<<< HEAD
-assignmexpr   : lvalue { //SEARCH GIA FUNCTION
-                        }
-                        EQ expr { printf(RED "lvalue = expression\n" RESET); }
-=======
 assignmexpr   : lvalue EQ expr { printf(RED "lvalue = expression\n" RESET);
                 check_for_funcname($1);
               }
->>>>>>> c0b5e686709b37e27e91751c736bf5932d5bba4d
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -232,13 +226,8 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-<<<<<<< HEAD
 funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block    
          | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block { make_accessible_again(scope+1);}
-=======
-funcdef  : FUNCTION  { TMP++; }L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block { TMP--;}
-         | FUNCTION { TMP++; } IDENTIFIER { newFunction( $3, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block { TMP--; make_accessible_again(scope+1);}
->>>>>>> c0b5e686709b37e27e91751c736bf5932d5bba4d
 
 const    : number { printf(RED "const:: number\n" RESET); }
          | STRING { printf(RED "const:: str\n" RESET); }
