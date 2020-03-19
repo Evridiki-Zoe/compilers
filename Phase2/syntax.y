@@ -120,8 +120,8 @@ void check_for_funcname(char* lvalue_name);
 program  :  multi_stmts
          ;
 
-multi_stmts : stmt multi_stmts {printf("stmt multi_stmt");}
-            | /*empty*/
+multi_stmts : stmt multi_stmts {printf("stmt multi_stmt\n");}
+            | /*empty*/{printf("multi_stmts empty\n");}
             ;
 
 stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
@@ -298,7 +298,7 @@ block   :  L_CBRACKET multi_stmts R_CBRACKET { printf( RED "block:: {stmt multi 
         ;
 
 funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES block
-         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES block { make_accessible_again(scope+1);}
+         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES { make_not_accessible(scope+1); } block { make_accessible_again(scope+1);}
 
 const    : number { printf(RED "const:: number\n" RESET); }
          | STRING { printf(RED "const:: str\n" RESET); }

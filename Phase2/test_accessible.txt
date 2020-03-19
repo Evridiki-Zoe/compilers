@@ -1,0 +1,15 @@
+w=9;
+g=8;
+function x(){
+        local a;
+        local b;
+
+        {
+                a=0; // ok
+        }
+
+        function y(){
+             a = 9; // error
+        }
+
+}

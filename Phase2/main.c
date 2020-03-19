@@ -15,10 +15,9 @@ extern int scope; // current scope we are right now, as we do the syntactic anal
 extern int isFunction;
 int lastActiveFunc = 0;
 
-void print_table();
+int print_table();
 int argumentF(const char *name, int line, int scope);
 int newFunction(char* name, int line,int tmpscope);
-void print_table();
 
 //------------------------- LEX ----------------------------
 
@@ -121,17 +120,40 @@ int searchValue(struct arguments *head, const char *key);
 int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope);
 
 int insertLocalVar( char* name, int line, int scope);
-void print_table();
 
 
 void make_not_accessible(int curr_scope){
 	int i = 0;
-	for(i = 0; i < 100; i++) {
-		struct symbol_table_binding *curr = table->pinakas[i];
-		while(curr != NULL) {
-					if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
-							if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
-									curr->accessible = 0;
+			for(i = 0; i < 100; i++) {
+				struct symbol_table_binding *curr = table->pinakas[i];
+				while(curr != NULL) {
+							if((curr->symbol_type == 1 || curr->symbol_type == 2)){  //edw DEN PREPEI na exei to 0, giati tis global den thelw na tis xalaw
+									if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
+											curr->accessible = 0;
+									}
+									else {
+										curr = curr->next ;
+									}
+						}
+						else{
+								curr = curr->next ;
+						}
+				}
+
+			}
+
+//printf("NOT ACCESSIBLE\n");
+//print_table();
+}
+
+void make_accessible_again(int curr_scope){
+	int i = 0;
+			for(i = 0; i < 100; i++) {
+				struct symbol_table_binding *curr = table->pinakas[i];
+				while(curr != NULL) {
+					if(( curr->symbol_type == 1 || curr->symbol_type == 2)){ //edw DEN PREPEI na exei to 0, giati tis global den thelw na tis xalaw
+							if(  curr->accessible == 0 &&  curr->value.var->scope<curr_scope ){
+									curr->accessible = 1;
 							}
 							else {
 								curr = curr->next ;
@@ -140,34 +162,10 @@ void make_not_accessible(int curr_scope){
 				else{
 						curr = curr->next ;
 				}
-		}
 
-	}
+				}
 
-//printf("NOT ACCESSIBLE\n");
-//print_table();
-}
-
-void make_accessible_again(int curr_scope){
-	int i = 0;
-	for(i = 0; i < 100; i++) {
-		struct symbol_table_binding *curr = table->pinakas[i];
-		while(curr != NULL) {
-			if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2)){
-					if(  curr->accessible == 0 &&  curr->value.var->scope < curr_scope ){
-							curr->accessible = 1;
-					}
-					else {
-						curr = curr->next ;
-					}
-		}
-		else{
-				curr = curr->next ;
-		}
-
-		}
-
-	}
+			}
 
 //printf("AGAIN ACCESSIBLE\n");
 //print_table();
@@ -202,6 +200,7 @@ void check_for_funcname(char* lvalue_name){
 		     curr = curr->next;
 			}
 	}
+
 
 }
 
@@ -238,6 +237,7 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
 
 	newnode->active = active;
 	newnode->symbol_type = sym_type;
+	newnode->accessible = 1;
 
 	newnode->next = table->pinakas[mapping]; /*to bazw sthn arxh ths listas*/
 	table->pinakas[mapping] = newnode;
@@ -412,12 +412,12 @@ int insertVar(char* name , int line , int scope){
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR
 	 *
-	 * meta check an yparxei ws synartisi, ERROR
-	 * 
+	 *  meta check an yparxei ws synartisi, ERROR
+	 *
 	 * meta globally, ok
 	 *
 	 * alliws einai GG kai kanoume insert
- 	 */
+	 */
 	tmp = table->pinakas[lastActiveFunc];
 
 	curr = table->pinakas[hash];//paw se ayth th thesh
@@ -426,7 +426,7 @@ int insertVar(char* name , int line , int scope){
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag  ) {
 			if(tmp != NULL) {
 				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
-					printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+					printf("Cannot access \"%s\"  defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 					exit(EXIT_FAILURE);
 				}
 			}
@@ -525,12 +525,12 @@ char* enum_toString(symtype sym) {
 
 
 /*prints table*/
-void print_table(){
+int print_table(){
   	int i = 0, scope = 0;
 
   	if(table == NULL){
     	printf("table is empty\n");
-    	return ;
+    	return 0;
   	}
 	printf("\n\"NAME\"   [TYPE]    (LINE)   (SCOPE)\n");
 	for(scope = 0; scope < 10; scope++) {
@@ -556,6 +556,8 @@ void print_table(){
 		}
 		printf("\n");
 	}
+
+	return 1;
 }
 
 
