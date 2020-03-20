@@ -1,5 +1,4 @@
-function f(){
-
- 	 f = 10;
+function f() {
+	 f = 0;
 }
 

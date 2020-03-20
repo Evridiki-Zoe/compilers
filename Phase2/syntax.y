@@ -193,14 +193,13 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
                       }
       | lvalue PPLUS { printf(RED "lvalue++\n" RESET);
                               if($1 == NULL){ /**/}
-                              else{
+                              else {
                                     char *token;
                                     /* get the first token */
                                     token = strtok($1, " ");
                                     if(strcmp(token,"sketoid") == 0) {
 
-                                        char * idname;
-                                        idname = strtok(NULL, " ");
+                                        char * idname = strtok(NULL, " ");
                                         check_for_funcname(idname);
                                     }
                               }
@@ -236,8 +235,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue { /* check_for_funcname(yylval.stringValue); */ } EQ expr {  printf(RED "lvalue = expression\n" RESET);    
-                              if($1 == NULL){ /**/}
+assignmexpr   : lvalue {  if($1 == NULL){ /**/}
                                   else{
                                         char *token;
                                         /* get the first token */
@@ -246,9 +244,10 @@ assignmexpr   : lvalue { /* check_for_funcname(yylval.stringValue); */ } EQ expr
 
                                             char * idname;
                                             idname = strtok(NULL, " ");
-                                            check_for_funcname(idname);
+                                            check_for_funcname(yylval.stringValue);
                                         }
-                                  }
+                                  } /* check_for_funcname(yylval.stringValue); */ } EQ expr {  printf(RED "lvalue = expression\n" RESET);    
+                             
                               
                           }
               ;

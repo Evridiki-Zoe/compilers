@@ -206,7 +206,7 @@ void check_for_funcname(const char* lvalue_name){
 					if(curr->symbol_type == 3 || curr->symbol_type == 4){
 						if(strcmp(lvalue_name,curr->value.func->name) == 0) {
 								printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-							exit(1);
+								exit(1);
 							}
 				}
 			curr = curr->next;
@@ -265,14 +265,11 @@ int check_if_exists_already(const char *name, int scope) {
 	mapping = hash_function(name);
 	curr = table->pinakas[mapping];
 
-
 	while(curr) {
 		if(strcmp(curr->value.func->name, name) == 0) {
 			return 0;
 		}
 	}
-
-
 	insert_hash_table(name, 3, yylineno, 1, scope);
 	return 0;
 }
