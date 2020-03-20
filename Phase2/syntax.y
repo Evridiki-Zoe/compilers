@@ -14,12 +14,14 @@ extern int yylineno;
 extern char * yytext;
 extern int scope;
 
+int args = 0;
 char *result;
 int unnamedFuncs = 0;
 
 
 int insideLoop = 0;
 int insideFunc = 0;
+
 
 char** table;
 void print_table();
@@ -177,79 +179,14 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | MINUS expr { printf(RED " - expression \n" RESET); }
       | NOT expr { printf(RED "NOT expression\n" RESET); }
-      | PPLUS lvalue { printf(RED "++lvalue\n" RESET);
-                              if($2 == NULL){ /**/}
-                              else{
-                                    char *token;
-                                    /* get the first token */
-                                    token = strtok($2, " ");
-                                    if(strcmp(token,"sketoid") == 0) {
-
-                                        char * idname;
-                                        idname = strtok(NULL, " ");
-                                        check_for_funcname(idname);
-                                    }
-                              }
-                      }
-      | lvalue PPLUS { printf(RED "lvalue++\n" RESET);
-                              if($1 == NULL){ /**/}
-                              else {
-                                    char *token;
-                                    /* get the first token */
-                                    token = strtok($1, " ");
-                                    if(strcmp(token,"sketoid") == 0) {
-
-                                        char * idname = strtok(NULL, " ");
-                                        check_for_funcname(idname);
-                                    }
-                              }
-                        }
-      | MMINUS lvalue { printf(RED "--lvalue\n" RESET);
-                            if($2 == NULL){ /**/}
-                            else{
-                                  char *token;
-                                  /* get the first token */
-                                  token = strtok($2, " ");
-                                  if(strcmp(token,"sketoid") == 0) {
-
-                                      char * idname;
-                                      idname = strtok(NULL, " ");
-                                      check_for_funcname(idname);
-                                  }
-                            }
-                      }
-      | lvalue MMINUS { printf(RED "lvalue--\n" RESET);
-                            if($1 == NULL){ /**/}
-                            else{
-                                  char *token;
-                                  /* get the first token */
-                                  token = strtok($1, " ");
-                                  if(strcmp(token,"sketoid") == 0) {
-
-                                      char * idname;
-                                      idname = strtok(NULL, " ");
-                                      check_for_funcname(idname);
-                                  }
-                            }
-                      }
+      | PPLUS lvalue { check_for_funcname(yylval.stringValue); }
+      | lvalue { check_for_funcname(yylval.stringValue); } PPLUS { printf(RED "lvalue++\n" RESET); }
+      | MMINUS lvalue { check_for_funcname(yylval.stringValue); printf(RED "--lvalue\n" RESET); }
+      | lvalue { check_for_funcname(yylval.stringValue);  } MMINUS { printf(RED "lvalue--\n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue {  if($1 == NULL){ /**/}
-                                  else{
-                                        char *token;
-                                        /* get the first token */
-                                        token = strtok($1, " ");
-                                        if(strcmp(token,"sketoid") == 0) {
-
-                                            char * idname;
-                                            idname = strtok(NULL, " ");
-                                            check_for_funcname(yylval.stringValue);
-                                        }
-                                  } /* check_for_funcname(yylval.stringValue); */ } EQ expr {  printf(RED "lvalue = expression\n" RESET);    
-                             
-                              
-                          }
+assignmexpr   : lvalue {   check_for_funcname(yylval.stringValue); } EQ expr { printf(RED "lvalue = expression\n" RESET); }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -259,16 +196,8 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET);
-                        /*pernaw to "sketoid + idvalue" sto lvalue gia na to xrhsimopoihsw meta gia thn check*/
-                        char * whole = malloc(sizeof(char)*(strlen($1)+7+1)); //7 gia to sketoid, 1 gia to \0
-                        strcpy(whole,"sketoid ");
-                        char* id = yylval.stringValue;
-                        strcat(whole, id);
-                        $$ = whole; 
-
-                        insertVar( $1, yylineno, scope);  }
-         | LOCAL IDENTIFIER {  localVar( $2, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope); }
+         | LOCAL IDENTIFIER { printf("%s\n", yylval.stringValue); localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
          | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
@@ -283,8 +212,8 @@ member   : lvalue DOT IDENTIFIER { printf(RED "member:: lvalue.id \n" RESET); }
          | call L_SBRACKET expr R_SBRACKET { printf(RED "member:: call[expression]\n" RESET); }
          ;
 
-call   : call L_PARENTHES elist R_PARENTHES { check_if_exists_already(yylval.stringValue, scope); printf(RED "call:: call (elist)\n" RESET); }
-       | lvalue callsuffix { printf(RED "call:: lvalue callsuffix\n" RESET); }
+call   : call L_PARENTHES elist R_PARENTHES { printf(RED "call:: call (elist)\n" RESET); }
+       | lvalue callsuffix { check_if_exists_already( $1, scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES { printf(RED "call:: (funcdef)(elist)\n" RESET); }
        ;
 
@@ -292,11 +221,11 @@ callsuffix : L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: (elist)\n"
            | DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: ..id(elist)\n" RESET); }
            ;
 
-elist   : expr multi_exprs { printf(RED "elist:: \n" RESET); }
-        | /*emty*/ { printf(RED "elist:: empty\n" RESET); }
+elist   : expr multi_exprs { args++; printf(RED "elist:: \n" RESET); }
+        | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
         ;
 
-multi_exprs	:  COMMA expr multi_exprs { printf(RED "multiexpr commma expr exprs\n" RESET); }
+multi_exprs	:  COMMA expr multi_exprs { args++; printf(RED "multiexpr commma expr exprs\n" RESET); }
         	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
       	;
 
@@ -315,7 +244,7 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
 indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
-block   :  L_CBRACKET multi_stmts R_CBRACKET { printf( RED "block:: {stmt multi stmt}\n" RESET ); }
+block   :  L_CBRACKET { scope++; }multi_stmts R_CBRACKET { scope--; printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
 funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--; }

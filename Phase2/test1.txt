@@ -1,4 +1,7 @@
-function f() {
-	 f = 0;
-}
+wtf[a] = 2;
 
+
+wok[0] =  3;
+
+
+akoas[wok[0]] = 2;

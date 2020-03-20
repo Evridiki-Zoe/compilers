@@ -14,6 +14,7 @@ extern int scope; // current scope we are right now, as we do the syntactic anal
 
 extern int isFunction;
 int lastActiveFunc = 0;
+extern int args;
 
 int print_table();
 int argumentF(const char *name, int line, int scope);
@@ -184,34 +185,35 @@ int hash_function(const char *name){
   return uiHash % 100 ;
 }
 
-void check_for_funcname(const char* lvalue_name){
+int check_for_funcname( char* name){
 	int i = 0 ;
-	assert(lvalue_name);
+	assert(name);
 
-	// struct symbol_table_binding *curr = table->pinakas[hash_function(lvalue_name)];
-	// printf("name: %s\n", lvalue_name);
+	// struct symbol_table_binding *curr = table->pinakas[hash_function(name)];
+	// printf("name: %s\n", name);
 	// while(curr != NULL) {
 	// 	if(curr->symbol_type == 3 || curr->symbol_type == 4){
-	// 		if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+	// 		if(strcmp(name,curr->value.func->name) == 0) {
 	// 				printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
 	// 				exit(EXIT_FAILURE);
 	// 		}
 	// 	}
 	// 	curr = curr->next;
 	// }
-
-	for(i = 0; i < 100; i++){
-		struct symbol_table_binding *curr = table->pinakas[i];
-		while(curr != NULL) {
-					if(curr->symbol_type == 3 || curr->symbol_type == 4){
-						if(strcmp(lvalue_name,curr->value.func->name) == 0) {
-								printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-								exit(1);
-							}
-				}
-			curr = curr->next;
-		}
-	}
+	
+	// for(i = 0; i < 100; i++){
+	// 	struct symbol_table_binding *curr = table->pinakas[i];
+	// 	while(curr != NULL) {
+	// 		if(curr->symbol_type == 3 || curr->symbol_type == 4){
+	// 			// if(strcmp(name, curr->value.func->name) == 0) {
+	// 			// 		printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+	// 			// 		exit(1);
+	// 			// 	}
+	// 		}
+	// 		curr = curr->next;
+	// 	}
+	// }
+	return 1;
 }
 
 
@@ -256,22 +258,32 @@ int insert_hash_table(const char *name, symtype sym_type, int line, bool active,
   return 1;
 }
 
+
 int check_if_exists_already(const char *name, int scope) {
 	struct symbol_table_binding *curr;
 	int mapping = 0;
+	int counter2 = 0;
 
 	assert(name);
 
 	mapping = hash_function(name);
 	curr = table->pinakas[mapping];
 
-	while(curr) {
+		while(curr) {
 		if(strcmp(curr->value.func->name, name) == 0) {
+			while(curr->value.func->args_list != NULL) {
+				counter2++;
+				curr->value.func->args_list = curr->value.func->args_list->next;
+			}
+			if(counter2 > args) {
+				printf("Function \"%s\" in line: %d has less arguments than the one defined at line: %d\n", name, yylineno, curr->value.func->line);
+				exit(EXIT_FAILURE);
+			}
 			return 0;
 		}
 	}
 	insert_hash_table(name, 3, yylineno, 1, scope);
-	return 0;
+	return 1;
 }
 
 int global_exists(const char *name) {
