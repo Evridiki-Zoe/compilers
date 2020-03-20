@@ -9,21 +9,16 @@ int scope;
 int print_list();
 struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int line);
 
-void yywarning(char *text){
+int yywarning(char *text){
     printf("Warning in line %d : %s\n",yylineno,text );
+    return 0;
 }
 
 void hide_symbols(int scope);
 
-/*void yyerror(char *text){
-    printf("Error in line %d : %s\n",yylineno,text );
-    exit(0);
-}*/
-
-
-int yyerror (char* s){
+int yyerror (const char* s){
    printf("Error in line %d, before token: '%s'\n", yylineno, yytext);
-   return 0;
+   exit(EXIT_FAILURE);
 }
 
 int commentHandler(int from);

@@ -17,7 +17,7 @@ int lastActiveFunc = 0;
 
 int print_table();
 int argumentF(const char *name, int line, int scope);
-int newFunction(char* name, int line,int tmpscope);
+int newFunction(const char* name, int line,int tmpscope);
 
 //------------------------- LEX ----------------------------
 
@@ -119,28 +119,28 @@ int searchValue(struct arguments *head, const char *key);
 
 int SymTable_contains(struct SymTable_struct *table, const char *name, symtype sym_type, int line, bool active, int scope);
 
-int insertLocalVar( char* name, int line, int scope);
+int insertLocalVar(const char* name, int line, int scope);
 
 
 void make_not_accessible(int curr_scope){
 	int i = 0;
-			for(i = 0; i < 100; i++) {
-				struct symbol_table_binding *curr = table->pinakas[i];
-				while(curr != NULL) {
-							if((curr->symbol_type == 1 || curr->symbol_type == 2)){  //edw DEN PREPEI na exei to 0, giati tis global den thelw na tis xalaw
-									if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
-											curr->accessible = 0;
-									}
-									else {
-										curr = curr->next ;
-									}
-						}
-						else{
-								curr = curr->next ;
-						}
-				}
-
+	for(i = 0; i < 100; i++) {
+		struct symbol_table_binding *curr = table->pinakas[i];
+		while(curr != NULL) {
+			if((curr->symbol_type == 1 || curr->symbol_type == 2)){  //edw DEN PREPEI na exei to 0, giati tis global den thelw na tis xalaw
+					if(  curr->accessible == 1 &&  curr->value.var->scope<curr_scope ){
+							curr->accessible = 0;
+					}
+					else {
+						curr = curr->next ;
+					}
 			}
+			else{
+				curr = curr->next ;
+			}
+		}
+
+	}
 
 //printf("NOT ACCESSIBLE\n");
 //print_table();
@@ -184,35 +184,34 @@ int hash_function(const char *name){
   return uiHash % 100 ;
 }
 
-void check_for_funcname(char* lvalue_name){
+void check_for_funcname(const char* lvalue_name){
 	int i = 0 ;
 	assert(lvalue_name);
 
-	struct symbol_table_binding *curr = table->pinakas[hash_function(lvalue_name)];
-
-	while(curr != NULL) {
-		if(curr->symbol_type == 3 || curr->symbol_type == 4){
-			if(strcmp(lvalue_name,curr->value.func->name) == 0) {
-					printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-					exit(EXIT_FAILURE);
-			}
-		}
-		curr = curr->next;
-	}
-
-	// for(i = 0; i < 100; i++){
-	// 	struct symbol_table_binding *curr = table->pinakas[i];
-	// 	while(curr != NULL) {
-	// 				if(curr->symbol_type == 3 || curr->symbol_type == 4){
-	// 					if(strcmp(lvalue_name,curr->value.func->name) == 0) {
-	// 							printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-	// 						exit(1);
-	// 						}
-	// 			}
-
-	// 		curr = curr->next;
+	// struct symbol_table_binding *curr = table->pinakas[hash_function(lvalue_name)];
+	// printf("name: %s\n", lvalue_name);
+	// while(curr != NULL) {
+	// 	if(curr->symbol_type == 3 || curr->symbol_type == 4){
+	// 		if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+	// 				printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+	// 				exit(EXIT_FAILURE);
+	// 		}
 	// 	}
+	// 	curr = curr->next;
 	// }
+
+	for(i = 0; i < 100; i++){
+		struct symbol_table_binding *curr = table->pinakas[i];
+		while(curr != NULL) {
+					if(curr->symbol_type == 3 || curr->symbol_type == 4){
+						if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+								printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+							exit(1);
+							}
+				}
+			curr = curr->next;
+		}
+	}
 }
 
 
@@ -368,7 +367,7 @@ int argumentF(const char *name, int line, int scope) {
 	return 0;
 }
 
-int newFunction(char* name , int line, int scope){
+int newFunction(const char* name , int line, int scope){
 	struct symbol_table_binding *newnode;
 	int mapping = 0;
 	int flag = 1;

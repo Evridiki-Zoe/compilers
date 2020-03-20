@@ -8,7 +8,7 @@
 #define RED   "\x1B[31m"
 #define RESET "\x1B[0m"
 
-int yyerror(char* s);
+extern int yyerror(const char* s);
 
 extern int yylineno;
 extern char * yytext;
@@ -17,7 +17,9 @@ extern int scope;
 char *result;
 int unnamedFuncs = 0;
 
-int isFunction = 1;
+
+int insideLoop = 0;
+int insideFunc = 0;
 
 char** table;
 void print_table();
@@ -25,7 +27,7 @@ int global_exists(const char *name);
 
 int newFunction(char* name, int line,int tmpscope);
 int argumentF(char *name, int line, int scope);
-int insert_hash_table(char *name, int sym_type, int line, bool active, int scope);
+int insert_hash_table(const char *name, int sym_type, int line, bool active, int scope);
 
 int localVar(const char *name, int line, int scope);
 
@@ -129,9 +131,27 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | ifstmt 	{ printf(RED "if stmt \n" RESET); }
       | whilestmt 	{ printf(RED "while stmt \n" RESET); }
       | forstmt 	{ printf(RED "for stmt \n" RESET); }
-      | returnstmt 	{ printf(RED "return stmt \n" RESET); }
-      | BREAK SEMICOLON { printf(RED "break \n" RESET);}
-      | CONTINUE SEMICOLON { printf(RED "continue \n" RESET);}
+      | returnstmt 	{ printf(RED "return stmt \n" RESET);
+                              if( insideFunc > 0) {
+                                    // ok
+                              } else {
+                                    printf("Error: RETURN STMT outside of function\n");
+                                    exit(EXIT_FAILURE);
+                              } }
+      | BREAK SEMICOLON { printf(RED "break \n" RESET);
+                              if( insideLoop > 0) {
+                              // ok
+                              } else {
+                                    printf("Error: BREAK STMT outside of loop\n");
+                                    exit(EXIT_FAILURE);
+                              } }
+      | CONTINUE SEMICOLON { printf(RED "continue \n" RESET);
+                              if( insideLoop > 0) {
+                              // ok
+                              } else {
+                                    printf("Error: CONTINUE STMT outside of loop\n");
+                                    exit(EXIT_FAILURE);
+                              } }
       | block { printf(RED "block \n" RESET);}
       | funcdef { printf(RED "funcdef \n" RESET);}
       | SEMICOLON { printf(RED "semicolon \n" RESET);}
@@ -216,19 +236,19 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue {check_for_funcname(yylval.stringValue); }  EQ expr {   printf(RED "lvalue = expression\n" RESET);
-                                  /* if($1 == NULL){ }
+assignmexpr   : lvalue { /* check_for_funcname(yylval.stringValue); */ } EQ expr {  printf(RED "lvalue = expression\n" RESET);    
+                              if($1 == NULL){ /**/}
                                   else{
                                         char *token;
-                                        
+                                        /* get the first token */
                                         token = strtok($1, " ");
                                         if(strcmp(token,"sketoid") == 0) {
 
                                             char * idname;
-                                            idname = strtok(NULL, " "); 
-                                          
-                                        } 
-                                  }*/
+                                            idname = strtok(NULL, " ");
+                                            check_for_funcname(idname);
+                                        }
+                                  }
                               
                           }
               ;
@@ -242,11 +262,11 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET);
                         /*pernaw to "sketoid + idvalue" sto lvalue gia na to xrhsimopoihsw meta gia thn check*/
-                        /* char * whole = malloc(sizeof(char)*(strlen($1)+7+1)); //7 gia to sketoid, 1 gia to \0
+                        char * whole = malloc(sizeof(char)*(strlen($1)+7+1)); //7 gia to sketoid, 1 gia to \0
                         strcpy(whole,"sketoid ");
                         char* id = yylval.stringValue;
                         strcat(whole, id);
-                        $$ = whole; */
+                        $$ = whole; 
 
                         insertVar( $1, yylineno, scope);  }
          | LOCAL IDENTIFIER {  localVar( $2, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
@@ -299,8 +319,8 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET multi_stmts R_CBRACKET { printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES { result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1);}
-         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES idlist R_PARENTHES { make_not_accessible(scope+1); } block { make_accessible_again(scope+1);}
+funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--; }
+         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block { make_accessible_again(scope+1); insideFunc--; }
          ;
 
 const    : number { printf(RED "const:: number\n" RESET); }
@@ -326,10 +346,10 @@ ifstmt  : IF L_PARENTHES expr R_PARENTHES stmt ELSE stmt { printf(RED "if(exprse
         | IF L_PARENTHES expr R_PARENTHES stmt { printf(RED "if(exprsession) stmt\n" RESET); }
         ;
 
-whilestmt	: WHILE L_PARENTHES expr R_PARENTHES stmt { printf(RED "while(expr) stmt\n" RESET); }
+whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr R_PARENTHES stmt { insideLoop--; printf(RED "while(expr) stmt\n" RESET); }
     			;
 
-forstmt	: FOR L_PARENTHES elist SEMICOLON expr SEMICOLON elist R_PARENTHES stmt { printf(RED "for(elist; expr;elist) stmt\n" RESET); }
+forstmt	: FOR L_PARENTHES { insideLoop++; } elist SEMICOLON expr SEMICOLON elist R_PARENTHES stmt {printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
     		;
 
 returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}

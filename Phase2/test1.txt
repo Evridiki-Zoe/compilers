@@ -1,20 +1,5 @@
-y;
-{x;
+function f(){
 
-{
-
-x;
-y;
-
-local x;
- x;
-function k(b,c){
-
-	b=2;
-	c = (function(){});
-
+ 	 f = 10;
 }
 
-
-}
-}
