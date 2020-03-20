@@ -187,21 +187,32 @@ int hash_function(const char *name){
 void check_for_funcname(char* lvalue_name){
 	int i = 0 ;
 	assert(lvalue_name);
-	for(i = 0; i < 100; i++){
-			struct symbol_table_binding *curr = table->pinakas[i];
-			while(curr != NULL) {
-						if(curr->symbol_type == 3 || curr->symbol_type == 4){
-							if(strcmp(lvalue_name,curr->value.func->name) == 0) {
-								 printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-							   exit(1);
-							 }
-				   }
 
-		     curr = curr->next;
+	struct symbol_table_binding *curr = table->pinakas[hash_function(lvalue_name)];
+
+	while(curr != NULL) {
+		if(curr->symbol_type == 3 || curr->symbol_type == 4){
+			if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+					printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+					exit(EXIT_FAILURE);
 			}
+		}
+		curr = curr->next;
 	}
 
+	// for(i = 0; i < 100; i++){
+	// 	struct symbol_table_binding *curr = table->pinakas[i];
+	// 	while(curr != NULL) {
+	// 				if(curr->symbol_type == 3 || curr->symbol_type == 4){
+	// 					if(strcmp(lvalue_name,curr->value.func->name) == 0) {
+	// 							printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+	// 						exit(1);
+	// 						}
+	// 			}
 
+	// 		curr = curr->next;
+	// 	}
+	// }
 }
 
 
@@ -446,19 +457,34 @@ int insertVar(char* name , int line , int scope){
 	while(curr){
 
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
+
 			printf("Reference to local var\n" );
 			return 0;
-	} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1&& curr->active == true && curr->symbol_type ==2 ) {
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
 
 			printf("Reference to formal argument\n");
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1&& curr->active == true  && curr->value.var->scope != 0 ) {
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0 ) {
+
+				if(tmp != NULL) {
+					if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
+						printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+						exit(EXIT_FAILURE);
+					}
+				}
+
 			printf("Reference to accessible var in another scope\n");
 			return 0;
+		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
+			printf("Reference to accessible var in another scope\n");
+			return 0;
+		
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
 			printf("Reference to global var\n");
 			return 0;
 		}
+
+		printf("name: %s, acce: %d, active: %d scope: %d\n", curr->value.var->name, curr->accessible, curr->active, curr->value.var->scope);
 		// yparxei locally i anamesa se synartisi
 		// if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
 
@@ -486,12 +512,15 @@ int insertVar(char* name , int line , int scope){
 	return 0;
 }
 
-
+// int localVar(const char *name, int line, int scope) {
+// 	printf("WTF");
+// 	return 1;
+// }
 int localVar(const char* name, int line, int scope){
 	int flag = 1;
 	struct symbol_table_binding *curr;
     int hash = 0;
-
+	printf("gamw ti mana sou");
     assert(table && name);
 	if (scope == 0) flag = 0;
 
@@ -506,7 +535,7 @@ int localVar(const char* name, int line, int scope){
     hash = hash_function(name);//briskw pou kanei hash to stoixeio
     curr = table->pinakas[hash];//paw se ayth th thesh
 
-	// elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
+	// // elegxw an uparxeihdh to stoixeio pou thelw na prosthesw
     while(curr){
 		if (strcmp(curr->value.var->name, name) == 0 && scope == curr->value.var->scope && curr->active == true ) {
 			if (curr->symbol_type == 3 || curr->symbol_type == 4){
@@ -519,7 +548,7 @@ int localVar(const char* name, int line, int scope){
     }
 
 	insert_hash_table(name, flag, line, true, scope);
-    return 0;
+	return 1;
 }
 
 char* enum_toString(symtype sym) {

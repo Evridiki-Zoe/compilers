@@ -216,19 +216,20 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue  EQ expr {  printf(RED "lvalue = expression\n" RESET);
-                                  if($1 == NULL){ }
+assignmexpr   : lvalue {check_for_funcname(yylval.stringValue); }  EQ expr {   printf(RED "lvalue = expression\n" RESET);
+                                  /* if($1 == NULL){ }
                                   else{
                                         char *token;
-                                        /* get the first token */
+                                        
                                         token = strtok($1, " ");
                                         if(strcmp(token,"sketoid") == 0) {
 
                                             char * idname;
-                                            idname = strtok(NULL, " ");
-                                            check_for_funcname(idname);
-                                        }
-                                  }
+                                            idname = strtok(NULL, " "); 
+                                          
+                                        } 
+                                  }*/
+                              
                           }
               ;
 
@@ -241,14 +242,14 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET);
                         /*pernaw to "sketoid + idvalue" sto lvalue gia na to xrhsimopoihsw meta gia thn check*/
-                        char * whole = malloc(sizeof(char)*(strlen($1)+7+1)); //7 gia to sketoid, 1 gia to \0
+                        /* char * whole = malloc(sizeof(char)*(strlen($1)+7+1)); //7 gia to sketoid, 1 gia to \0
                         strcpy(whole,"sketoid ");
                         char* id = yylval.stringValue;
                         strcat(whole, id);
-                        $$ = whole;
+                        $$ = whole; */
 
                         insertVar( $1, yylineno, scope);  }
-         | LOCAL IDENTIFIER { printf(RED "lvalue:: local identifier\n" RESET);  localVar( $2, yylineno, scope); }
+         | LOCAL IDENTIFIER {  localVar( $2, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
          | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
