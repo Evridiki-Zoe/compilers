@@ -189,26 +189,26 @@ int check_for_funcname( char* name){
 	int i = 0 ;
 	assert(name);
 
-	// struct symbol_table_binding *curr = table->pinakas[hash_function(name)];
+	struct symbol_table_binding *curr = table->pinakas[hash_function(name)];
 	// printf("name: %s\n", name);
-	// while(curr != NULL) {
-	// 	if(curr->symbol_type == 3 || curr->symbol_type == 4){
-	// 		if(strcmp(name,curr->value.func->name) == 0) {
-	// 				printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-	// 				exit(EXIT_FAILURE);
-	// 		}
-	// 	}
-	// 	curr = curr->next;
-	// }
+	while(curr != NULL) {
+		if(curr->symbol_type == 3 || curr->symbol_type == 4){
+			if(strcmp(name,curr->value.func->name) == 0) {
+					printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+					exit(EXIT_FAILURE);
+			}
+		}
+		curr = curr->next;
+	}
 	
 	// for(i = 0; i < 100; i++){
 	// 	struct symbol_table_binding *curr = table->pinakas[i];
 	// 	while(curr != NULL) {
 	// 		if(curr->symbol_type == 3 || curr->symbol_type == 4){
-	// 			// if(strcmp(name, curr->value.func->name) == 0) {
-	// 			// 		printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
-	// 			// 		exit(1);
-	// 			// 	}
+	// 			if(strcmp(name, curr->value.func->name) == 0) {
+	// 					printf("Error: you are trying to assign a value to a user/library function in line %d\n", yylineno);
+	// 					exit(1);
+	// 				}
 	// 		}
 	// 		curr = curr->next;
 	// 	}

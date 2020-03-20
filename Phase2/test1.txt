@@ -1,7 +1,2 @@
-wtf[a] = 2;
-
-
-wok[0] =  3;
-
-
-akoas[wok[0]] = 2;
+print++;
+--print;

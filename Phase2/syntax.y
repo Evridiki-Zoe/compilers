@@ -19,9 +19,10 @@ char *result;
 int unnamedFuncs = 0;
 
 
+
 int insideLoop = 0;
 int insideFunc = 0;
-
+int arrayFlag;
 
 char** table;
 void print_table();
@@ -186,7 +187,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue {   check_for_funcname(yylval.stringValue); } EQ expr { printf(RED "lvalue = expression\n" RESET); }
+assignmexpr   : lvalue { if(!arrayFlag) check_for_funcname(yylval.stringValue); } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -207,9 +208,9 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.str
          ;
 
 member   : lvalue DOT IDENTIFIER { printf(RED "member:: lvalue.id \n" RESET); }
-         | lvalue L_SBRACKET expr R_SBRACKET { printf(RED "member:: lvalue[expression]\n" RESET); }
+         | lvalue L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
          | call DOT IDENTIFIER { printf(RED "member:: call.id\n" RESET); }
-         | call L_SBRACKET expr R_SBRACKET { printf(RED "member:: call[expression]\n" RESET); }
+         | call L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: call[expression]\n" RESET); }
          ;
 
 call   : call L_PARENTHES elist R_PARENTHES { printf(RED "call:: call (elist)\n" RESET); }
