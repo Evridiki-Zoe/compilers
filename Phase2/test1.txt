@@ -1,1 +1,20 @@
-print = 2;
+y;
+{x;
+
+{
+
+x;
+y;
+
+local x;
+ x;
+function k(b,c){
+
+	b=2;
+	c = (function(){});
+
+}
+
+
+}
+}

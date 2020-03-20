@@ -23,6 +23,7 @@ void hide_symbols(int scope);
 
 int yyerror (char* s){
    printf("Error in line %d, before token: '%s'\n", yylineno, yytext);
+   return 0;
 }
 
 int commentHandler(int from);
@@ -251,6 +252,5 @@ int stringHandler(){
 
     }
 	yyerror("not closing string");
-
+	return 0;
 }
-

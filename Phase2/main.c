@@ -259,12 +259,13 @@ int check_if_exists_already(const char *name, int scope) {
 	while(curr) {
 		if(strcmp(curr->value.func->name, name) == 0) {
 			return 0;
-		} 
+		}
 	}
 
-	
+
 	insert_hash_table(name, 3, yylineno, 1, scope);
-} 
+	return 0;
+}
 
 int global_exists(const char *name) {
 	struct symbol_table_binding *curr;
@@ -300,9 +301,11 @@ int contains_Func(const char *name, int scope) {
 		if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope) {
 			printf("Redefinition of \"%s\" in line: %d\n", name, yylineno);
 			exit(EXIT_FAILURE);
+
 		}
 		curr = curr->next;
 	}
+	return 0;
 }
 
 void hide_symbols(int scope){
@@ -442,38 +445,23 @@ int insertVar(char* name , int line , int scope){
 	curr = table->pinakas[hash];//paw se ayth th thesh
 	while(curr){
 
-		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag  ) {
-			if(tmp != NULL) {
-				if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
-					printf("Cannot access \"%s\"  defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
-					exit(EXIT_FAILURE);
-				}
-			}
-			//OK REFERENCE sto akrivos idio scope
+		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
+			printf("Reference to local var\n" );
 			return 0;
-		// } else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type != flag && curr->value.func->scope == scope ) {
-		// 	printf("Cannot change value of \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
-		// 	//exit(EXIT_FAILURE);
+	} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1&& curr->active == true && curr->symbol_type ==2 ) {
 
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type != flag && curr->value.var->scope != 0) {
-			printf("illigal opws leei kai o kwstas\n");
-			exit(EXIT_FAILURE);
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->symbol_type == flag && curr->value.var->scope != 0 ) {
-			printf("reference amanesa, oti kai an simainei auto. auto einai ok :)\n");
+			printf("Reference to formal argument\n");
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->symbol_type != flag && curr->value.var->scope != 0) {
-			printf("error allos typos anamesa sto global kai auto to scope basika auto einai ok\n");
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1&& curr->active == true  && curr->value.var->scope != 0 ) {
+			printf("Reference to accessible var in another scope\n");
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type == flag && curr->value.var->scope == 0) {
-			printf("ok yparxei globbally");
-			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->symbol_type != flag && curr->value.var->scope == 0) {
-			printf("yparxei globally ws synartisi probably error, basika einai ok");
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
+			printf("Reference to global var\n");
 			return 0;
 		}
 		// yparxei locally i anamesa se synartisi
 		// if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
-			
+
 		// 	if(tmp != NULL) {
 		// 		if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
 		// 			printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
@@ -495,6 +483,7 @@ int insertVar(char* name , int line , int scope){
 		curr = curr->next;
 	}
 	insert_hash_table(name, flag, line, true, scope);
+	return 0;
 }
 
 

@@ -35,6 +35,7 @@ void insertVar(const char* name, int line,int tmpscope);
 void make_not_accessible(int scope);
 void make_accessible_again(int scope);
 void check_for_funcname(char* lvalue_name);
+int check_if_exists_already(const char *name, int scope);
 %}
 
 /*%glr-parser*/
