@@ -1,2 +1,4 @@
-print++;
---print;
+function x(){
+ x();
+  x=2;
+}

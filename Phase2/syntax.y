@@ -14,6 +14,7 @@ extern int yylineno;
 extern char * yytext;
 extern int scope;
 
+int tmplocal=1;
 int args = 0;
 char *result;
 int unnamedFuncs = 0;
@@ -187,7 +188,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue { if(!arrayFlag) check_for_funcname(yylval.stringValue); } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; }
+assignmexpr   : lvalue { if(!arrayFlag && tmplocal) check_for_funcname(yylval.stringValue); } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -198,7 +199,7 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          ;
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope); }
-         | LOCAL IDENTIFIER { printf("%s\n", yylval.stringValue); localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
+         | LOCAL IDENTIFIER {tmplocal=0; printf("%s\n", yylval.stringValue); localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
          | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);

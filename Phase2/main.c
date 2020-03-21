@@ -200,7 +200,7 @@ int check_for_funcname( char* name){
 		}
 		curr = curr->next;
 	}
-	
+
 	// for(i = 0; i < 100; i++){
 	// 	struct symbol_table_binding *curr = table->pinakas[i];
 	// 	while(curr != NULL) {
@@ -281,6 +281,7 @@ int check_if_exists_already(const char *name, int scope) {
 			}
 			return 0;
 		}
+		curr=curr->next;
 	}
 	insert_hash_table(name, 3, yylineno, 1, scope);
 	return 1;
@@ -486,7 +487,7 @@ int insertVar(char* name , int line , int scope){
 		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
 			printf("Reference to accessible var in another scope\n");
 			return 0;
-		
+
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
 			printf("Reference to global var\n");
 			return 0;
