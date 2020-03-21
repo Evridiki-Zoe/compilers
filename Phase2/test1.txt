@@ -1,4 +1,5 @@
 function x(){
  x();
-  x=2;
+  local  x=3;
+ x=3;
 }

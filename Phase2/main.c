@@ -11,7 +11,7 @@ extern int yylineno;
 extern char *yytext;
 extern int token_count;
 extern int scope; // current scope we are right now, as we do the syntactic analysis
-
+extern int ref;
 extern int isFunction;
 int lastActiveFunc = 0;
 extern int args;
@@ -468,10 +468,12 @@ int insertVar(char* name , int line , int scope){
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
 
 			printf("Reference to local var\n" );
+			ref=0;
 			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
 
 			printf("Reference to formal argument\n");
+			ref=0;
 			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0 ) {
 
@@ -490,6 +492,7 @@ int insertVar(char* name , int line , int scope){
 
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
 			printf("Reference to global var\n");
+
 			return 0;
 		}
 
@@ -529,7 +532,7 @@ int localVar(const char* name, int line, int scope){
 	int flag = 1;
 	struct symbol_table_binding *curr;
     int hash = 0;
-	printf("gamw ti mana sou");
+
     assert(table && name);
 	if (scope == 0) flag = 0;
 
@@ -551,11 +554,14 @@ int localVar(const char* name, int line, int scope){
 				printf("Conflicting types of \"%s\" in line: %d \n",name , yylineno );
 				exit(EXIT_FAILURE);
 
-			} else return 0;
+			} else{
+				ref=0;
+				return 0;
+			}
 		}
     	curr = curr->next;
     }
-
+	ref=0;
 	insert_hash_table(name, flag, line, true, scope);
 	return 1;
 }
