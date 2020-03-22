@@ -268,17 +268,17 @@ int check_if_exists_already(const char *name, int scope) {
 
 	mapping = hash_function(name);
 	curr = table->pinakas[mapping];
-
+	printf("geiaaaaaaaa\n");
 		while(curr) {
 		if(strcmp(curr->value.func->name, name) == 0) {
-			while(curr->value.func->args_list != NULL) {
-				counter2++;
-				curr->value.func->args_list = curr->value.func->args_list->next;
-			}
-			if(counter2 > args) {
-				printf("Function \"%s\" in line: %d has less arguments than the one defined at line: %d\n", name, yylineno, curr->value.func->line);
-				exit(EXIT_FAILURE);
-			}
+	//		while(curr->value.func->args_list != NULL) {
+	//			counter2++;
+	//			curr->value.func->args_list = curr->value.func->args_list->next;
+	//		}
+	//		if(counter2 > args) {
+	//			printf("Function \"%s\" in line: %d has less arguments than the one defined at line: %d\n", name, yylineno, curr->value.func->line);
+	//			exit(EXIT_FAILURE);
+	//		}
 			return 0;
 		}
 		curr=curr->next;
