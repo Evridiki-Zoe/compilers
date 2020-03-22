@@ -412,6 +412,7 @@ int newFunction(const char* name , int line, int scope){
 	newnode->value.func->args_list = NULL;
 	newnode->active = 1;
 	newnode->symbol_type = 3;
+	newnode->accessible=1;
 
 	newnode->next = table->pinakas[mapping]; /*to bazw sthn arxh ths listas*/
 	table->pinakas[mapping] = newnode;
@@ -475,7 +476,7 @@ int insertVar(char* name , int line , int scope){
 			printf("Reference to formal argument\n");
 			ref=0;
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0 ) {
+		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
 
 				if(tmp != NULL) {
 					if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {

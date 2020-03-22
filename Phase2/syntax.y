@@ -139,21 +139,21 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
                               if( insideFunc > 0) {
                                     // ok
                               } else {
-                                    printf("Error: RETURN STMT outside of function\n");
+                                    printf("Error: RETURN STMT outside of function in line %d\n",yylineno);
                                     exit(EXIT_FAILURE);
                               } }
       | BREAK SEMICOLON { printf(RED "break \n" RESET);
                               if( insideLoop > 0) {
                               // ok
                               } else {
-                                    printf("Error: BREAK STMT outside of loop\n");
+                                    printf("Error: BREAK STMT outside of loop in line %d\n",yylineno);
                                     exit(EXIT_FAILURE);
                               } }
       | CONTINUE SEMICOLON { printf(RED "continue \n" RESET);
                               if( insideLoop > 0) {
                               // ok
                               } else {
-                                    printf("Error: CONTINUE STMT outside of loop\n");
+                                    printf("Error: CONTINUE STMT outside of loop in line %d\n",yylineno);
                                     exit(EXIT_FAILURE);
                               } }
       | block { printf(RED "block \n" RESET);}

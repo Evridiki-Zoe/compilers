@@ -1,5 +1,4 @@
-function x(){
- x();
-  local  x=3;
- x=3;
+function f(){
+
+ f(12);
 }
