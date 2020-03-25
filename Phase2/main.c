@@ -268,7 +268,7 @@ int check_if_exists_already(const char *name, int scope) {
 
 	mapping = hash_function(name);
 	curr = table->pinakas[mapping];
-	printf("geiaaaaaaaa\n");
+	//printf("geiaaaaaaaa\n");
 		while(curr) {
 		if(strcmp(curr->value.func->name, name) == 0) {
 	//		while(curr->value.func->args_list != NULL) {
@@ -485,19 +485,19 @@ int insertVar(char* name , int line , int scope){
 					}
 				}
 
-			printf("Reference to accessible var in another scope\n");
+			//printf("Reference to accessible var in another scope\n");
 			return 0;
 		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
-			printf("Reference to accessible var in another scope\n");
+			//printf("Reference to accessible var in another scope\n");
 			return 0;
 
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
-			printf("Reference to global var\n");
+			//printf("Reference to global var\n");
 
 			return 0;
 		}
 
-		printf("name: %s, acce: %d, active: %d scope: %d\n", curr->value.var->name, curr->accessible, curr->active, curr->value.var->scope);
+		//printf("name: %s, acce: %d, active: %d scope: %d\n", curr->value.var->name, curr->accessible, curr->active, curr->value.var->scope);
 		// yparxei locally i anamesa se synartisi
 		// if (strcmp(curr->value.var->name, name) == 0 && curr->active == true && curr->value.var->scope != 0){
 
