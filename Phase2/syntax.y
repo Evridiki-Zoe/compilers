@@ -13,12 +13,11 @@ extern int yyerror(const char* s);
 extern int yylineno;
 extern char * yytext;
 extern int scope;
-extern int ref=1;
-int tmplocal=1;
+extern int maxScope;
+int ref = 1;
 int args = 0;
 char *result;
 int unnamedFuncs = 0;
-
 
 
 int insideLoop = 0;
@@ -27,21 +26,21 @@ int arrayFlag;
 
 char** table;
 void print_table();
-int global_exists(const char *name);
+int global_exists(char *name);
 
-int newFunction(char* name, int line,int tmpscope);
+int newFunction(char *name, int line,int tmpscope);
 int argumentF(char *name, int line, int scope);
-int insert_hash_table(const char *name, int sym_type, int line, bool active, int scope);
+int insert_hash_table(char *name, int sym_type, int line, bool active, int scope);
 
-int localVar(const char *name, int line, int scope);
+int localVar(char *name, int line, int scope);
 
-void insertVar(const char* name, int line,int tmpscope);
+void insertVar(char* name, int line,int tmpscope);
 
 
 void make_not_accessible(int scope);
 void make_accessible_again(int scope);
-void check_for_funcname(char* lvalue_name);
-int check_if_exists_already(const char *name, int scope);
+void check_for_funcname(const char *lvalue_name);
+int check_if_exists(const char *name, int scope);
 %}
 
 /*%glr-parser*/
@@ -127,8 +126,8 @@ int check_if_exists_already(const char *name, int scope);
 program  :  multi_stmts
          ;
 
-multi_stmts : stmt multi_stmts {printf("stmt multi_stmt\n");}
-            | /*empty*/{printf("multi_stmts empty\n");}
+multi_stmts : stmt multi_stmts { printf(RED "stmt multi_stmt\n" RESET);}
+            | /*empty*/ {printf(RED "multi_stmts empty\n" RESET);}
             ;
 
 stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
@@ -188,7 +187,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); }
       ;
 
-assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; ref=1;}
+assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; ref = 1;}
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
@@ -199,8 +198,8 @@ primary  : lvalue { printf(RED "primary:: lvalue\n" RESET); }
          ;
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope); }
-         | LOCAL IDENTIFIER { printf("%s\n", yylval.stringValue); localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
-         | DCOLON IDENTIFIER { if(global_exists( $2) == 0) {
+         | LOCAL IDENTIFIER { localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
+         | DCOLON IDENTIFIER { if(global_exists($2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
                   exit(EXIT_FAILURE);
             }
@@ -215,7 +214,7 @@ member   : lvalue DOT IDENTIFIER { printf(RED "member:: lvalue.id \n" RESET); }
          ;
 
 call   : call L_PARENTHES elist R_PARENTHES { printf(RED "call:: call (elist)\n" RESET); }
-       | lvalue callsuffix { check_if_exists_already( $1, scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
+       | lvalue callsuffix { check_if_exists( $1, scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES { printf(RED "call:: (funcdef)(elist)\n" RESET); }
        ;
 
@@ -246,10 +245,11 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
 indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
-block   :  L_CBRACKET { scope++; }multi_stmts R_CBRACKET { scope--; printf( RED "block:: {stmt multi stmt}\n" RESET ); }
+block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET { scope--; printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);} idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--; }
+funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope); 
+      free(result); } idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--; }
          | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block { make_accessible_again(scope+1); insideFunc--; }
          ;
 

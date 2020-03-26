@@ -134,7 +134,8 @@ STRING				\"
 {FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval.floatValue = atof(yytext); return FLOAT;}
 {INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno); yylval.intValue = atoi(yytext); return INTEGER;}
 {IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);	yylval.stringValue = strdup(yytext); return IDENTIFIER;}
-{STRING}	  	{ stringHandler(); yylval.stringValue = strdup(yytext); return STRING; } //TODO uparxei periptwsh na einai lathos kai na prepei to return string na brisketai sthn stringHandler
+{STRING}	  	{ stringHandler(); yylval.stringValue = strdup(yytext); return STRING; }
+
 "/*"  { commentHandler(yylineno);	}
 
 [ \t]+            { }
@@ -200,7 +201,7 @@ int commentHandler(int from){
 
 int stringHandler(){
 	char c;
-    char *buff = malloc(16*sizeof(char));
+    char *buff = calloc(16, sizeof(char));
 	long int length = 0;
 	long int baseofre = 16;
     char tmp;
@@ -219,7 +220,7 @@ int stringHandler(){
 
         if (c == '\\') {
 
-            char tmp = input();
+            tmp = input();
 
             if (tmp == 't') {
               strcat(buff, "\t");
@@ -235,14 +236,14 @@ int stringHandler(){
 
             } else {
 
-		strcat(buff,"\\");
+		        strcat(buff,"\\");
 
                 printf("Warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
                 unput(tmp);
             }
-        } else   {
+        } else {
 
-            strncat(buff, &c, 1);
+            strcat(buff, &c);
         }
 
     }

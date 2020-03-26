@@ -1,6 +1,0 @@
-//error kanena apo ayta den prepei na pernaei
-sin = 0;
---cos;
-cos--;
-++cos;
-cos++ ;
