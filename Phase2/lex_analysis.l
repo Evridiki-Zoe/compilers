@@ -134,8 +134,7 @@ STRING				\"
 {FLOAT}			{ add_alpha_token(++token_count, "FLOAT", yytext, yylineno); yylval.floatValue = atof(yytext); return FLOAT;}
 {INTEGER} 		{ add_alpha_token(++token_count, "INTEGER", yytext, yylineno); yylval.intValue = atoi(yytext); return INTEGER;}
 {IDENTIFIER} 	{ add_alpha_token(++token_count, "IDENTIFIER", yytext, yylineno);	yylval.stringValue = strdup(yytext); return IDENTIFIER;}
-{STRING}	  	{ stringHandler(); yylval.stringValue = strdup(yytext); return STRING; }
-
+{STRING}	  	{ stringHandler(); yylval.stringValue = strdup(yytext); return STRING; } //TODO uparxei periptwsh na einai lathos kai na prepei to return string na brisketai sthn stringHandler
 "/*"  { commentHandler(yylineno);	}
 
 [ \t]+            { }
@@ -201,12 +200,12 @@ int commentHandler(int from){
 
 int stringHandler(){
 	char c;
-    char *buff = calloc(16, sizeof(char));
+    char *buff = malloc(16*sizeof(char));
 	long int length = 0;
 	long int baseofre = 16;
     char tmp;
 
-    while ((c = input()) ) {
+    while ((c = input())!= EOF ) {
     		length++;
 		  if (length > baseofre) {
 			  baseofre *= 2;
@@ -220,7 +219,7 @@ int stringHandler(){
 
         if (c == '\\') {
 
-            tmp = input();
+            char tmp = input();
 
             if (tmp == 't') {
               strcat(buff, "\t");
@@ -236,14 +235,14 @@ int stringHandler(){
 
             } else {
 
-		        strcat(buff,"\\");
+		strcat(buff,"\\");
 
                 printf("Warning: unknown escape sequence: '\\%c' in line: %d\n", tmp, yylineno );
                 unput(tmp);
             }
-        } else {
+        } else   {
 
-            strcat(buff, &c);
+            strncat(buff, &c, 1);
         }
 
     }
