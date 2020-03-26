@@ -642,9 +642,6 @@ int main(void) {
 	yyparse();
 
 	print_table();
-	
-	free_table();
-	free_list();
 
 	return 1;
 }
