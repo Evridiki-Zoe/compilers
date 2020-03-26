@@ -304,7 +304,7 @@ int contains_Func(char *name, int scope) {
 	curr = table->pinakas[mapping];
 
 	while(curr) {
-		if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope) {
+		if(strcmp(curr->value.func->name, name) == 0 && curr->value.func->scope == scope && curr->active == 1) {
 			return 1;
 		}
 		curr = curr->next;
