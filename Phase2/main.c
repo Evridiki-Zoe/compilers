@@ -124,7 +124,8 @@ int searchValue(struct arguments *head, char *key);
 
 int insertLocalVar(char* name, int line, int scope);
 
-
+/*makes all variables (type 1 or 2) of scope equal to current scope or less, not accessible
+used for checking inside function*/
 void make_not_accessible(int curr_scope){
 	size_t i = 0;
 	for(i = 0; i < SIZE; i++) {
@@ -145,6 +146,7 @@ void make_not_accessible(int curr_scope){
 	}
 }
 
+/*makes all variables (type 1 or 2) accessible*/
 void make_accessible_again(int curr_scope){
 	size_t i = 0;
 	for(i = 0; i < SIZE; i++) {
@@ -236,7 +238,8 @@ int insert_hash_table(char *name, symtype sym_type, int line, bool active, int s
   return 1;
 }
 
-
+/*checks if exists, returns 0 if exists
+inserts in hash table if not*/
 int check_if_exists(char *name, int scope) {
 	struct symbol_table_binding *curr;
 	int mapping = 0;
@@ -623,7 +626,7 @@ int main(void) {
 
 	table = malloc(sizeof(struct SymTable_struct));
 
-	table->pinakas = calloc(SIZE, sizeof(struct symbol_table_binding *));
+	table->pinakas = calloc(SIZE, sizeof(struct symbol_table_binding *));//oxi calloc, tha to diorthwsw kapoia stigmh
 	table->total_size = 0;
 
 	insert_hash_table("print", 4 , 0, true, 0);
@@ -643,5 +646,5 @@ int main(void) {
 
 	print_table();
 
-	return 1;
+	return 0;
 }
