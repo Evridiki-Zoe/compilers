@@ -181,7 +181,7 @@ int check_for_funcname(const char *name){
 	struct symbol_table_binding *curr;
 
 	assert(name);
-	
+
 	curr = table->pinakas[hash_function(name)];
 	while(curr != NULL) {
 		if(curr->symbol_type == 3 || curr->symbol_type == 4){
@@ -197,7 +197,7 @@ int check_for_funcname(const char *name){
 
 
 /*
- * Inserts a new node 
+ * Inserts a new node
  * in hashtable
  */
 int insert_hash_table(char *name, symtype sym_type, int line, bool active, int scope){
@@ -267,7 +267,7 @@ int check_if_exists(char *name, int scope) {
 	return 1;
 }
 
-/* 
+/*
  * Return values:
  * 1 if it exists globally
  * 0 in any other case
@@ -407,8 +407,8 @@ int newFunction(char* name , int line, int scope){
 	return 0;
 }
 
-/* 
- * Function to check if there is 
+/*
+ * Function to check if there is
  * duplicate formal argument.
  * Return:
  * 1 on success, found this key.
@@ -431,7 +431,7 @@ int searchValue(struct arguments *head, char *key) {
 int insertVar(char* name , int line , int scope){
 	int hash = 0, flag = 1;
 	struct symbol_table_binding *curr, *tmp;
-
+	printf("searching name : %s , line %d , scope %d\n",name,line,scope );
 	assert(table && name);
 
 	if (scope == 0) flag = 0;
@@ -448,19 +448,19 @@ int insertVar(char* name , int line , int scope){
 	 */
 	hash = hash_function(name);//briskw pou kanei hash to stoixeio
 	curr = table->pinakas[hash];//paw se ayth th thesh
-	
-	tmp = table->pinakas[lastActiveFunc];
-	
-	while(curr){
 
+	tmp = table->pinakas[lastActiveFunc];
+
+	while(curr){
+		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
 
-			// printf("Reference to local var\n" );
+			 printf("Reference to local var\n" );
 			ref = 0;
 			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
 
-			//printf("Reference to formal argument\n");
+			printf("Reference to formal argument\n");
 			ref = 0;
 			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
@@ -472,14 +472,14 @@ int insertVar(char* name , int line , int scope){
 					}
 				}
 
-			//printf("Reference to accessible var in another scope\n");
+			printf("Reference to accessible var in another scope\n");
 			return 0;
 		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
-			//printf("Reference to accessible var in another scope\n");
+			printf("Reference to accessible var in another scope\n");
 			return 0;
 
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
-			//printf("Reference to global var\n");
+			printf("Reference to global var\n");
 
 			return 0;
 		}
@@ -553,7 +553,7 @@ int free_table(void) {
 					prev->value.func->args_list = prev->value.func->args_list->next;
 					free(prev_arg);
 				}
-				
+
 				free(prev->value.func->name);
 				free(prev->value.func);
 			} else {
@@ -592,7 +592,7 @@ int print_table(){
     	printf("Table is empty\n");
     	return 0;
   	}
-	
+
 	printf("\n\"NAME\"   [TYPE]    (LINE)   (SCOPE)\n");
 	for(scope = 0; scope <= maxScope; scope++) {
 		printf("----------Scope #%lu ----------", scope);
