@@ -197,7 +197,7 @@ primary  : lvalue { printf( "primary:: lvalue %s\n"  , ($1)); }
          | const { printf(RED "primary:: const\n" RESET); }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope);  printf("geia\n" );}
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope); }
          | LOCAL IDENTIFIER { localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
          | DCOLON IDENTIFIER { if(global_exists($2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
