@@ -431,7 +431,7 @@ int searchValue(struct arguments *head, char *key) {
 int insertVar(char* name , int line , int scope){
 	int hash = 0, flag = 1;
 	struct symbol_table_binding *curr, *tmp;
-	printf("searching name : %s , line %d , scope %d\n",name,line,scope );
+	//printf("searching name : %s , line %d , scope %d\n",name,line,scope );
 	assert(table && name);
 
 	if (scope == 0) flag = 0;
@@ -452,15 +452,15 @@ int insertVar(char* name , int line , int scope){
 	tmp = table->pinakas[lastActiveFunc];
 
 	while(curr){
-		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
+//		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
 
-			 printf("Reference to local var\n" );
+//			 printf("Reference to local var\n" );
 			ref = 0;
 			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
 
-			printf("Reference to formal argument\n");
+//			printf("Reference to formal argument\n");
 			ref = 0;
 			return 0;
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
@@ -472,14 +472,14 @@ int insertVar(char* name , int line , int scope){
 					}
 				}
 
-			printf("Reference to accessible var in another scope\n");
+//			printf("Reference to accessible var in another scope\n");
 			return 0;
 		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
-			printf("Reference to accessible var in another scope\n");
+//			printf("Reference to accessible var in another scope\n");
 			return 0;
 
 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
-			printf("Reference to global var\n");
+//			printf("Reference to global var\n");
 
 			return 0;
 		}
