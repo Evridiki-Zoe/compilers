@@ -173,6 +173,77 @@ void print_list_rvalues(){
 
 }
 
+
+typedef enum {
+	assign,
+	add,
+	sub,
+	mul,
+	Div, //oxi div alliws exei conflict type with lex
+	mod,
+	uminus,
+	and,
+	or,
+	not,
+	if_eq,
+	if_not_eq,
+	if_lesseq,
+	if_greatereq,
+	if_less,
+	if_greater,
+	call,
+	param,
+	ret,
+	getretval,
+	funcstart,
+	funcend,
+	tablecreate,
+	tablegetelem,
+	table_setelem
+
+}iopcode;
+
+//gia ta quads
+typedef enum {
+var_e,
+tableitem_e,
+programfunc_e,
+libfunc_e,
+
+arithmeticexp_e,
+boolexp_e,
+assignexp_e,
+newtable_e,
+
+const_num_e,
+constbool_e,
+conststring_e,
+nil_e
+
+}expr_t;
+
+struct expr{
+
+expr_t type;
+//symbol* sym;	//mallon thelei olo to symbol node?
+struct expr* index;
+double numconst;
+char* strconst;
+unsigned char boolconst;
+struct expr* next;
+
+};
+
+struct quad{
+	iopcode opcode;
+  struct expr* res;
+  struct expr* arg1;
+  struct expr* arg2;
+	unsigned label;
+	unsigned line;
+};
+
+
 struct SymTable_struct *table = NULL;
 
 int searchValue(struct arguments *head, char *key);
