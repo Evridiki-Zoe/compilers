@@ -42,6 +42,7 @@ void make_accessible_again(int scope);
 void hide_symbols(int scope);
 void check_for_funcname(const char *lvalue_name);
 int check_if_exists(const char *name, int scope);
+
 %}
 
 /*%glr-parser*/
@@ -254,15 +255,17 @@ funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)
          | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block { make_accessible_again(scope+1); insideFunc--; }
          ;
 
-const    : number { printf(RED "const:: number\n" RESET); }
-         | STRING { printf(RED "const:: str\n" RESET); }
-         | NIL { printf(RED "const:: nil\n" RESET); }
-         | TRUE { printf(RED "const:: true\n" RESET); }
-         | FALSE { printf(RED "const:: false\n" RESET); }
+//rvalue is const mazi me libfunc kai userfunc?
+
+const    : number { }
+         | STRING { /*printf("STRINGGG %s \n",yylval.stringValue );*/ insert_rvalue_list(yylval.stringValue ,1); } //DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
+         | NIL {insert_rvalue_list("nil" ,2); }
+         | TRUE { insert_rvalue_list("true" ,2);}
+         | FALSE { insert_rvalue_list("false" ,2);}
          ;
 
-number   : INTEGER { printf(RED "integer\n" RESET); }
-         | FLOAT { printf(RED "float\n" RESET); }
+number   : INTEGER { char buff[100]; sprintf(buff, "%d", yylval.intValue); insert_rvalue_list( buff,0);  }
+         | FLOAT { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
          ;
 
 idlist   : IDENTIFIER { argumentF( $1, yylineno, (scope + 1)); } multi_id

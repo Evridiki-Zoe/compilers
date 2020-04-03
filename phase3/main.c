@@ -83,7 +83,6 @@ typedef enum {
     library 	= 4
 } symtype;
 
-
 struct arguments {
 	char 				*name;
 	struct arguments 	*next;
@@ -110,6 +109,8 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 	} value;
 	bool 			active;
 	bool accessible ;
+
+	//int val; // gia ta lvalue?????????
   struct symbol_table_binding *next;
 };
 
@@ -117,6 +118,60 @@ struct SymTable_struct { /*TABLE*/
     struct symbol_table_binding **pinakas;
     int total_size;
 };
+
+//===================================================
+
+/*enum for rvalue type*/
+typedef enum {
+number = 0,
+string = 1,
+boolean = 2,
+nil = 3,
+function_addr = 4,
+lib_func = 5
+} rvalue_type;
+
+struct rvalue_node {
+	char* name;
+	rvalue_type type;
+  struct rvalue_node* next;
+};
+
+struct rvalue_node* r_value_head = NULL;
+
+void insert_rvalue_list(char* name, rvalue_type type){
+
+	if(r_value_head == NULL) { //mhn to allaksete ayto
+		struct rvalue_node* newnode = malloc(sizeof(struct rvalue_node));
+		newnode->name = malloc((strlen(name) + 1) * sizeof(char));
+
+		strcpy(newnode->name, name);
+		newnode->type = type;
+		newnode->next = NULL;
+		r_value_head = newnode;
+		return;
+	}
+
+	struct rvalue_node* newnode = malloc(sizeof(struct rvalue_node));
+	newnode->name = malloc((strlen(name) + 1) * sizeof(char));
+
+	strcpy(newnode->name, name);
+	newnode->type = type;
+	newnode->next = r_value_head;
+	r_value_head = newnode;
+}
+
+void print_list_rvalues(){
+
+	assert(r_value_head);
+	struct rvalue_node* curr = r_value_head;
+
+	while(curr != NULL){
+			printf("RVALUE: %s, with type: %d\n", curr->name, curr->type);
+			curr = curr->next;
+		}
+
+}
 
 struct SymTable_struct *table = NULL;
 
@@ -684,7 +739,7 @@ int main(void) {
 
 	table = malloc(sizeof(struct SymTable_struct));
 
-	table->pinakas = calloc(SIZE, sizeof(struct symbol_table_binding *));//oxi calloc, tha to diorthwsw kapoia stigmh
+	table->pinakas = malloc(SIZE* sizeof(struct symbol_table_binding *));//oxi calloc, tha to diorthwsw kapoia stigmh
 	table->total_size = 0;
 
 	insert_hash_table("print", 4 , 0, true, 0);
@@ -703,6 +758,6 @@ int main(void) {
 	yyparse();
 
 	print_table();
-
+	print_list_rvalues();
 	return 0;
 }
