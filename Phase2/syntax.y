@@ -39,6 +39,7 @@ void insertVar(char* name, int line,int tmpscope);
 
 void make_not_accessible(int scope);
 void make_accessible_again(int scope);
+void hide_symbols(int scope);
 void check_for_funcname(const char *lvalue_name);
 int check_if_exists(const char *name, int scope);
 %}
@@ -190,7 +191,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; ref = 1;}
               ;
 
-primary  : lvalue { printf( "primary:: lvalue %s\n"  , ($1)); }
+primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); }
          | call { printf(RED "primary:: call\n" RESET); }
          | objectdef { printf(RED "primary:: objectdef\n" RESET); }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
@@ -245,7 +246,7 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
 indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
               ;
 
-block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET { scope--; hide_symbols(scope); printf( RED "block:: {stmt multi stmt}\n" RESET ); }
+block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
 funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);

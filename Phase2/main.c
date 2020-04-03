@@ -320,7 +320,7 @@ void hide_symbols(int scope){
 	for(i = 0; i < SIZE; i++ ){
 	  	struct symbol_table_binding *curr = table->pinakas[i];
 	  	while(curr != NULL){
-			if(curr->value.var->scope == scope && curr->value.var->scope != 0 ) curr->active = false;
+			if(curr->value.var->scope == scope && curr->value.var->scope != 0 )	curr->active = false;
 			curr = curr->next;
 	  }
 	}
@@ -451,41 +451,99 @@ int insertVar(char* name , int line , int scope){
 
 	tmp = table->pinakas[lastActiveFunc];
 
-	while(curr){
-//		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
+	while (curr) {
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
-
-//			 printf("Reference to local var\n" );
+		//	 printf("Reference to local var\n" );
 			ref = 0;
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
+		}
+		curr = curr->next;
+	}
 
-//			printf("Reference to formal argument\n");
+	curr = table->pinakas[hash];
+
+	while (curr) {
+		if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
+
+		//	printf("Reference to formal argument\n");
 			ref = 0;
 			return 0;
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
+		}
+		curr = curr->next;
+	}
 
+	curr = table->pinakas[hash];
+
+	while (curr) {
+		if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
 				if(tmp != NULL) {
 					if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
 						printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
 						exit(EXIT_FAILURE);
 					}
 				}
-
-//			printf("Reference to accessible var in another scope\n");
-			return 0;
-		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
-//			printf("Reference to accessible var in another scope\n");
-			return 0;
-
-		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
-//			printf("Reference to global var\n");
-
+		//	printf("Reference to accessible var in another scope\n");
 			return 0;
 		}
-
 		curr = curr->next;
 	}
+
+	curr = table->pinakas[hash];
+
+	while (curr) {
+//		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
+		if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
+		//	printf("Reference to accessible var in another scope\n");
+			return 0;
+		}
+		curr = curr->next;
+	}
+
+	curr = table->pinakas[hash];
+
+	while (curr) {
+		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
+		//	printf("Reference to global var\n");
+			return 0;
+		}
+		curr = curr->next;
+	}
+
+// 	while(curr){
+// //		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
+// 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
+//
+// //			 printf("Reference to local var\n" );
+// 			ref = 0;
+// 			return 0;
+// 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
+//
+// //			printf("Reference to formal argument\n");
+// 			ref = 0;
+// 			return 0;
+// 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
+//
+// 				if(tmp != NULL) {
+// 					if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
+// 						printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
+// 						exit(EXIT_FAILURE);
+// 					}
+// 				}
+//
+// //			printf("Reference to accessible var in another scope\n");
+// 			return 0;
+// 		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
+// //			printf("Reference to accessible var in another scope\n");
+// 			return 0;
+//
+// 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
+// //			printf("Reference to global var\n");
+//
+// 			return 0;
+// 		}
+//
+// 		curr = curr->next;
+// 	}
 	insert_hash_table(name, flag, line, true, scope);
 	return 1;
 }
