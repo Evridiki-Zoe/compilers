@@ -9,6 +9,64 @@ extern struct rvalue_node* r_value_head;
 extern struct quad *quads;
 
 
+char* enum_toString_opCodes(iopcode sym) {
+	switch (sym) {
+		case 0:
+				return "assign";
+		case 1:
+				return "add";
+		case 2:
+				return "sub";
+		case 3:
+				return "mul";
+	    case 4:
+				return "div";
+		case 5:
+				return "mod";
+		case 6:
+				return "uminus";
+		case 7:
+				return "and";
+		case 8:
+				return "or";
+		case 9:
+				return "not";
+		case 10:
+				return "if_eq";
+		case 11:
+				return "if_not_eq";
+		case 12:
+				return "if_lesseq";
+		case 13:
+				return "if_greatereq";
+		case 14:
+				return "if_less";
+	    case 15:
+				return "if_greater";
+		case 16:
+				return "call";
+		case 17:
+				return "param";
+		case 18:
+				return "ret";
+		case 19:
+				return "getretval";
+		case 20:
+				return "funcstart";
+		case 21:
+				return "funcend";
+		case 22:
+				return "tablecreate";
+		case 23:
+				return "tablegetelem";
+		case 24:
+				return "table_setelem";
+		default:
+				return "not compatible type";
+
+	}
+}
+
 void initialize_quad_table(){
 	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad*) );
 }
@@ -89,7 +147,7 @@ void print_quads(){
 	printf("------------------------------------------------\n" );
 	int i;
 	for ( i = 0; i < QuadNo; i++) {
-		printf("%d: %d %s %s %s  \n",i,quads[i].opcode , quads[i].res->sym->value.var->name,quads[i].arg1->sym->value.var->name ,quads[i].arg2->sym->value.var->name );
+		printf("%d: %s %s %s %s  \n",i,enum_toString_opCodes(quads[i].opcode) , quads[i].res->sym->value.var->name,quads[i].arg1->sym->value.var->name ,quads[i].arg2->sym->value.var->name );
 	}
 	printf("------------------------------------------------\n" );
 
