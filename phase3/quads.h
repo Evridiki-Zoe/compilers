@@ -93,7 +93,8 @@ void insert_rvalue_list(char* name, rvalue_type type);
 
 void print_list_rvalues();
 
-struct expr* new_expr(expr_t expr_type);
+struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struct expr* index
+	,double numconst ,char* strconst , unsigned char boolconst , struct expr* next);
 
 void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res_expr, int line, int label);
 

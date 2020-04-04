@@ -34,7 +34,7 @@ int main(void) {
 	yyparse();
 
 	print_table();
-	print_list_rvalues();
+//	print_list_rvalues();
 	print_quads();
 	return 0;
 }

@@ -47,13 +47,18 @@ void print_list_rvalues(){
 
 }
 
-struct expr* new_expr(expr_t expr_type){
+struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struct expr* index
+	,double numconst ,char* strconst , unsigned char boolconst , struct expr* next){
+
 	struct expr* expr_node = malloc(sizeof(struct expr*));
 
 	expr_node->type = expr_type;
-	expr_node->sym = NULL;
-	expr_node->index = NULL; //??
-	expr_node->next = NULL;
+	expr_node->sym = sym;
+	expr_node->index = index;
+	expr_node->numconst=numconst;
+	expr_node->strconst=strconst;
+	expr_node->boolconst=boolconst;
+	expr_node->next = next;
 
 	return expr_node;
 
@@ -75,7 +80,7 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
-
+	printf("%f\n",new_quad->arg1->numconst );
 	quads[(int)QuadNo-1]=*new_quad;
 }
 

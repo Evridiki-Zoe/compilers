@@ -22,7 +22,7 @@ int ref = 1;
 int args = 0;
 char *result;
 int unnamedFuncs = 0;
-
+int rvalues = 0;
 
 int insideLoop = 0;
 int insideFunc = 0;
@@ -86,7 +86,7 @@ char** table;
 /*The %union declaration modifies the type of yylval*/
 %union
 {
-    int intValue;
+    double intValue;
     float floatValue;
     char *stringValue;
 	struct expr* expression;
@@ -95,7 +95,7 @@ char** table;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 %type<stringValue>      lvalue
-%type<expression>       expr
+%type<expression>       expr const term primary number
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -153,10 +153,8 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
 
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
       |  expr PLUS expr {
-              /*if(expr types both num) */
-
-              //$$->sym = NULL;
-
+		  	   
+			   emit(add,$1,$3,$$,yylineno,0);
 
               }
       |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);}
@@ -171,7 +169,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
       |  expr NEQUAL expr { printf(RED "expr != expr \n" RESET);}
       |  expr AND expr { printf(RED "expr and expr \n" RESET);}
       |  expr OR expr { printf(RED "expr or expr \n" RESET);}
-      | term { printf(RED "TERM \n" RESET);}
+      | term { printf(RED "TERM \n" RESET); $$=$1; }
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
@@ -181,20 +179,20 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | lvalue { check_for_funcname(yylval.stringValue); } PPLUS { printf(RED "lvalue++\n" RESET); }
       | MMINUS lvalue { check_for_funcname(yylval.stringValue); printf(RED "--lvalue\n" RESET); }
       | lvalue { check_for_funcname(yylval.stringValue);  } MMINUS { printf(RED "lvalue--\n" RESET); }
-      | primary { printf(RED "primary\n" RESET); }
+      | primary { printf(RED "primary\n" RESET); $$=$1; }
       ;
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; ref = 1;}
               ;
 
-primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); }
+primary  : lvalue { printf(RED "primary:: lvalue \n" RESET);  }
          | call { printf(RED "primary:: call\n" RESET); }
          | objectdef { printf(RED "primary:: objectdef\n" RESET); }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
-         | const { printf(RED "primary:: const\n" RESET); }
+         | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope); }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope);  }
          | LOCAL IDENTIFIER { localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
          | DCOLON IDENTIFIER { if(global_exists($2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
@@ -252,14 +250,30 @@ funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)
 
 //rvalue is const mazi me libfunc kai userfunc?
 
-const    : number { }
+const    : number {		$$=$1;	}
          | STRING { /*printf("STRINGGG %s \n",yylval.stringValue );*/ insert_rvalue_list(yylval.stringValue ,1); } //DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
-         | NIL {insert_rvalue_list("nil" ,2); }
-         | TRUE { insert_rvalue_list("true" ,2);}
-         | FALSE { insert_rvalue_list("false" ,2);}
+         | NIL {
+			// insert_rvalue_list("nil" ,2);
+			 result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++); struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
+
+		  }
+         | TRUE {
+			 // insert_rvalue_list("true" ,2);
+			 result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++);  struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
+		 }
+         | FALSE {
+			  //insert_rvalue_list("false" ,2);
+			  result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++); struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
+		  }
          ;
 
-number   : INTEGER { char buff[100]; sprintf(buff, "%d", yylval.intValue); insert_rvalue_list( buff,0);  }
+number   : INTEGER { result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++);
+ 					struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
+					$$ = (struct expr *)malloc(sizeof(struct expr));
+					$$ = new_expr(const_num_e,tmp,NULL,($1),"",'\0',NULL);
+					printf("%f\n",$1 );
+					printf("%f\n",($$)->numconst );
+				}
          | FLOAT { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
          ;
 

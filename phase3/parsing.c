@@ -200,7 +200,7 @@ int check_for_funcname(const char *name){
  * Inserts a new node
  * in hashtable
  */
-int insert_hash_table(char *name, symtype sym_type, int line, bool active, int scope){
+struct symbol_table_binding* insert_hash_table(char *name, symtype sym_type, int line, bool active, int scope){
 	struct symbol_table_binding *newnode;
 	int mapping = 0;
 
@@ -235,7 +235,7 @@ int insert_hash_table(char *name, symtype sym_type, int line, bool active, int s
 	table->pinakas[mapping] = newnode;
 	table->total_size++;
 
-  return 1;
+  return newnode;
 }
 
 /*checks if exists, returns 0 if exists
@@ -328,7 +328,7 @@ void hide_symbols(int scope){
 }
 
 
-int insertVar(char* name , int line , int scope){
+struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	int hash = 0, flag = 1;
 	struct symbol_table_binding *curr, *tmp;
 	//printf("searching name : %s , line %d , scope %d\n",name,line,scope );
@@ -355,7 +355,7 @@ int insertVar(char* name , int line , int scope){
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
 		//	 printf("Reference to local var\n" );
 			ref = 0;
-			return 0;
+			return curr;
 		}
 		curr = curr->next;
 	}
@@ -367,7 +367,7 @@ int insertVar(char* name , int line , int scope){
 
 		//	printf("Reference to formal argument\n");
 			ref = 0;
-			return 0;
+			return curr;
 		}
 		curr = curr->next;
 	}
@@ -383,7 +383,7 @@ int insertVar(char* name , int line , int scope){
 					}
 				}
 		//	printf("Reference to accessible var in another scope\n");
-			return 0;
+			return curr;
 		}
 		curr = curr->next;
 	}
@@ -394,7 +394,7 @@ int insertVar(char* name , int line , int scope){
 //		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
 		if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
 		//	printf("Reference to accessible var in another scope\n");
-			return 0;
+			return curr;
 		}
 		curr = curr->next;
 	}
@@ -404,7 +404,7 @@ int insertVar(char* name , int line , int scope){
 	while (curr) {
 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
 		//	printf("Reference to global var\n");
-			return 0;
+			return curr;
 		}
 		curr = curr->next;
 	}
@@ -444,8 +444,8 @@ int insertVar(char* name , int line , int scope){
 //
 // 		curr = curr->next;
 // 	}
-	insert_hash_table(name, flag, line, true, scope);
-	return 1;
+	curr =insert_hash_table(name, flag, line, true, scope);
+	return curr;
 }
 
 int localVar(char* name, int line, int scope){
