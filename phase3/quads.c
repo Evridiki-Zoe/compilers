@@ -67,6 +67,7 @@ char* enum_toString_opCodes(iopcode sym) {
 	}
 }
 
+
 void initialize_quad_table(){
 	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad) );
 }
@@ -126,19 +127,21 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	QuadNo++;
 	if (QuadNo==QuadsSize) {
 		QuadsSize*=2;
-		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad*) );
+		printf("realloc in emit\n" );
+		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad) );
 	}
 	struct quad* new_quad = malloc(sizeof(struct quad));
-	new_quad->arg1 = malloc(sizeof(struct expr));
-	new_quad->arg2 = malloc(sizeof(struct expr));
-	new_quad->res = malloc(sizeof(struct expr));
+
+	new_quad->arg1 = malloc(sizeof(struct expr ));
+	new_quad->arg2 = malloc(sizeof(struct expr ));
+	new_quad->res = malloc(sizeof(struct expr ));
 	new_quad->opcode=opcode;
 	new_quad->arg1 = arg1;
 	new_quad->arg2 = arg2;
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
-	printf("%f\n",new_quad->arg1->numconst );
+	printf("emit :: %f\n",new_quad->arg1->numconst );
 	quads[(int)QuadNo-1]=*new_quad;
 }
 
@@ -147,7 +150,7 @@ void print_quads(){
 	printf("------------------------------------------------\n" );
 	int i;
 	for ( i = 0; i < QuadNo; i++) {
-		
+
 		printf("%d: %s",i+1,enum_toString_opCodes(quads[i].opcode) );
 
 		if (quads[i].res!=NULL) {

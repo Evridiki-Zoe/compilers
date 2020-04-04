@@ -190,11 +190,6 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
 							printf(RED "lvalue = expression\n" RESET) ; arrayFlag = 0; ref = 1;
-						//	tmpnode=malloc(sizeof(struct symbol_table_binding));
-						//	tmpexpr=malloc(sizeof(struct expr));
-						// 	tmpnode=insertVar( yylval.stringValue, yylineno, scope);
-						//	tmpexpr=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
-
 							emit(assign,$4,NULL,$1,yylineno,0);
 						}
               ;
