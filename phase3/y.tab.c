@@ -567,15 +567,15 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint16 yyrline[] =
 {
        0,   117,   117,   120,   121,   124,   125,   126,   127,   128,
-     135,   142,   149,   150,   151,   154,   155,   160,   161,   162,
-     163,   164,   165,   166,   167,   168,   169,   170,   171,   172,
-     175,   176,   177,   178,   179,   179,   180,   181,   181,   182,
-     185,   185,   188,   189,   190,   191,   192,   195,   196,   197,
-     202,   205,   206,   207,   208,   211,   212,   213,   216,   217,
-     220,   221,   224,   225,   229,   230,   233,   236,   237,   240,
-     243,   243,   246,   247,   246,   248,   248,   248,   248,   253,
-     254,   255,   260,   264,   270,   277,   280,   280,   281,   284,
-     284,   285,   288,   289,   292,   292,   295,   295,   298,   299
+     135,   142,   149,   150,   151,   154,   155,   164,   165,   166,
+     167,   168,   169,   170,   171,   172,   173,   174,   175,   176,
+     179,   180,   181,   182,   183,   183,   184,   185,   185,   186,
+     189,   189,   192,   193,   194,   195,   196,   199,   200,   201,
+     206,   209,   210,   211,   212,   215,   216,   217,   220,   221,
+     224,   225,   228,   229,   233,   234,   237,   240,   241,   244,
+     247,   247,   250,   251,   250,   252,   252,   252,   252,   257,
+     258,   259,   264,   268,   274,   286,   289,   289,   290,   293,
+     293,   294,   297,   298,   301,   301,   304,   304,   307,   308
 };
 #endif
 
@@ -1766,174 +1766,178 @@ yyreduce:
   case 16:
 #line 155 "syntax.y"
     {
-		  	   
+		  		result =malloc(5*sizeof(char));
+				sprintf(result,"_%ld",rvalues++);
+		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+		  		(yyval.expression) = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+
 			   emit(add,(yyvsp[(1) - (3)].expression),(yyvsp[(3) - (3)].expression),(yyval.expression),yylineno,0);
 
               }
     break;
 
   case 17:
-#line 160 "syntax.y"
+#line 164 "syntax.y"
     { printf(RED "expr - expr \n" RESET);}
     break;
 
   case 18:
-#line 161 "syntax.y"
+#line 165 "syntax.y"
     { printf(RED "expr * expr \n" RESET);}
     break;
 
   case 19:
-#line 162 "syntax.y"
+#line 166 "syntax.y"
     { printf(RED "expr / expr \n" RESET);}
     break;
 
   case 20:
-#line 163 "syntax.y"
+#line 167 "syntax.y"
     { printf(RED "expr mod expr \n" RESET);}
     break;
 
   case 21:
-#line 164 "syntax.y"
+#line 168 "syntax.y"
     { printf(RED "expr > expr \n" RESET);}
     break;
 
   case 22:
-#line 165 "syntax.y"
+#line 169 "syntax.y"
     { printf(RED "expr >= expr \n" RESET);}
     break;
 
   case 23:
-#line 166 "syntax.y"
+#line 170 "syntax.y"
     { printf(RED "expr < expr \n" RESET);}
     break;
 
   case 24:
-#line 167 "syntax.y"
+#line 171 "syntax.y"
     { printf(RED "expr < = expr \n" RESET);}
     break;
 
   case 25:
-#line 168 "syntax.y"
+#line 172 "syntax.y"
     { printf(RED "expr == expr \n" RESET);}
     break;
 
   case 26:
-#line 169 "syntax.y"
+#line 173 "syntax.y"
     { printf(RED "expr != expr \n" RESET);}
     break;
 
   case 27:
-#line 170 "syntax.y"
+#line 174 "syntax.y"
     { printf(RED "expr and expr \n" RESET);}
     break;
 
   case 28:
-#line 171 "syntax.y"
+#line 175 "syntax.y"
     { printf(RED "expr or expr \n" RESET);}
     break;
 
   case 29:
-#line 172 "syntax.y"
+#line 176 "syntax.y"
     { printf(RED "TERM \n" RESET); (yyval.expression)=(yyvsp[(1) - (1)].expression); }
     break;
 
   case 30:
-#line 175 "syntax.y"
+#line 179 "syntax.y"
     { printf(RED " (expression) \n" RESET); }
     break;
 
   case 31:
-#line 176 "syntax.y"
+#line 180 "syntax.y"
     { printf(RED " - expression \n" RESET); }
     break;
 
   case 32:
-#line 177 "syntax.y"
+#line 181 "syntax.y"
     { printf(RED "NOT expression\n" RESET); }
     break;
 
   case 33:
-#line 178 "syntax.y"
+#line 182 "syntax.y"
     { check_for_funcname(yylval.stringValue); }
     break;
 
   case 34:
-#line 179 "syntax.y"
+#line 183 "syntax.y"
     { check_for_funcname(yylval.stringValue); }
     break;
 
   case 35:
-#line 179 "syntax.y"
+#line 183 "syntax.y"
     { printf(RED "lvalue++\n" RESET); }
     break;
 
   case 36:
-#line 180 "syntax.y"
+#line 184 "syntax.y"
     { check_for_funcname(yylval.stringValue); printf(RED "--lvalue\n" RESET); }
     break;
 
   case 37:
-#line 181 "syntax.y"
+#line 185 "syntax.y"
     { check_for_funcname(yylval.stringValue);  }
     break;
 
   case 38:
-#line 181 "syntax.y"
+#line 185 "syntax.y"
     { printf(RED "lvalue--\n" RESET); }
     break;
 
   case 39:
-#line 182 "syntax.y"
+#line 186 "syntax.y"
     { printf(RED "primary\n" RESET); (yyval.expression)=(yyvsp[(1) - (1)].expression); }
     break;
 
   case 40:
-#line 185 "syntax.y"
+#line 189 "syntax.y"
     { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  }
     break;
 
   case 41:
-#line 185 "syntax.y"
+#line 189 "syntax.y"
     { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; ref = 1;}
     break;
 
   case 42:
-#line 188 "syntax.y"
+#line 192 "syntax.y"
     { printf(RED "primary:: lvalue \n" RESET);  }
     break;
 
   case 43:
-#line 189 "syntax.y"
+#line 193 "syntax.y"
     { printf(RED "primary:: call\n" RESET); }
     break;
 
   case 44:
-#line 190 "syntax.y"
+#line 194 "syntax.y"
     { printf(RED "primary:: objectdef\n" RESET); }
     break;
 
   case 45:
-#line 191 "syntax.y"
+#line 195 "syntax.y"
     { printf(RED "primary:: (funcdef)\n" RESET); }
     break;
 
   case 46:
-#line 192 "syntax.y"
+#line 196 "syntax.y"
     { printf(RED "primary:: const\n" RESET);  (yyval.expression)=(yyvsp[(1) - (1)].expression); }
     break;
 
   case 47:
-#line 195 "syntax.y"
+#line 199 "syntax.y"
     { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope);  }
     break;
 
   case 48:
-#line 196 "syntax.y"
+#line 200 "syntax.y"
     { localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
     break;
 
   case 49:
-#line 197 "syntax.y"
+#line 201 "syntax.y"
     { if(global_exists((yyvsp[(2) - (2)].stringValue)) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", (yyvsp[(2) - (2)].stringValue), yylineno); \
                   exit(EXIT_FAILURE);
@@ -1942,163 +1946,163 @@ yyreduce:
     break;
 
   case 50:
-#line 202 "syntax.y"
+#line 206 "syntax.y"
     { printf(RED "lvalue:: member\n" RESET); }
     break;
 
   case 51:
-#line 205 "syntax.y"
+#line 209 "syntax.y"
     { printf(RED "member:: lvalue.id \n" RESET); }
     break;
 
   case 52:
-#line 206 "syntax.y"
+#line 210 "syntax.y"
     { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
     break;
 
   case 53:
-#line 207 "syntax.y"
+#line 211 "syntax.y"
     { printf(RED "member:: call.id\n" RESET); }
     break;
 
   case 54:
-#line 208 "syntax.y"
+#line 212 "syntax.y"
     { arrayFlag = 1; printf(RED "member:: call[expression]\n" RESET); }
     break;
 
   case 55:
-#line 211 "syntax.y"
+#line 215 "syntax.y"
     { printf(RED "call:: call (elist)\n" RESET); }
     break;
 
   case 56:
-#line 212 "syntax.y"
+#line 216 "syntax.y"
     { check_if_exists( (yyvsp[(1) - (2)].stringValue), scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
     break;
 
   case 57:
-#line 213 "syntax.y"
+#line 217 "syntax.y"
     { printf(RED "call:: (funcdef)(elist)\n" RESET); }
     break;
 
   case 58:
-#line 216 "syntax.y"
+#line 220 "syntax.y"
     { printf(RED "callsuffix:: (elist)\n" RESET); }
     break;
 
   case 59:
-#line 217 "syntax.y"
+#line 221 "syntax.y"
     { printf(RED "callsuffix:: ..id(elist)\n" RESET); }
     break;
 
   case 60:
-#line 220 "syntax.y"
+#line 224 "syntax.y"
     { args++; printf(RED "elist:: \n" RESET); }
     break;
 
   case 61:
-#line 221 "syntax.y"
+#line 225 "syntax.y"
     { printf(RED "elist:: empty\n" RESET); args = 0; }
     break;
 
   case 62:
-#line 224 "syntax.y"
+#line 228 "syntax.y"
     { args++; printf(RED "multiexpr commma expr exprs\n" RESET); }
     break;
 
   case 63:
-#line 225 "syntax.y"
+#line 229 "syntax.y"
     { printf(RED "multi exprsessions: empty\n" RESET); }
     break;
 
   case 64:
-#line 229 "syntax.y"
+#line 233 "syntax.y"
     { printf(RED "objectdef:: elist\n" RESET); }
     break;
 
   case 65:
-#line 230 "syntax.y"
+#line 234 "syntax.y"
     { printf(RED "objectdef:: indexed\n" RESET); }
     break;
 
   case 66:
-#line 233 "syntax.y"
+#line 237 "syntax.y"
     { printf(RED "indexed:: indexedelement multi\n" RESET); }
     break;
 
   case 67:
-#line 236 "syntax.y"
+#line 240 "syntax.y"
     { printf(RED "multi_indexedelem:: comma indelem multi\n" RESET); }
     break;
 
   case 68:
-#line 237 "syntax.y"
+#line 241 "syntax.y"
     { printf(RED "multi_indexedelem:: empty\n" RESET); }
     break;
 
   case 69:
-#line 240 "syntax.y"
+#line 244 "syntax.y"
     { printf(RED "ind elem {expr:expr}\n" RESET); }
     break;
 
   case 70:
-#line 243 "syntax.y"
+#line 247 "syntax.y"
     { scope++; if(scope > maxScope) maxScope = scope; }
     break;
 
   case 71:
-#line 243 "syntax.y"
+#line 247 "syntax.y"
     {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
     break;
 
   case 72:
-#line 246 "syntax.y"
+#line 250 "syntax.y"
     { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);
       free(result); }
     break;
 
   case 73:
-#line 247 "syntax.y"
+#line 251 "syntax.y"
     { make_not_accessible(scope+1); }
     break;
 
   case 74:
-#line 247 "syntax.y"
+#line 251 "syntax.y"
     { make_accessible_again(scope+1); insideFunc--; }
     break;
 
   case 75:
-#line 248 "syntax.y"
+#line 252 "syntax.y"
     { newFunction( (yyvsp[(2) - (2)].stringValue), yylineno, scope); }
     break;
 
   case 76:
-#line 248 "syntax.y"
+#line 252 "syntax.y"
     { insideFunc++;}
     break;
 
   case 77:
-#line 248 "syntax.y"
+#line 252 "syntax.y"
     { make_not_accessible(scope+1); }
     break;
 
   case 78:
-#line 248 "syntax.y"
+#line 252 "syntax.y"
     { make_accessible_again(scope+1); insideFunc--; }
     break;
 
   case 79:
-#line 253 "syntax.y"
+#line 257 "syntax.y"
     {		(yyval.expression)=(yyvsp[(1) - (1)].expression);	}
     break;
 
   case 80:
-#line 254 "syntax.y"
+#line 258 "syntax.y"
     { /*printf("STRINGGG %s \n",yylval.stringValue );*/ insert_rvalue_list(yylval.stringValue ,1); }
     break;
 
   case 81:
-#line 255 "syntax.y"
+#line 259 "syntax.y"
     {
 			// insert_rvalue_list("nil" ,2);
 			 result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++); struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
@@ -2107,7 +2111,7 @@ yyreduce:
     break;
 
   case 82:
-#line 260 "syntax.y"
+#line 264 "syntax.y"
     {
 			 // insert_rvalue_list("true" ,2);
 			 result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++);  struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
@@ -2115,7 +2119,7 @@ yyreduce:
     break;
 
   case 83:
-#line 264 "syntax.y"
+#line 268 "syntax.y"
     {
 			  //insert_rvalue_list("false" ,2);
 			  result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++); struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
@@ -2123,84 +2127,89 @@ yyreduce:
     break;
 
   case 84:
-#line 270 "syntax.y"
-    { result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++);
- 					struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
+#line 274 "syntax.y"
+    {
+ 					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ((yyvsp[(1) - (1)].intValue)));
+
+					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+					newnode->value.var = malloc(sizeof(struct variable));
+					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+					strcpy(newnode->value.var->name, result);
 					(yyval.expression) = (struct expr *)malloc(sizeof(struct expr));
-					(yyval.expression) = new_expr(const_num_e,tmp,NULL,((yyvsp[(1) - (1)].intValue)),"",'\0',NULL);
+					(yyval.expression) = new_expr(const_num_e,newnode,NULL,((yyvsp[(1) - (1)].intValue)),"",'\0',NULL);
 					printf("%f\n",(yyvsp[(1) - (1)].intValue) );
 					printf("%f\n",((yyval.expression))->numconst );
 				}
     break;
 
   case 85:
-#line 277 "syntax.y"
+#line 286 "syntax.y"
     { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
     break;
 
   case 86:
-#line 280 "syntax.y"
+#line 289 "syntax.y"
     { argumentF( (yyvsp[(1) - (1)].stringValue), yylineno, (scope + 1)); }
     break;
 
   case 88:
-#line 281 "syntax.y"
+#line 290 "syntax.y"
     { printf(RED "idlist:: empty\n" RESET); }
     break;
 
   case 89:
-#line 284 "syntax.y"
+#line 293 "syntax.y"
     { argumentF(((yyvsp[(2) - (2)].stringValue)), yylineno, (scope+1)); }
     break;
 
   case 91:
-#line 285 "syntax.y"
+#line 294 "syntax.y"
     { printf(RED "multi_idlists:: empty\n" RESET); }
     break;
 
   case 92:
-#line 288 "syntax.y"
+#line 297 "syntax.y"
     { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
     break;
 
   case 93:
-#line 289 "syntax.y"
+#line 298 "syntax.y"
     { printf(RED "if(exprsession) stmt\n" RESET); }
     break;
 
   case 94:
-#line 292 "syntax.y"
+#line 301 "syntax.y"
     { insideLoop++; }
     break;
 
   case 95:
-#line 292 "syntax.y"
+#line 301 "syntax.y"
     { insideLoop--; printf(RED "while(expr) stmt\n" RESET); }
     break;
 
   case 96:
-#line 295 "syntax.y"
+#line 304 "syntax.y"
     { insideLoop++; }
     break;
 
   case 97:
-#line 295 "syntax.y"
+#line 304 "syntax.y"
     {printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
     break;
 
   case 98:
-#line 298 "syntax.y"
+#line 307 "syntax.y"
     {printf(RED "return expression; \n" RESET);}
     break;
 
   case 99:
-#line 299 "syntax.y"
+#line 308 "syntax.y"
     { printf(RED "return; \n" RESET);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 2204 "y.tab.c"
+#line 2213 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2414,6 +2423,6 @@ yyreturn:
 }
 
 
-#line 302 "syntax.y"
+#line 311 "syntax.y"
 
 

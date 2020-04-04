@@ -153,7 +153,11 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
 
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
       |  expr PLUS expr {
-		  	   
+		  		result =malloc(5*sizeof(char));
+				sprintf(result,"_%ld",rvalues++);
+		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+		  		$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+
 			   emit(add,$1,$3,$$,yylineno,0);
 
               }
@@ -267,10 +271,15 @@ const    : number {		$$=$1;	}
 		  }
          ;
 
-number   : INTEGER { result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++);
- 					struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
+number   : INTEGER {
+ 					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
+
+					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+					newnode->value.var = malloc(sizeof(struct variable));
+					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+					strcpy(newnode->value.var->name, result);
 					$$ = (struct expr *)malloc(sizeof(struct expr));
-					$$ = new_expr(const_num_e,tmp,NULL,($1),"",'\0',NULL);
+					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
 					printf("%f\n",$1 );
 					printf("%f\n",($$)->numconst );
 				}
