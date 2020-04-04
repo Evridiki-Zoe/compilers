@@ -95,7 +95,7 @@ char** table;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 %type<stringValue>      lvalue
-%type<expression> 		expr
+%type<expression>       expr
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ

@@ -16,6 +16,14 @@ typedef enum {
 } symtype;
 
 
+typedef enum {
+	program_var = 0,
+	formal_arg = 1,
+	function_loc = 2
+
+} symbol_space;
+
+
 struct arguments {
 	char 				*name;
 	struct arguments 	*next;
@@ -42,6 +50,9 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 	} value;
 	bool 			active;
 	bool accessible ;
+
+	symbol_space scope_space;
+	int offset;
   struct symbol_table_binding *next;
 };
 
