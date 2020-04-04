@@ -222,7 +222,7 @@ member   : lvalue DOT IDENTIFIER { printf(RED "member:: lvalue.id \n" RESET); }
          ;
 
 call   : call L_PARENTHES elist R_PARENTHES { printf(RED "call:: call (elist)\n" RESET); }
-       | lvalue callsuffix { check_if_exists( $1, scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
+       | lvalue callsuffix { check_if_exists( $1->sym->value.var->name, scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES { printf(RED "call:: (funcdef)(elist)\n" RESET); }
        ;
 
