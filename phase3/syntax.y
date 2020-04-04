@@ -165,15 +165,40 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 
             }
             else{
+
             printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
               exit(EXIT_FAILURE);
 
             }
               }
-      |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);}
-      |  expr MULT expr { printf(RED "expr * expr \n" RESET);}
-      |  expr DIV expr { printf(RED "expr / expr \n" RESET);}
-      |  expr MOD expr { printf(RED "expr mod expr \n" RESET);}
+      |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);
+					result =malloc(5*sizeof(char));
+					sprintf(result,"_%d",rvalues++);
+					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+					emit(sub,$1,$3,$$,yylineno,0);
+  	  			}
+      |  expr MULT expr { printf(RED "expr * expr \n" RESET);
+					result =malloc(5*sizeof(char));
+					sprintf(result,"_%d",rvalues++);
+					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+				 	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+					emit(mul,$1,$3,$$,yylineno,0);
+  				}
+      |  expr DIV expr { printf(RED "expr / expr \n" RESET);
+				  	result =malloc(5*sizeof(char));
+				  	sprintf(result,"_%d",rvalues++);
+				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+				  	emit(Div,$1,$3,$$,yylineno,0);
+  				}
+      |  expr MOD expr { printf(RED "expr mod expr \n" RESET);
+				  	result =malloc(5*sizeof(char));
+				  	sprintf(result,"_%d",rvalues++);
+				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+				  	emit(mod,$1,$3,$$,yylineno,0);
+  				}
       |  expr GREATER expr { printf(RED "expr > expr \n" RESET);}
       |  expr GREATER_EQUAL expr { printf(RED "expr >= expr \n" RESET);}
       |  expr LESS expr { printf(RED "expr < expr \n" RESET);}
