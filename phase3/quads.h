@@ -50,22 +50,23 @@ typedef enum {
 	table_setelem
 }iopcode;
 
+
 //gia ta quads
 typedef enum {
-	var_e,
-	tableitem_e,
-	programfunc_e,
-	libfunc_e,
+	var_e = 0,
+	tableitem_e = 1,
+	programfunc_e = 2,
+	libfunc_e = 3,
 
-	arithmeticexp_e,
-	boolexp_e,
-	assignexp_e,
-	newtable_e,
+	arithmeticexp_e = 4,
+	boolexp_e = 5,
+	assignexp_e = 6,
+	newtable_e = 7,
 
-	const_num_e,
-	constbool_e,
-	conststring_e,
-	nil_e
+	const_num_e = 8,
+	constbool_e = 9,
+	conststring_e = 10,
+	nil_e = 11 
 
 }expr_t;
 
