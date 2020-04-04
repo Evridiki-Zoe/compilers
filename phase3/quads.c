@@ -67,8 +67,9 @@ char* enum_toString_opCodes(iopcode sym) {
 	}
 }
 
+
 void initialize_quad_table(){
-	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad*) );
+	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad) );
 }
 
 void insert_rvalue_list(char* name, rvalue_type type){
@@ -108,7 +109,7 @@ void print_list_rvalues(){
 struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struct expr* index
 	,double numconst ,char* strconst , unsigned char boolconst , struct expr* next){
 
-	struct expr* expr_node = malloc(sizeof(struct expr*));
+	struct expr* expr_node = malloc(sizeof(struct expr));
 
 	expr_node->type = expr_type;
 	expr_node->sym = sym;
@@ -126,19 +127,21 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	QuadNo++;
 	if (QuadNo==QuadsSize) {
 		QuadsSize*=2;
-		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad*) );
+		printf("realloc in emit\n" );
+		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad) );
 	}
-	struct quad* new_quad = malloc(sizeof(struct quad*));
-	new_quad->arg1 = malloc(sizeof(struct expr*));
-	new_quad->arg2 = malloc(sizeof(struct expr* ));
-	new_quad->res = malloc(sizeof(struct expr* ));
+	struct quad* new_quad = malloc(sizeof(struct quad));
+
+	new_quad->arg1 = malloc(sizeof(struct expr ));
+	new_quad->arg2 = malloc(sizeof(struct expr ));
+	new_quad->res = malloc(sizeof(struct expr ));
 	new_quad->opcode=opcode;
 	new_quad->arg1 = arg1;
 	new_quad->arg2 = arg2;
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
-	printf("%f\n",new_quad->arg1->numconst );
+	printf("emit :: %f\n",new_quad->arg1->numconst );
 	quads[(int)QuadNo-1]=*new_quad;
 }
 

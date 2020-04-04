@@ -157,7 +157,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 				sprintf(result,"_%ld",rvalues++);
 		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 		  		$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-
+printf("print to emit expr + expr\n");
 			   emit(add,$1,$3,$$,yylineno,0);
 
               }
@@ -272,7 +272,8 @@ const    : number {		$$=$1;	}
          ;
 
 number   : INTEGER {
- 					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
+ 					result = malloc(50 * sizeof(char));
+          sprintf(result,"%0.f", ($1));
 
 					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
 					newnode->value.var = malloc(sizeof(struct variable));
@@ -280,8 +281,8 @@ number   : INTEGER {
 					strcpy(newnode->value.var->name, result);
 					$$ = (struct expr *)malloc(sizeof(struct expr));
 					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
-					printf("%f\n",$1 );
-					printf("%f\n",($$)->numconst );
+					printf("int is: %f\n",$1 );
+					printf("numconst is: %f\n",($$)->numconst );
 				}
          | FLOAT { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
          ;
