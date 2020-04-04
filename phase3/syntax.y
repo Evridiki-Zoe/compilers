@@ -4,6 +4,10 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
+#include "lex.h"
+#include "parsing.h"
+#include "quads.h"
+
 
 #define RED   "\x1B[31m"
 #define RESET "\x1B[0m"
@@ -25,26 +29,7 @@ int insideFunc = 0;
 int arrayFlag;
 
 char** table;
-void print_table();
-int global_exists(char *name);
 
-int newFunction(char *name, int line,int tmpscope);
-int argumentF(char *name, int line, int scope);
-int insert_hash_table(char *name, int sym_type, int line, bool active, int scope);
-
-int localVar(char *name, int line, int scope);
-
-void insertVar(char* name, int line,int tmpscope);
-
-
-void make_not_accessible(int scope);
-void make_accessible_again(int scope);
-void hide_symbols(int scope);
-void check_for_funcname(const char *lvalue_name);
-int check_if_exists(const char *name, int scope);
-
-//=========================
-extern struct expr;
 %}
 
 /*%glr-parser*/
