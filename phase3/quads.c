@@ -68,7 +68,7 @@ char* enum_toString_opCodes(iopcode sym) {
 }
 
 void initialize_quad_table(){
-	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad*) );
+	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad) );
 }
 
 void insert_rvalue_list(char* name, rvalue_type type){
@@ -108,7 +108,7 @@ void print_list_rvalues(){
 struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struct expr* index
 	,double numconst ,char* strconst , unsigned char boolconst , struct expr* next){
 
-	struct expr* expr_node = malloc(sizeof(struct expr*));
+	struct expr* expr_node = malloc(sizeof(struct expr));
 
 	expr_node->type = expr_type;
 	expr_node->sym = sym;
@@ -128,10 +128,10 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 		QuadsSize*=2;
 		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad*) );
 	}
-	struct quad* new_quad = malloc(sizeof(struct quad*));
-	new_quad->arg1 = malloc(sizeof(struct expr*));
-	new_quad->arg2 = malloc(sizeof(struct expr* ));
-	new_quad->res = malloc(sizeof(struct expr* ));
+	struct quad* new_quad = malloc(sizeof(struct quad));
+	new_quad->arg1 = malloc(sizeof(struct expr));
+	new_quad->arg2 = malloc(sizeof(struct expr));
+	new_quad->res = malloc(sizeof(struct expr));
 	new_quad->opcode=opcode;
 	new_quad->arg1 = arg1;
 	new_quad->arg2 = arg2;
@@ -147,7 +147,20 @@ void print_quads(){
 	printf("------------------------------------------------\n" );
 	int i;
 	for ( i = 0; i < QuadNo; i++) {
-		printf("%d: %s %s %s %s  \n",i,enum_toString_opCodes(quads[i].opcode) , quads[i].res->sym->value.var->name,quads[i].arg1->sym->value.var->name ,quads[i].arg2->sym->value.var->name );
+		
+		printf("%d: %s",i+1,enum_toString_opCodes(quads[i].opcode) );
+
+		if (quads[i].res!=NULL) {
+
+			printf(" %s", quads[i].res->sym->value.var->name );
+		}
+		if (quads[i].arg1!=NULL) {
+			printf(" %s", quads[i].arg1->sym->value.var->name );
+		}
+		if (quads[i].arg2!=NULL) {
+			printf(" %s", quads[i].arg2->sym->value.var->name );
+		}
+		printf("   [line %d]\n",quads[i].line );
 	}
 	printf("------------------------------------------------\n" );
 

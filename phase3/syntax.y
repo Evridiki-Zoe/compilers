@@ -30,6 +30,8 @@ int arrayFlag;
 
 char** table;
 
+struct expr *tmpexpr;
+struct symbol_table_binding *tmpnode;
 %}
 
 /*%glr-parser*/
@@ -94,8 +96,8 @@ char** table;
 %type<intValue>         INTEGER
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
-%type<stringValue>      lvalue
-%type<expression>       expr const term primary number
+//%type<stringValue>    //  lvalue
+%type<expression>       expr const term primary number assignmexpr lvalue
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -154,10 +156,10 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
       |  expr PLUS expr {
 		  		result =malloc(5*sizeof(char));
-				sprintf(result,"_%ld",rvalues++);
+				sprintf(result,"_%d",rvalues++);
 		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 		  		$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-
+				printf("edodooo\n" );
 			   emit(add,$1,$3,$$,yylineno,0);
 
               }
@@ -186,17 +188,29 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       | primary { printf(RED "primary\n" RESET); $$=$1; }
       ;
 
-assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr { printf(RED "lvalue = expression\n" RESET); arrayFlag = 0; ref = 1;}
+assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
+							printf(RED "lvalue = expression\n" RESET) ; arrayFlag = 0; ref = 1;
+						//	tmpnode=malloc(sizeof(struct symbol_table_binding));
+						//	tmpexpr=malloc(sizeof(struct expr));
+						// 	tmpnode=insertVar( yylval.stringValue, yylineno, scope);
+						//	tmpexpr=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+
+							emit(assign,$4,NULL,$1,yylineno,0);
+						}
               ;
 
-primary  : lvalue { printf(RED "primary:: lvalue \n" RESET);  }
+primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
          | call { printf(RED "primary:: call\n" RESET); }
          | objectdef { printf(RED "primary:: objectdef\n" RESET); }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id\n" RESET); insertVar( yylval.stringValue, yylineno, scope);  }
+lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
+						tmpnode=malloc(sizeof(struct symbol_table_binding));
+						tmpexpr=malloc(sizeof(struct expr));
+						tmpnode= insertVar( yylval.stringValue, yylineno, scope);
+						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
          | LOCAL IDENTIFIER { localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
          | DCOLON IDENTIFIER { if(global_exists($2) == 0) {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
