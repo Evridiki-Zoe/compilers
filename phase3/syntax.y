@@ -43,6 +43,8 @@ void hide_symbols(int scope);
 void check_for_funcname(const char *lvalue_name);
 int check_if_exists(const char *name, int scope);
 
+//=========================
+extern struct expr;
 %}
 
 /*%glr-parser*/
@@ -107,6 +109,7 @@ int check_if_exists(const char *name, int scope);
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 %type<stringValue>      lvalue
+%type<struct expr*> expr
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -163,7 +166,13 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       ;
 
 expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
-      |  expr PLUS expr { printf(RED "expr + exp \n" RESET);}
+      |  expr PLUS expr {
+              /*if(expr types both num) */
+              //$$ = new_expr(4);
+              //$$->sym = NULL;
+              //emit(1, $1, $3, $$, 1, 1);
+
+              }
       |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);}
       |  expr MULT expr { printf(RED "expr * expr \n" RESET);}
       |  expr DIV expr { printf(RED "expr / expr \n" RESET);}

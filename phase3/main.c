@@ -179,7 +179,7 @@ typedef enum {
 	add,
 	sub,
 	mul,
-	Div, //oxi div alliws exei conflict type with lex
+	Div, //oxi div alliws exei conflict me thn stdlib
 	mod,
 	uminus,
 	and,
@@ -205,33 +205,32 @@ typedef enum {
 
 //gia ta quads
 typedef enum {
-var_e,
-tableitem_e,
-programfunc_e,
-libfunc_e,
+	var_e,
+	tableitem_e,
+	programfunc_e,
+	libfunc_e,
 
-arithmeticexp_e,
-boolexp_e,
-assignexp_e,
-newtable_e,
+	arithmeticexp_e,
+	boolexp_e,
+	assignexp_e,
+	newtable_e,
 
-const_num_e,
-constbool_e,
-conststring_e,
-nil_e
+	const_num_e,
+	constbool_e,
+	conststring_e,
+	nil_e
 
 }expr_t;
 
 struct expr{
 
-expr_t type;
-//symbol* sym;	//mallon thelei olo to symbol node?
-struct expr* index;
-double numconst;
-char* strconst;
-unsigned char boolconst;
-struct expr* next;
-
+	expr_t type;
+	struct symbol_table_binding* sym;
+	struct expr* index;
+	double numconst;
+	char* strconst;
+	unsigned char boolconst;
+	struct expr* next;
 };
 
 struct quad{
@@ -243,6 +242,29 @@ struct quad{
 	unsigned line;
 };
 
+//APO TO SLIDE 21 , den einai swsta oute oloklhrwmena
+struct expr* new_expr(expr_t expr_type){
+	struct expr* expr_node = malloc(sizeof(struct expr*));
+
+	expr_node->type = expr_type;
+//	expr_node->sym = NULL;
+	expr_node->index = NULL; //??
+	expr_node->next = NULL;
+
+	return expr_node;
+
+}
+
+void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res_expr, int line, int label){
+
+	struct quad* new_quad = malloc(sizeof(struct quad*));
+	new_quad->arg1 = arg1;
+	new_quad->arg2 = arg2;
+	new_quad->res = res_expr;
+	new_quad->line = line;
+	new_quad->label = label;
+
+}
 
 struct SymTable_struct *table = NULL;
 
