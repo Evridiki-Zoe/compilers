@@ -7,7 +7,11 @@ struct SymTable_struct *table = NULL;
 struct alpha_token_t *head = NULL;
 struct rvalue_node* r_value_head = NULL;
 
+struct quad *quads=NULL;
+
 int main(void) {
+
+	initialize_quad_table();
 
 	table = malloc(sizeof(struct SymTable_struct));
 
@@ -31,5 +35,6 @@ int main(void) {
 
 	print_table();
 	print_list_rvalues();
+	print_quads();
 	return 0;
 }

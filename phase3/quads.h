@@ -8,18 +8,18 @@
 
 /*enum for rvalue type*/
 typedef enum {
-number = 0,
-string = 1,
-boolean = 2,
-nil = 3,
-function_addr = 4,
-lib_func = 5
+	number = 0,
+	string = 1,
+	boolean = 2,
+	nil = 3,
+	function_addr = 4,
+	lib_func = 5
 } rvalue_type;
 
 struct rvalue_node {
 	char* name;
 	rvalue_type type;
-  struct rvalue_node* next;
+  	struct rvalue_node* next;
 };
 
 typedef enum {
@@ -48,7 +48,6 @@ typedef enum {
 	tablecreate,
 	tablegetelem,
 	table_setelem
-
 }iopcode;
 
 //gia ta quads
@@ -83,9 +82,9 @@ struct expr{
 
 struct quad{
 	iopcode opcode;
-  struct expr* res;
-  struct expr* arg1;
-  struct expr* arg2;
+  	struct expr* res;
+  	struct expr* arg1;
+  	struct expr* arg2;
 	unsigned label;
 	unsigned line;
 };
@@ -97,3 +96,6 @@ void print_list_rvalues();
 struct expr* new_expr(expr_t expr_type);
 
 void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res_expr, int line, int label);
+
+void initialize_quad_table();
+void print_quads();

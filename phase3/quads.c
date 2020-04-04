@@ -2,7 +2,16 @@
 #include "parsing.h"
 #include "lex.h"
 
+double QuadsSize=1024;
+double QuadNo=0;
+
 extern struct rvalue_node* r_value_head;
+extern struct quad *quads;
+
+
+void initialize_quad_table(){
+	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad*) );
+}
 
 void insert_rvalue_list(char* name, rvalue_type type){
 
@@ -42,7 +51,7 @@ struct expr* new_expr(expr_t expr_type){
 	struct expr* expr_node = malloc(sizeof(struct expr*));
 
 	expr_node->type = expr_type;
-//	expr_node->sym = NULL;
+	expr_node->sym = NULL;
 	expr_node->index = NULL; //??
 	expr_node->next = NULL;
 
@@ -51,12 +60,33 @@ struct expr* new_expr(expr_t expr_type){
 }
 
 void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res_expr, int line, int label){
-
+	QuadNo++;
+	if (QuadNo==QuadsSize) {
+		QuadsSize*=2;
+		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad*) );
+	}
 	struct quad* new_quad = malloc(sizeof(struct quad*));
+	new_quad->arg1 = malloc(sizeof(struct expr ));
+	new_quad->arg2 = malloc(sizeof(struct expr* ));
+	new_quad->res = malloc(sizeof(struct expr* ));
+	new_quad->opcode=opcode;
 	new_quad->arg1 = arg1;
 	new_quad->arg2 = arg2;
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
+
+	quads[(int)QuadNo-1]=*new_quad;
+}
+
+
+void print_quads(){
+	printf("------------------------------------------------\n" );
+	int i;
+	for ( i = 0; i < QuadNo; i++) {
+		printf("%d: %d %s %s %s  \n",i,quads[i].opcode , quads[i].res->sym->value.var->name,quads[i].arg1->sym->value.var->name ,quads[i].arg2->sym->value.var->name );
+	}
+	printf("------------------------------------------------\n" );
+
 
 }
