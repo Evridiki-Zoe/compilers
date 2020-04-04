@@ -158,14 +158,14 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
 		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-				
-            if( ( ($1)->type == 8 || ($1)->type == 4) && (($3)->type == 8  || ($3)->type == 4) ) {
+
+            if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 8 || ($1)->type == 4 ) && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 8  || ($3)->type == 4) ) {
       		  		$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
       			    emit(add,$1,$3,$$,yylineno,0);
 
             }
             else{
-              printf("Compile time error: cannot add 2 numbers of different type");
+            printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
               exit(EXIT_FAILURE);
 
             }
