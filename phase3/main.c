@@ -6,7 +6,8 @@
 struct SymTable_struct *table = NULL;
 struct alpha_token_t *head = NULL;
 struct rvalue_node* r_value_head = NULL;
-
+struct expr* true_expr;
+struct expr* false_expr;
 struct quad *quads=NULL;
 
 int main(void) {
