@@ -97,7 +97,7 @@ struct symbol_table_binding *tmpnode;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 //%type<stringValue>    //  lvalue
-%type<expression>       expr const term primary number assignmexpr lvalue
+%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -406,7 +406,9 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
 
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
          | call { printf(RED "primary:: call\n" RESET); }
-         | objectdef { printf(RED "primary:: objectdef\n" RESET); }
+         | objectdef { printf(RED "primary:: objectdef\n" RESET);
+                emit(tablecreate,NULL,NULL,$1,yylineno,0);
+         }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
          ;
@@ -447,7 +449,8 @@ callsuffix : L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: (elist)\n"
            | DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: ..id(elist)\n" RESET); }
            ;
 
-elist   : expr multi_exprs { args++; printf(RED "elist:: \n" RESET); }
+elist   : expr { /*emit(table_setelem,NULL,NULL,$1,yylineno,0);*/}
+              multi_exprs { args++; printf(RED "elist:: \n" RESET); }
         | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
         ;
 
@@ -455,8 +458,9 @@ multi_exprs	:  COMMA expr multi_exprs { args++; printf(RED "multiexpr commma exp
         	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
       	;
 
-/*DEN HTAN OR AYTO POU EIXE EKEI*/
-objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET); }
+/*DEN HTAN OR AYTO POU EIXE EKEI*/ //TODO prepei na epistrefoume to temp list sto objectdef
+objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET);
+            }
             |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
             ;
 
@@ -467,7 +471,11 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem { printf(RED "multi_inde
                   | /*empty*/ { printf(RED "multi_indexedelem:: empty\n" RESET); }
                   ;
 
-indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET); }
+indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET);
+
+                  emit(table_setelem,$2,$4,NULL,yylineno,0); //TODO : DEN thelei null sto result
+
+              }
               ;
 
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
