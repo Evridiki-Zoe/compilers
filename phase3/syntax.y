@@ -153,7 +153,13 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | SEMICOLON { printf(RED "semicolon \n" RESET);}
       ;
 
-expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
+expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
+					result =malloc(5*sizeof(char));
+					sprintf(result,"_%d",rvalues++);
+					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+					emit(assign,$1,NULL,$$,yylineno,0);
+					}
       |  expr PLUS expr {
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
