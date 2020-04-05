@@ -47,7 +47,8 @@ typedef enum {
 	funcend,
 	tablecreate,
 	tablegetelem,
-	table_setelem
+	table_setelem,
+	jump
 }iopcode;
 
 
@@ -66,7 +67,7 @@ typedef enum {
 	const_num_e = 8,
 	constbool_e = 9,
 	conststring_e = 10,
-	nil_e = 11 
+	nil_e = 11
 
 }expr_t;
 

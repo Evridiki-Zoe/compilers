@@ -243,11 +243,11 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 
             struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
-            
-            emit(if_greater,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
-            emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+
+            emit(if_greater,$1,$3,NULL,yylineno,10);//THELEI SWSTO LABEL
+            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(assign,true_expr,NULL,$$,yylineno,10);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
        }
@@ -259,11 +259,11 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 
             struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
-            
+
             emit(if_greatereq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr LESS expr {
@@ -274,11 +274,11 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 
             struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
-            
+
             emit(if_less,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
       }
@@ -290,11 +290,11 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 
             struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
-            
+
             emit(if_lesseq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr EQUAL expr {
@@ -315,9 +315,9 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr NEQUAL expr {
@@ -338,9 +338,9 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
 
             emit(if_not_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr AND expr {
@@ -352,13 +352,13 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
             struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
 
-            emit(if_eq,$1,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_denkserwpou);
-            emit(if_eq,$3,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_palidenkserwpou);
-            emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
-            emit(assign,false_expr,NULL,$$,yylineno,0);
+            emit(if_eq,$1,true_expr,NULL,yylineno,0);//epomeno expr an true
+            emit(jump,NULL,NULL,NULL,yylineno,10); // jump assign false
+            emit(if_eq,$3,true_expr,NULL,yylineno,0);//ass true an true h methepomeno gia pollapla and (?)
+            emit(jump,NULL,NULL,NULL,yylineno,10); // jump assing false
+            emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
+            emit(jump,NULL,NULL,NULL,yylineno,10); // jump under ass false
+            emit(assign,false_expr,NULL,$$,yylineno,0); // =false
 
       }
       |  expr OR expr {
@@ -371,11 +371,11 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
             struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_denkserwpou);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(if_eq,$3,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
-            //emit(jump,NULL,NULL,NULL,yylineno,label_palidenkserwpou);
+            emit(jump,NULL,NULL,NULL,yylineno,20);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(jump,NULL,NULL,NULL,yylineno,10);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
       }
@@ -407,14 +407,21 @@ primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
 
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
 						tmpnode=malloc(sizeof(struct symbol_table_binding));
-						tmpexpr=malloc(sizeof(struct expr));
 						tmpnode= insertVar( yylval.stringValue, yylineno, scope);
 						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
-         | LOCAL IDENTIFIER { localVar( yylval.stringValue, yylineno, scope); printf(RED "lvalue:: local identifier\n" RESET); }
-         | DCOLON IDENTIFIER { if(global_exists($2) == 0) {
-                  printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
-                  exit(EXIT_FAILURE);
-            }
+         | LOCAL IDENTIFIER {
+						printf(RED "lvalue:: local identifier\n" RESET);
+						tmpnode=malloc(sizeof(struct symbol_table_binding));
+						tmpnode = localVar( yylval.stringValue, yylineno, scope);
+						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);}
+         | DCOLON IDENTIFIER {
+			 			tmpnode=malloc(sizeof(struct symbol_table_binding));
+						if((tmpnode=global_exists($2)) == NULL) {
+			                  printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); \
+			                  exit(EXIT_FAILURE);
+			            }
+						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+
             printf( RED "lvalue:: doublecolon\n" RESET);}
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;

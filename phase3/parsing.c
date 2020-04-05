@@ -273,7 +273,7 @@ int check_if_exists(char *name, int scope) {
  * 1 if it exists globally
  * 0 in any other case
  */
-int global_exists(const char *name) {
+struct symbol_table_binding* global_exists(const char *name) {
 	struct symbol_table_binding *curr;
 	int mapping = 0;
 
@@ -285,12 +285,13 @@ int global_exists(const char *name) {
 	while(curr) {
 		if (strcmp(curr->value.var->name, name) == 0) {
 			if( curr->value.var->scope == 0) {
-				return 1;
+				return curr;
 			}
 		}
 		curr = curr->next;
 	}
-	return 0;
+	curr=NULL;
+	return curr;
 }
 
 /*
@@ -448,7 +449,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	return curr;
 }
 
-int localVar(char* name, int line, int scope){
+struct symbol_table_binding* localVar(char* name, int line, int scope){
 	int flag = 1;
 	struct symbol_table_binding *curr;
     int hash = 0;
@@ -476,14 +477,14 @@ int localVar(char* name, int line, int scope){
 
 			} else {
 				ref = 0;
-				return 0;
+				return curr;
 			}
 		}
     	curr = curr->next;
     }
 	ref = 0;
-	insert_hash_table(name, flag, line, true, scope);
-	return 1;
+	curr =insert_hash_table(name, flag, line, true, scope);
+	return curr;
 }
 
 
