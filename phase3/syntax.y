@@ -485,8 +485,9 @@ funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char))
 		  } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
 			  make_accessible_again(scope+1); insideFunc--;
 
-			  //thelei insert to onoma tis function
- 			  tmpexpr = new_expr(2,NULL,NULL,0,"",'\0',NULL);
+			  tmpnode=malloc(sizeof(struct symbol_table_binding));
+ 			  tmpnode= SearchFunction($2);
+ 			  tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
 			  printf("%d\n",yylineno );
 			  emit(funcend,tmpexpr,NULL,NULL,yylineno,0);
 		   	}

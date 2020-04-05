@@ -102,3 +102,5 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 
 void initialize_quad_table();
 void print_quads();
+
+struct symbol_table_binding* SearchFunction(char* name);

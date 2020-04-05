@@ -7,7 +7,7 @@ double QuadNo=0;
 
 extern struct rvalue_node* r_value_head;
 extern struct quad *quads;
-
+extern struct SymTable_struct *table;
 
 char* enum_toString_opCodes(iopcode sym) {
 	switch (sym) {
@@ -145,6 +145,24 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	new_quad->label = label;
 //	printf("emit :: %f\n",new_quad->arg1->numconst );
 	quads[(int)QuadNo-1]=*new_quad;
+}
+
+
+
+struct symbol_table_binding* SearchFunction(char* name){
+		int hash = 0;
+		struct symbol_table_binding *curr;
+		hash = hash_function(name);//briskw pou kanei hash to stoixeio
+		curr = table->pinakas[hash];
+
+		while (curr) {
+			if(strcmp(name, curr->value.var->name) == 0 && curr->active == true) {
+				return curr;
+			}
+			curr = curr->next;
+		}
+		curr = NULL;
+		return curr;
 }
 
 
