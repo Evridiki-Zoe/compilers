@@ -159,55 +159,227 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);}
 				sprintf(result,"_%d",rvalues++);
 		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 
-            if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 8 || ($1)->type == 4 ) && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 8  || ($3)->type == 4) ) {
+            /*compile time type check*/
+            if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 8 || ($1)->type == 4 )
+                        && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 8  || ($3)->type == 4) ) {
       		  		$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
       			    emit(add,$1,$3,$$,yylineno,0);
 
             }
             else{
-
-            printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+              printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
               exit(EXIT_FAILURE);
-
             }
               }
-      |  expr MINUS expr{ printf(RED "expr - expr \n" RESET);
-					result =malloc(5*sizeof(char));
-					sprintf(result,"_%d",rvalues++);
-					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-					emit(sub,$1,$3,$$,yylineno,0);
+      |  expr MINUS expr{
+
+            /*compile time type check*/
+            if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
+                        && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 4  || ($3)->type == 8) ) {
+          					result =malloc(5*sizeof(char));
+          					sprintf(result,"_%d",rvalues++);
+          					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+          					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+          					emit(sub,$1,$3,$$,yylineno,0);
+                }
+                else{
+                  printf("Compile time error: cannot sub 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                  exit(EXIT_FAILURE);
+                }
   	  			}
-      |  expr MULT expr { printf(RED "expr * expr \n" RESET);
-					result =malloc(5*sizeof(char));
-					sprintf(result,"_%d",rvalues++);
-					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-				 	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-					emit(mul,$1,$3,$$,yylineno,0);
+      |  expr MULT expr {
+
+                /*compile time type check*/
+                if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
+                            && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 4  || ($3)->type == 8) ) {
+                					result =malloc(5*sizeof(char));
+                					sprintf(result,"_%d",rvalues++);
+                					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                				 	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+                					emit(mul,$1,$3,$$,yylineno,0);
+                }
+                else{
+                  printf("Compile time error: cannot multiple 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                  exit(EXIT_FAILURE);
+                }
   				}
-      |  expr DIV expr { printf(RED "expr / expr \n" RESET);
-				  	result =malloc(5*sizeof(char));
-				  	sprintf(result,"_%d",rvalues++);
-				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-				  	emit(Div,$1,$3,$$,yylineno,0);
+      |  expr DIV expr {
+
+                /*compile time type check*/
+                if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
+                            && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 4  || ($3)->type == 8) ) {
+                  				  	result =malloc(5*sizeof(char));
+                  				  	sprintf(result,"_%d",rvalues++);
+                  				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                  				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+                  				  	emit(Div,$1,$3,$$,yylineno,0);
+                }
+                else{
+                  printf("Compile time error: cannot div 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                  exit(EXIT_FAILURE);
+                }
+      }
+      |  expr MOD expr {
+
+      /*compile time type check*/
+      if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
+                  && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 4  || ($3)->type == 8) ) {
+          				  	result =malloc(5*sizeof(char));
+          				  	sprintf(result,"_%d",rvalues++);
+          				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+          				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+          				  	emit(mod,$1,$3,$$,yylineno,0);
+            }
+            else{
+              printf("Compile time error: cannot mod 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+              exit(EXIT_FAILURE);
+            }
   				}
-      |  expr MOD expr { printf(RED "expr mod expr \n" RESET);
-				  	result =malloc(5*sizeof(char));
-				  	sprintf(result,"_%d",rvalues++);
-				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-				  	emit(mod,$1,$3,$$,yylineno,0);
-  				}
-      |  expr GREATER expr { printf(RED "expr > expr \n" RESET);}
-      |  expr GREATER_EQUAL expr { printf(RED "expr >= expr \n" RESET);}
-      |  expr LESS expr { printf(RED "expr < expr \n" RESET);}
-      |  expr LESS_EQUAL expr { printf(RED "expr < = expr \n" RESET);}
-      |  expr EQUAL expr { printf(RED "expr == expr \n" RESET);}
-      |  expr NEQUAL expr { printf(RED "expr != expr \n" RESET);}
-      |  expr AND expr { printf(RED "expr and expr \n" RESET);}
-      |  expr OR expr { printf(RED "expr or expr \n" RESET);}
-      | term { printf(RED "TERM \n" RESET); $$=$1; }
+      |  expr GREATER expr {
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            
+            emit(if_greater,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+
+       }
+      |  expr GREATER_EQUAL expr {
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            
+            emit(if_greatereq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+      }
+      |  expr LESS expr {
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            
+            emit(if_less,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+
+      }
+      |  expr LESS_EQUAL expr {
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            
+            emit(if_lesseq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+      }
+      |  expr EQUAL expr {
+            /*compile time type check*/
+            if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
+            }
+
+            else if( ($1)->type != ($3)->type){
+                printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                exit(EXIT_FAILURE);
+            }
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+
+            emit(if_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+      }
+      |  expr NEQUAL expr {
+            /*compile time type check*/
+            if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
+            }
+
+            else if( ($1)->type != ($3)->type){
+                printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                exit(EXIT_FAILURE);
+            }
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+
+            emit(if_not_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_false);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+      }
+      |  expr AND expr {
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+
+            emit(if_eq,$1,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_denkserwpou);
+            emit(if_eq,$3,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_palidenkserwpou);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+
+      }
+      |  expr OR expr {
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+
+            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+
+            emit(if_eq,$1,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_denkserwpou);
+            emit(if_eq,$3,true_expr,NULL,yylineno,0);//THELEI SWSTO LABEL
+            //emit(jump,NULL,NULL,NULL,yylineno,label_palidenkserwpou);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            //emit(jump,NULL,NULL,NULL,yylineno,label_true);
+            emit(assign,false_expr,NULL,$$,yylineno,0);
+
+      }
+      | term { $$=$1; }
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
@@ -221,9 +393,9 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       ;
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
-							printf(RED "lvalue = expression\n" RESET) ; arrayFlag = 0; ref = 1;
-							emit(assign,$4,NULL,$1,yylineno,0);
-						}
+							     arrayFlag = 0; ref = 1;
+							     emit(assign,$4,NULL,$1,yylineno,0);
+						  }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
@@ -313,16 +485,16 @@ const    : number {		$$=$1;	}
          ;
 
 number   : INTEGER {
- 					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
+   					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
 
-					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
-					newnode->value.var = malloc(sizeof(struct variable));
-					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
-					strcpy(newnode->value.var->name, result);
-					$$ = (struct expr *)malloc(sizeof(struct expr));
-					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
-					printf("%f\n",$1 );
-					printf("%f\n",($$)->numconst );
+  					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+  					newnode->value.var = malloc(sizeof(struct variable));
+  					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+  					strcpy(newnode->value.var->name, result);
+  					$$ = (struct expr *)malloc(sizeof(struct expr));
+  					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
+  					printf("%f\n",$1 );
+  					printf("%f\n",($$)->numconst );
 				}
          | FLOAT { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
          ;

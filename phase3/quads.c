@@ -141,7 +141,7 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
-	printf("emit :: %f\n",new_quad->arg1->numconst );
+//	printf("emit :: %f\n",new_quad->arg1->numconst );
 	quads[(int)QuadNo-1]=*new_quad;
 }
 
@@ -152,15 +152,36 @@ void print_quads(){
 	for ( i = 0; i < QuadNo; i++) {
 
 		printf("%d: %s",i+1,enum_toString_opCodes(quads[i].opcode) );
+		if(quads[i].opcode== 0){ //gia to assign
+			if (quads[i].res!=NULL) {
+				if( quads[i].res->sym !=NULL)
+				printf(" %s", quads[i].res->sym->value.var->name );
+			}
+			printf(" '%d'",quads[i].arg1->boolconst);
+			printf("   [line %d]\n",quads[i].line );
 
+			continue;
+		}
+		else if(quads[i].opcode== 10){//gia to if_eq
+			if (quads[i].arg1!=NULL) {
+				if( quads[i].arg1->sym !=NULL)
+				printf(" %s", quads[i].arg1->sym->value.var->name );
+			}
+			printf(" '%d'",quads[i].arg2->boolconst);
+			printf("   [line %d]\n",quads[i].line );
+
+			continue;
+		}
 		if (quads[i].res!=NULL) {
-
+			if( quads[i].res->sym !=NULL)
 			printf(" %s", quads[i].res->sym->value.var->name );
 		}
 		if (quads[i].arg1!=NULL) {
+			if( quads[i].arg1->sym !=NULL)
 			printf(" %s", quads[i].arg1->sym->value.var->name );
 		}
 		if (quads[i].arg2!=NULL) {
+			if( quads[i].arg2->sym !=NULL)
 			printf(" %s", quads[i].arg2->sym->value.var->name );
 		}
 		printf("   [line %d]\n",quads[i].line );
