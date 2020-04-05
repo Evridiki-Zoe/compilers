@@ -449,8 +449,7 @@ callsuffix : L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: (elist)\n"
            | DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: ..id(elist)\n" RESET); }
            ;
 
-elist   : expr { /*emit(table_setelem,NULL,NULL,$1,yylineno,0);*/}
-              multi_exprs { args++; printf(RED "elist:: \n" RESET); }
+elist   : expr multi_exprs { args++; printf(RED "elist:: \n" RESET); }
         | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
         ;
 
@@ -458,11 +457,28 @@ multi_exprs	:  COMMA expr multi_exprs { args++; printf(RED "multiexpr commma exp
         	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
       	;
 
+
 /*DEN HTAN OR AYTO POU EIXE EKEI*/ //TODO prepei na epistrefoume to temp list sto objectdef
-objectdef   :  L_SBRACKET elist  R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET);
+objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET);
             }
             |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
             ;
+
+
+//------------------------------------------
+//ONLY FOR TABLE ELEMENTS
+// se ayta ta expr tha gietai to emit table_setelem
+elist_for_table   : expr multi_exprs_for_table  { args++; printf(RED "elist:: \n" RESET); }
+        | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
+        ;
+
+multi_exprs_for_table 	:  COMMA expr multi_exprs_for_table  { args++; printf(RED "multiexpr commma expr exprs\n" RESET); }
+        	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
+      	;
+
+//------------------------------------------
+
+
 
 indexed     : indexedelem  multi_indexedelem { printf(RED "indexed:: indexedelement multi\n" RESET); }
             ;
