@@ -8,6 +8,8 @@ double QuadNo=0;
 extern struct rvalue_node* r_value_head;
 extern struct quad *quads;
 extern struct SymTable_struct *table;
+extern struct symbol_table_binding* true_expr_sym;
+extern struct symbol_table_binding* false_expr_sym;
 
 char* enum_toString_opCodes(iopcode sym) {
 	switch (sym) {
@@ -72,6 +74,23 @@ char* enum_toString_opCodes(iopcode sym) {
 
 void initialize_quad_table(){
 	quads= (struct quad*)malloc(QuadsSize * sizeof(struct quad) );
+
+	true_expr_sym=malloc(sizeof(struct symbol_table_binding));
+	false_expr_sym=malloc(sizeof(struct symbol_table_binding));
+
+	true_expr_sym->value.var = malloc(sizeof(struct variable));
+	true_expr_sym->value.var->name = malloc(5* sizeof(char));
+	strcpy(true_expr_sym->value.var->name, "true");// newnode->value.var->name = name;
+	true_expr_sym->value.var->line = 0;
+	true_expr_sym->symbol_type = 4;
+	true_expr_sym->value.var->scope = 0;
+
+	false_expr_sym->value.var = malloc(sizeof(struct variable));
+	false_expr_sym->value.var->name = malloc(5 * sizeof(char));
+	strcpy(false_expr_sym->value.var->name, "false");// newnode->value.var->name = name;
+	false_expr_sym->value.var->line = 0;
+	false_expr_sym->symbol_type = 4;
+	false_expr_sym->value.var->scope = 0;
 }
 
 void insert_rvalue_list(char* name, rvalue_type type){
@@ -177,7 +196,7 @@ void print_quads(){
 				if( quads[i].res->sym !=NULL)
 				printf(" %s", quads[i].res->sym->value.var->name );
 			}
-			printf(" '%d'",quads[i].arg1->boolconst);
+			printf(" %s",quads[i].arg1->sym->value.var->name);
 			printf("  [line %d]\n",quads[i].line );
 
 			continue;
@@ -187,7 +206,7 @@ void print_quads(){
 				if( quads[i].arg1->sym !=NULL)
 				printf(" %s", quads[i].arg1->sym->value.var->name );
 			}
-			printf(" '%d'",quads[i].arg2->boolconst);
+			printf(" %s",quads[i].arg2->sym->value.var->name);
 			printf(" %d",quads[i].label );
 			printf("  [line %d]\n",quads[i].line );
 

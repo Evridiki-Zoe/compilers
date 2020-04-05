@@ -19,7 +19,8 @@ extern char * yytext;
 extern int scope;
 extern int maxScope;
 extern double QuadNo;
-
+extern struct symbol_table_binding* true_expr_sym;
+extern struct symbol_table_binding* false_expr_sym;
 int ref = 1;
 int args = 0;
 char *result;
@@ -249,8 +250,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_greater,$1,$3,NULL,yylineno,10);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,10);
@@ -265,8 +266,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_greatereq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,10);
@@ -280,8 +281,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_less,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,10);
@@ -296,8 +297,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_lesseq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,10);
@@ -319,8 +320,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
@@ -342,8 +343,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_not_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,10);
@@ -357,8 +358,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
             emit(jump,NULL,NULL,NULL,yylineno,10); // jump assign false
@@ -375,8 +376,8 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
-            struct expr* false_expr = new_expr(constbool_e,NULL,NULL,0,"",0,NULL );
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
             emit(jump,NULL,NULL,NULL,yylineno,10);
@@ -506,7 +507,7 @@ funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char))
 			 tmpnode= newFunction( $2, yylineno, scope);
 			 tmpexpr=malloc(sizeof(struct expr));
 			 tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-			  emit(jump,NULL,NULL,NULL,yylineno,10); // jump sto telos tis func
+			  emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
 			  emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
 		  } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
 			  make_accessible_again(scope+1); insideFunc--;
@@ -561,14 +562,14 @@ multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, (scope+1)); } multi_id
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
-ifstmt  : if_start R_PARENTHES  stmt  ELSE  {emit(jump,NULL,NULL,NULL,yylineno,10); /*Sto telos tis else*/}  stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
+ifstmt  : if_start R_PARENTHES  stmt  ELSE  {emit(jump,NULL,NULL,NULL,yylineno,999); /*Sto telos tis else*/}  stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
         | if_start  R_PARENTHES  stmt  { printf(RED "if(exprsession) stmt\n" RESET); }
         ;
 
 if_start: IF L_PARENTHES expr {
-				struct expr* true_expr = new_expr(constbool_e,NULL,NULL,0,"",1,NULL );
+				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tou if
-				emit(jump,NULL,NULL,NULL,yylineno,10); //Kanonika sto telos tis if
+				emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis if
 			}
 
 whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr R_PARENTHES stmt { insideLoop--; printf(RED "while(expr) stmt\n" RESET); }
