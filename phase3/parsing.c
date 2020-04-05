@@ -59,7 +59,7 @@ int argumentF(char *name, int line, int scope) {
 }
 
 
-int newFunction(char* name , int line, int scope){
+struct symbol_table_binding * newFunction(char* name , int line, int scope){
 	struct symbol_table_binding *newnode;
 	int mapping = 0;
 
@@ -98,7 +98,7 @@ int newFunction(char* name , int line, int scope){
 	table->pinakas[mapping] = newnode;
 	//table->total_size++;
 
-	return 0;
+	return newnode;
 }
 
 

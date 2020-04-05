@@ -1,1 +1,7 @@
-local y=0;
+function a(){
+
+
+
+a();
+
+}

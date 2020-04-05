@@ -473,9 +473,23 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES { insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);
-      free(result); } idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--; }
-         | FUNCTION IDENTIFIER { newFunction( $2, yylineno, scope); } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block { make_accessible_again(scope+1); insideFunc--; }
+funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);
+      free(result); } idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--;}
+         | FUNCTION IDENTIFIER {
+			 tmpnode=malloc(sizeof(struct symbol_table_binding));
+			 tmpnode= newFunction( $2, yylineno, scope);
+			 tmpexpr=malloc(sizeof(struct expr));
+			 tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
+			  emit(jump,NULL,NULL,NULL,yylineno,10); // jump sto telos tis func
+			  emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
+		  } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
+			  make_accessible_again(scope+1); insideFunc--;
+
+			  //thelei insert to onoma tis function
+ 			  tmpexpr = new_expr(2,NULL,NULL,0,"",'\0',NULL);
+			  printf("%d\n",yylineno );
+			  emit(funcend,tmpexpr,NULL,NULL,yylineno,0);
+		   	}
          ;
 
 //rvalue is const mazi me libfunc kai userfunc?

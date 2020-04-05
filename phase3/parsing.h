@@ -64,7 +64,7 @@ struct SymTable_struct { /*TABLE*/
 
 
 int argumentF(char *name, int line, int scope);
-int newFunction(char* name, int line,int tmpscope);
+struct symbol_table_binding * newFunction(char* name, int line,int tmpscope);
 int searchValue(struct arguments *head, char *key);
 int insertLocalVar(char* name, int line, int scope);
 void make_not_accessible(int curr_scope);
