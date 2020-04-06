@@ -1,0 +1,8 @@
+table1 = [];
+
+
+table2 = [w1,t,5]; //den douleuei akoma to table2 = [w1,t,5,true]; 
+
+
+table3 = [{r:6}, {3:0}];
+
