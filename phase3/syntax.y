@@ -410,12 +410,13 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
          | call { printf(RED "primary:: call\n" RESET); }
          | objectdef { printf(RED "primary:: objectdef\n" RESET);
-                result =malloc(5*sizeof(char));
+/*                result =malloc(5*sizeof(char));
                 sprintf(result,"_%d",rvalues++);
                 struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                 struct expr* tmp_table = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
                 emit(tablecreate,$1,NULL,tmp_table,yylineno,0);
-                //$$ = $1;
+*/
+                $$ = $1;
          }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
@@ -469,6 +470,12 @@ multi_exprs	:  COMMA expr multi_exprs { args++; printf(RED "multiexpr commma exp
 /*DEN HTAN OR AYTO POU EIXE EKEI*/ //TODO prepei na epistrefoume to temp list sto objectdef
 objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET);
 
+                  result =malloc(5*sizeof(char));
+                  sprintf(result,"_%d",rvalues++);
+                  struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                  struct expr* tmp_table = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+                  emit(tablecreate,NULL,NULL,tmp_table,yylineno,0);
+
                   //edw tupwnontai ola ta stoixeia tou pinaka
                   struct expr* tmp = $2;
                   while(tmp->sym!= NULL) {
@@ -478,6 +485,8 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
                         printf("ELEMENTS: %s \n", tmp->sym->value.var->name );
                         tmp = tmp->next;
                   }
+
+                  $$ = tmp_table;// epistrefw pros ta panw to temp table
             }
             |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
             ;
