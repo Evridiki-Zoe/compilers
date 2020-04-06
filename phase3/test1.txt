@@ -1,5 +1,6 @@
-y=false;
+/*y=false;
 n= nil;
-z = true;
-if ( x==true ) { x=0; }
+z = true;*/
+x = 6549.1234517543;
+//if ( x!=true ) { x=0; }
 //else { x=1;}

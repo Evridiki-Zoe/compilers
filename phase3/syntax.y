@@ -309,14 +309,16 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr EQUAL expr {
-            /*compile time type check
+            //compile time type check- MPOREI NA EINAI LATHOS
             if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
             }
-
+            else if(($1)->type ==0 && (($3)->type ==1 || ($3)->type == 4 ||
+                ($3)->type ==8 || ($3)->type == 9 || ($3)->type ==10 || ($3)->type ==11) ){//ok
+            }
             else if( ($1)->type != ($3)->type){
                 printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
                 exit(EXIT_FAILURE);
-            }*/
+            }
             result =malloc(5*sizeof(char));
             sprintf(result,"_%d",rvalues++);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
@@ -332,14 +334,16 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr NEQUAL expr {
-            /*compile time type check
+            //compile time type check- MPOREI NA EINAI LATHOS
             if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
             }
-
+            else if(($1)->type ==0 && (($3)->type ==1 || ($3)->type == 4 ||
+                ($3)->type ==8 || ($3)->type == 9 || ($3)->type ==10 || ($3)->type ==11) ){//ok
+            }
             else if( ($1)->type != ($3)->type){
                 printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
                 exit(EXIT_FAILURE);
-            }*/
+            }
             result =malloc(5*sizeof(char));
             sprintf(result,"_%d",rvalues++);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
@@ -663,7 +667,17 @@ number   : INTEGER {
     					printf("%f\n",$1 );
     					printf("%f\n",($$)->numconst );
 				}
-         | FLOAT { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
+         | FLOAT {
+              result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
+
+              struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+              newnode->value.var = malloc(sizeof(struct variable));
+              newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+              strcpy(newnode->value.var->name, result);
+              $$ = (struct expr *)malloc(sizeof(struct expr));
+              $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
+              printf("%f\n",$1 );
+         }
          ;
 
 idlist   : IDENTIFIER { argumentF( $1, yylineno, (scope + 1)); } multi_id
