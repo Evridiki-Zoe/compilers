@@ -100,7 +100,7 @@ struct symbol_table_binding *tmpnode;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 //%type<stringValue>    //  lvalue
-%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef
+%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -410,7 +410,12 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
          | call { printf(RED "primary:: call\n" RESET); }
          | objectdef { printf(RED "primary:: objectdef\n" RESET);
-                emit(tablecreate,NULL,NULL,$1,yylineno,0);
+                result =malloc(5*sizeof(char));
+                sprintf(result,"_%d",rvalues++);
+                struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                struct expr* tmp_table = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+                emit(tablecreate,$1,NULL,tmp_table,yylineno,0);
+                //$$ = $1;
          }
          | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
          | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
@@ -463,6 +468,16 @@ multi_exprs	:  COMMA expr multi_exprs { args++; printf(RED "multiexpr commma exp
 
 /*DEN HTAN OR AYTO POU EIXE EKEI*/ //TODO prepei na epistrefoume to temp list sto objectdef
 objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: elist\n" RESET);
+
+                  //edw tupwnontai ola ta stoixeia tou pinaka
+                  struct expr* tmp = $2;
+                  while(tmp->sym!= NULL) {
+                        //TODO pou prepei na baloume th thesh tou stoixeiou ston pinaka
+                        // theloume apla ena counter i gia ayto alla den kserw pou na to apothikeuw
+                        emit(table_setelem,NULL,NULL,tmp,yylineno,0);
+                        printf("ELEMENTS: %s \n", tmp->sym->value.var->name );
+                        tmp = tmp->next;
+                  }
             }
             |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
             ;
@@ -471,15 +486,44 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
 //------------------------------------------
 //ONLY FOR TABLE ELEMENTS
 // se ayta ta expr tha gietai to emit table_setelem
-elist_for_table   : expr multi_exprs_for_table  { args++; printf(RED "elist:: \n" RESET); }
-        | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
+elist_for_table   : expr multi_exprs_for_table  {
+                args++;
+                struct symbol_table_binding* newnode =insertVar($1->sym->value.var->name,yylineno,scope);
+                struct expr* temp_elem = new_expr(tableitem_e,newnode,NULL,0,"",'\0',$2);
+                //DEN prepei na ginetai edw to emit giati etsi ta bazei anapoda
+                // emit(table_setelem,NULL,NULL,temp_elem,yylineno,0);
+
+                $$ = temp_elem;
+        }
+        | /*emty*/ {
+          struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
+          $$ = temp_elem;
+          printf(RED "elist:: empty\n" RESET);
+          args = 0;
+        }
         ;
 
-multi_exprs_for_table 	:  COMMA expr multi_exprs_for_table  { args++; printf(RED "multiexpr commma expr exprs\n" RESET); }
-        	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
-      	;
+multi_exprs_for_table 	:  COMMA expr  multi_exprs_for_table  {
+                             args++;
+
+                             struct symbol_table_binding* newnode =insertVar($2->sym->value.var->name,yylineno,scope);
+                             struct expr* temp_elem = new_expr(tableitem_e,newnode,NULL,0,"",'\0',$3);
+                             // bazw sto next to epomeno stoixeio
+
+                             //DEN prepei na ginetai edw to emit giati etsi ta bazei anapoda
+
+                             $$ = temp_elem; //pernaw to neo expression me to next, sto $$
+
+                        }
+                      	|  /*empty*/ {
+                              struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
+                              $$ = temp_elem;
+                      }
+                    	;
 
 //------------------------------------------
+
+
 
 
 
