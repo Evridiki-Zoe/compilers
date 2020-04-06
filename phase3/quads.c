@@ -10,6 +10,7 @@ extern struct quad *quads;
 extern struct SymTable_struct *table;
 extern struct symbol_table_binding* true_expr_sym;
 extern struct symbol_table_binding* false_expr_sym;
+extern struct symbol_table_binding* nil_expr_sym;
 
 char* enum_toString_opCodes(iopcode sym) {
 	switch (sym) {
@@ -77,6 +78,7 @@ void initialize_quad_table(){
 
 	true_expr_sym=malloc(sizeof(struct symbol_table_binding));
 	false_expr_sym=malloc(sizeof(struct symbol_table_binding));
+	nil_expr_sym=malloc(sizeof(struct symbol_table_binding));
 
 	true_expr_sym->value.var = malloc(sizeof(struct variable));
 	true_expr_sym->value.var->name = malloc(5* sizeof(char));
@@ -91,6 +93,14 @@ void initialize_quad_table(){
 	false_expr_sym->value.var->line = 0;
 	false_expr_sym->symbol_type = 4;
 	false_expr_sym->value.var->scope = 0;
+
+	nil_expr_sym->value.var = malloc(sizeof(struct variable));
+	nil_expr_sym->value.var->name = malloc(5* sizeof(char));
+	strcpy(nil_expr_sym->value.var->name, "nil");// newnode->value.var->name = name;
+	nil_expr_sym->value.var->line = 0;
+	nil_expr_sym->symbol_type = 4;
+	nil_expr_sym->value.var->scope = 0;
+
 }
 
 void insert_rvalue_list(char* name, rvalue_type type){

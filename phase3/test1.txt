@@ -1,3 +1,5 @@
-table1 = [1,4,s,r];
-/*if ( 3 ==0 ) { x=0; }
-else { x=1;}*/
+y=false;
+n= nil;
+z = true;
+if ( x==true ) { x=0; }
+//else { x=1;}

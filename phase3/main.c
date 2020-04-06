@@ -8,6 +8,8 @@ struct alpha_token_t *head = NULL;
 struct rvalue_node* r_value_head = NULL;
 struct symbol_table_binding* true_expr_sym;
 struct symbol_table_binding* false_expr_sym;
+struct symbol_table_binding* nil_expr_sym;
+
 struct quad *quads=NULL;
 
 

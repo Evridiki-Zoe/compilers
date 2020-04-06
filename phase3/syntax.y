@@ -21,6 +21,8 @@ extern int maxScope;
 extern double QuadNo;
 extern struct symbol_table_binding* true_expr_sym;
 extern struct symbol_table_binding* false_expr_sym;
+extern struct symbol_table_binding* nil_expr_sym;
+
 int ref = 1;
 int args = 0;
 char *result;
@@ -100,7 +102,7 @@ struct symbol_table_binding *tmpnode;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 //%type<stringValue>    //  lvalue
-%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table
+%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -160,7 +162,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
 					result =malloc(5*sizeof(char));
 					sprintf(result,"_%d",rvalues++);
 					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
+					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
 					emit(assign,$1,NULL,$$,yylineno,0);
 					}
       |  expr PLUS expr {
@@ -250,7 +252,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_greater,$1,$3,NULL,yylineno,10);//THELEI SWSTO LABEL
@@ -266,7 +268,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_greatereq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
@@ -281,7 +283,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_less,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
@@ -297,7 +299,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_lesseq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
@@ -307,20 +309,20 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr EQUAL expr {
-            /*compile time type check*/
+            /*compile time type check
             if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
             }
 
             else if( ($1)->type != ($3)->type){
                 printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
                 exit(EXIT_FAILURE);
-            }
+            }*/
             result =malloc(5*sizeof(char));
             sprintf(result,"_%d",rvalues++);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
@@ -330,20 +332,20 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr NEQUAL expr {
-            /*compile time type check*/
+            /*compile time type check
             if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
             }
 
             else if( ($1)->type != ($3)->type){
                 printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
                 exit(EXIT_FAILURE);
-            }
+            }*/
             result =malloc(5*sizeof(char));
             sprintf(result,"_%d",rvalues++);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_not_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
@@ -358,7 +360,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
@@ -376,7 +378,7 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL ); //MPOREI KAI NA THELEI boolexp_e
+            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
@@ -616,33 +618,50 @@ funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char))
 //rvalue is const mazi me libfunc kai userfunc?
 
 const    : number {		$$=$1;	}
-         | STRING { /*printf("STRINGGG %s \n",yylval.stringValue );*/ insert_rvalue_list(yylval.stringValue ,1); } //DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
+         | STRING {
+                /*printf("STRINGGG %s \n",yylval.stringValue );*/
+                insert_rvalue_list(yylval.stringValue ,1);
+         } //TODO: DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
          | NIL {
-			// insert_rvalue_list("nil" ,2);
-			 result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++); struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
+        			 //insert_rvalue_list("nil" ,2);
+        			 result = malloc(2 * sizeof(char));
+               sprintf(result, "_%d", rvalues++);
+               struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
 
-		  }
+               $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL);
+
+
+		     }
          | TRUE {
-			 // insert_rvalue_list("true" ,2);
-			 result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++);  struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
-		 }
+        			 // insert_rvalue_list("true" ,2);
+        			 result = malloc(2 * sizeof(char));
+               sprintf(result, "_%d", rvalues++);
+               struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
+
+     					 $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+		     }
          | FALSE {
-			  //insert_rvalue_list("false" ,2);
-			  result = malloc(2 * sizeof(char));  sprintf(result, "_%d", rvalues++); struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
-		  }
+      			   //insert_rvalue_list("false" ,2);
+      			   result = malloc(2 * sizeof(char));
+               sprintf(result, "_%d", rvalues++);
+               struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
+
+               $$ = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+		     }
          ;
 
 number   : INTEGER {
-   					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
+     					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
 
-  					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
-  					newnode->value.var = malloc(sizeof(struct variable));
-  					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
-  					strcpy(newnode->value.var->name, result);
-  					$$ = (struct expr *)malloc(sizeof(struct expr));
-  					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
-  					printf("%f\n",$1 );
-  					printf("%f\n",($$)->numconst );
+    					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+    					newnode->value.var = malloc(sizeof(struct variable));
+    					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+    					strcpy(newnode->value.var->name, result);
+    					$$ = (struct expr *)malloc(sizeof(struct expr));
+    					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
+    					printf("%f\n",$1 );
+    					printf("%f\n",($$)->numconst );
 				}
          | FLOAT { char buff[100]; sprintf(buff, "%f", yylval.floatValue); insert_rvalue_list( buff,0);   }
          ;
