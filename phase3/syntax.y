@@ -473,7 +473,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
                   result =malloc(5*sizeof(char));
                   sprintf(result,"_%d",rvalues++);
                   struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-                  struct expr* tmp_table = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+                  struct expr* tmp_table = new_expr(newtable_e,newnode,NULL,0,"",'\0',NULL);
                   emit(tablecreate,NULL,NULL,tmp_table,yylineno,0);
 
                   //edw tupwnontai ola ta stoixeia tou pinaka
@@ -488,7 +488,15 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
 
                   $$ = tmp_table;// epistrefw pros ta panw to temp table
             }
-            |  L_SBRACKET indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET); }
+            |  L_SBRACKET {
+                    result =malloc(5*sizeof(char));
+                    sprintf(result,"_%d",rvalues++);
+                    struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                    struct expr* tmp_table = new_expr(newtable_e,newnode,NULL,0,"",'\0',NULL);
+                    emit(tablecreate,NULL,NULL,tmp_table,yylineno,0);
+
+                }
+            indexed R_SBRACKET { printf(RED "objectdef:: indexed\n" RESET);}
             ;
 
 
