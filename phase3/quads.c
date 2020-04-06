@@ -132,6 +132,8 @@ struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struc
 
 	struct expr* expr_node = malloc(sizeof(struct expr));
 
+	expr_node->index = malloc(sizeof(struct expr ));
+	expr_node->next = malloc(sizeof(struct expr ));
 	expr_node->type = expr_type;
 	expr_node->sym = sym;
 	expr_node->index = index;
