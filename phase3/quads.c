@@ -187,6 +187,8 @@ struct symbol_table_binding* SearchFunction(char* name){
 }
 
 
+
+
 void print_quads(){
 	printf("------------------------------------------------\n" );
 	int i;
@@ -198,7 +200,7 @@ void print_quads(){
 				if( quads[i].res->sym !=NULL)
 				printf(" %s", quads[i].res->sym->value.var->name );
 			}
-			printf(" %s",quads[i].arg1->sym->value.var->name);
+			if (quads[i].arg1->sym!=NULL) printf(" %s",quads[i].arg1->sym->value.var->name);
 			printf("  [line %d]\n",quads[i].line );
 
 			continue;
