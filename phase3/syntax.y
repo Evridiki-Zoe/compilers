@@ -478,15 +478,27 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
 
                   //edw tupwnontai ola ta stoixeia tou pinaka
                   struct expr* tmp = $2;
+                  int i = 0;
                   while(tmp->sym!= NULL) {
-                        //TODO pou prepei na baloume th thesh tou stoixeiou ston pinaka
-                        // theloume apla ena counter i gia ayto alla den kserw pou na to apothikeuw
-                        emit(table_setelem,NULL,NULL,tmp,yylineno,0);
+                        char* name =malloc(5*sizeof(char));
+                        sprintf(name,"%d",i);
+                        //to index:: ena symbol (oxi sto hash), me onoma to index tou stoixeiou
+                      	struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
+                        tmp_index->value.var = malloc(sizeof(struct variable));
+                    		tmp_index->value.var->name = malloc((strlen(name) + 1) * sizeof(char));
+                        strcpy(tmp_index->value.var->name, name);
+	                      tmp_index->next = NULL;
+                        //adespoto symbol pou den prepei na mpei sto hash!
+
+                        struct expr* tmp_expr_index = new_expr(newtable_e,tmp_index,NULL,0,"",'\0',NULL);
+
+                        emit(table_setelem,tmp_expr_index,NULL,tmp,yylineno,0);
                         printf("ELEMENTS: %s \n", tmp->sym->value.var->name );
                         tmp = tmp->next;
+                        i++;
                   }
 
-                  $$ = tmp_table;// epistrefw pros ta panw to temp table
+                  $$ = tmp_table;// epistrefw pros ta panw olo to table
             }
             |  L_SBRACKET {
                     result =malloc(5*sizeof(char));
@@ -505,7 +517,17 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
 // se ayta ta expr tha gietai to emit table_setelem
 elist_for_table   : expr multi_exprs_for_table  {
                 args++;
-                struct symbol_table_binding* newnode =insertVar($1->sym->value.var->name,yylineno,scope);
+                //struct symbol_table_binding* newnode =insertVar($1->sym->value.var->name,yylineno,scope);
+                //adespoto symbol pou den prepei na mpei sto hash!
+                struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
+                newnode->value.var = malloc(sizeof(struct variable));
+                newnode->value.var->name = malloc((strlen($1->sym->value.var->name) + 1) * sizeof(char));
+                strcpy(newnode->value.var->name, $1->sym->value.var->name);
+                newnode->value.var->line = yylineno;
+                newnode->symbol_type = 1;
+                newnode->value.var->scope = scope;
+                newnode->next = NULL;
+
                 struct expr* temp_elem = new_expr(tableitem_e,newnode,NULL,0,"",'\0',$2);
                 //DEN prepei na ginetai edw to emit giati etsi ta bazei anapoda
                 // emit(table_setelem,NULL,NULL,temp_elem,yylineno,0);
@@ -523,7 +545,17 @@ elist_for_table   : expr multi_exprs_for_table  {
 multi_exprs_for_table 	:  COMMA expr  multi_exprs_for_table  {
                              args++;
 
-                             struct symbol_table_binding* newnode =insertVar($2->sym->value.var->name,yylineno,scope);
+                             //struct symbol_table_binding* newnode =insertVar($1->sym->value.var->name,yylineno,scope);
+                             //adespoto symbol pou den prepei na mpei sto hash!
+                             struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
+                             newnode->value.var = malloc(sizeof(struct variable));
+                             newnode->value.var->name = malloc((strlen($2->sym->value.var->name) + 1) * sizeof(char));
+                             strcpy(newnode->value.var->name, $2->sym->value.var->name);
+                             newnode->value.var->line = yylineno;
+                             newnode->symbol_type = 1;
+                             newnode->value.var->scope = scope;
+                             newnode->next = NULL;
+
                              struct expr* temp_elem = new_expr(tableitem_e,newnode,NULL,0,"",'\0',$3);
                              // bazw sto next to epomeno stoixeio
 
