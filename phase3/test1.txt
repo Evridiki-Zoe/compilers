@@ -1,6 +1,3 @@
-/*y=false;
-n= nil;
-z = true;*/
-x = 6549.1234517543;
-//if ( x!=true ) { x=0; }
-//else { x=1;}
+for (i=0;i==0;i=3) { i=2;}
+
+

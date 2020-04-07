@@ -94,7 +94,7 @@ struct symbol_table_binding *tmpnode;
 %union
 {
     double intValue;
-    float floatValue;
+    double floatValue;
     char *stringValue;
 	struct expr* expression;
 }
@@ -491,9 +491,9 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  { printf(RED "objectdef:: 
                         //to index:: ena symbol (oxi sto hash), me onoma to index tou stoixeiou
                       	struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
                         tmp_index->value.var = malloc(sizeof(struct variable));
-                    		tmp_index->value.var->name = malloc((strlen(name) + 1) * sizeof(char));
+                    	tmp_index->value.var->name = malloc((strlen(name) + 1) * sizeof(char));
                         strcpy(tmp_index->value.var->name, name);
-	                      tmp_index->next = NULL;
+	                    tmp_index->next = NULL;
                         //adespoto symbol pou den prepei na mpei sto hash!
 
                         struct expr* tmp_expr_index = new_expr(newtable_e,tmp_index,NULL,0,"",'\0',NULL);
@@ -626,33 +626,9 @@ const    : number {		$$=$1;	}
                 /*printf("STRINGGG %s \n",yylval.stringValue );*/
                 insert_rvalue_list(yylval.stringValue ,1);
          } //TODO: DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
-         | NIL {
-        			 //insert_rvalue_list("nil" ,2);
-        			 result = malloc(2 * sizeof(char));
-               sprintf(result, "_%d", rvalues++);
-               struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
-
-               $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL);
-
-
-		     }
-         | TRUE {
-        			 // insert_rvalue_list("true" ,2);
-        			 result = malloc(2 * sizeof(char));
-               sprintf(result, "_%d", rvalues++);
-               struct symbol_table_binding* tmp= insertVar(result ,  yylineno , scope);
-
-     					 $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-		     }
-         | FALSE {
-      			   //insert_rvalue_list("false" ,2);
-      			   result = malloc(2 * sizeof(char));
-               sprintf(result, "_%d", rvalues++);
-               struct symbol_table_binding* tmp=  insertVar(result ,  yylineno , scope);
-
-               $$ = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
-
-		     }
+         | NIL	 	{ $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
+         | TRUE 	{ $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
+         | FALSE 	{ $$ = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL ); }
          ;
 
 number   : INTEGER {
@@ -668,15 +644,15 @@ number   : INTEGER {
     					printf("%f\n",($$)->numconst );
 				}
          | FLOAT {
-              result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
+		              result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
 
-              struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
-              newnode->value.var = malloc(sizeof(struct variable));
-              newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
-              strcpy(newnode->value.var->name, result);
-              $$ = (struct expr *)malloc(sizeof(struct expr));
-              $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
-              printf("%f\n",$1 );
+		              struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+		              newnode->value.var = malloc(sizeof(struct variable));
+		              newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+		              strcpy(newnode->value.var->name, result);
+		              $$ = (struct expr *)malloc(sizeof(struct expr));
+		              $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
+		              printf("%f\n",$1 );
          }
          ;
 
@@ -698,10 +674,27 @@ if_start: IF L_PARENTHES expr {
 				emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis if
 			}
 
-whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr R_PARENTHES stmt { insideLoop--; printf(RED "while(expr) stmt\n" RESET); }
+whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
+
+						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						emit(if_eq,$4,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
+						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis while
+
+					} R_PARENTHES stmt {
+						insideLoop--;
+						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tou expr tis  while
+						printf(RED "while(expr) stmt\n" RESET); }
     			;
 
-forstmt	: FOR L_PARENTHES { insideLoop++; } elist SEMICOLON expr SEMICOLON elist R_PARENTHES stmt {printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
+forstmt	: FOR L_PARENTHES { insideLoop++; } elist SEMICOLON expr {
+
+						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						emit(if_eq,$6,true_expr,NULL,yylineno,999); // jump stin arxi tis for
+						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for
+
+					} SEMICOLON elist {
+						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
+					} R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
     		;
 
 returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
