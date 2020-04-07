@@ -503,20 +503,29 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
 							     arrayFlag = 0;
                    ref = 1;
 
-                   if($1->type == tableitem_e){
-                        result =malloc(5*sizeof(char));
-                        sprintf(result,"_%d",rvalues++);
-                        struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-                        struct expr* tempexp = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
-                        emit(table_setelem,$1->index,$4,tempexp,yylineno,0);
+                   if($1->type != tableitem_e && $4->type == tableitem_e){
+                   printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
 
+                   result =malloc(5*sizeof(char));
+                   sprintf(result,"_%d",rvalues++);
+                   struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                   struct expr* tmp_table = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
+
+                   emit(tablegetelem,$4,$4->index,tmp_table,yylineno,0);
+                   emit(assign,tmp_table,NULL,$1,yylineno,0);
+
+                   }
+                   else if($1->type == tableitem_e){
+
+                        emit(table_setelem,$1->index,$4,$1,yylineno,0);
+//                                          e         x 2
                         struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
                         tmp_index->value.var = malloc(sizeof(struct variable));
                         tmp_index->value.var->name = malloc((strlen($1->index->sym->value.var->name) + 1) * sizeof(char));
                         strcpy(tmp_index->value.var->name, $1->index->sym->value.var->name);
                         tmp_index->next = NULL;
 
-                        struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,tempexp,0,"",'\0',NULL);
+                        struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,$1,0,"",'\0',NULL);
                         $$ = returned_exp;
                    }else{
 							            emit(assign,$4,NULL,$1,yylineno,0);

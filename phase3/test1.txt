@@ -1,2 +1,2 @@
-t.c.u.t.e = x;
-//x = table.a.b.c.d;
+//t.c.u.t.e = x;
+x = table.a.b.c.d;
