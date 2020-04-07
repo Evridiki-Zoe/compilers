@@ -1,5 +1,2 @@
-y=false;
-n= nil;
-z = true;
-if ( x==true ) { x=0; }
-//else { x=1;}
+t.a.v.l.l = x;
+//x = table.a.b.c.d;
