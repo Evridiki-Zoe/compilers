@@ -486,7 +486,16 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
 							     arrayFlag = 0; ref = 1;
+
+                   if($1->type == tableitem_e){
+                        result =malloc(5*sizeof(char));
+                        sprintf(result,"_%d",rvalues++);
+                        struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                        struct expr* tempexp = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
+                        emit(table_setelem,$4,$1,tempexp,yylineno,0);
+                   }else{
 							     emit(assign,$4,NULL,$1,yylineno,0);
+                   }
 						  }
               ;
 
@@ -529,6 +538,7 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
 member   : lvalue DOT IDENTIFIER {
                 printf("member:: lvalue(%s).id(%s) \n",$1->sym->value.var->name, $3);
                 $$ = member_item($1, $3);
+
 
          }
          | lvalue L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
