@@ -214,7 +214,7 @@ struct expr* emit_iftable_item(struct expr* exp){
 //mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
-			return exp;
+			return result;
 		}
 }
 
