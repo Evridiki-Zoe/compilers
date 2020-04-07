@@ -23,6 +23,7 @@ extern struct symbol_table_binding* true_expr_sym;
 extern struct symbol_table_binding* false_expr_sym;
 extern struct symbol_table_binding* nil_expr_sym;
 extern struct symbol_table_binding* number_one;
+extern char* Lex_string;
 
 int ref = 1;
 int args = 0;
@@ -101,7 +102,7 @@ struct symbol_table_binding *tmpnode;
 }
 %type<intValue>         INTEGER
 %type<floatValue>       FLOAT
-%type<stringValue>      IDENTIFIER
+%type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
 %type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
 
@@ -422,14 +423,14 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 			   	tmpexpr=malloc(sizeof(struct expr));
 			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 				// first add
 				emit(add,$2,tmp_one,$2,yylineno,0);
 				//then assign
 			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
 	   }
       | lvalue  PPLUS {
-		  		check_for_funcname(yylval.stringValue); 
+		  		check_for_funcname(yylval.stringValue);
 		  		printf(RED "lvalue++\n" RESET);
 				result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
@@ -439,7 +440,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 			   	tmpexpr=malloc(sizeof(struct expr));
 			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 				// first assing
 				emit(assign,$1,NULL,tmpexpr,yylineno,0);
 				//then add
@@ -456,7 +457,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 			   	tmpexpr=malloc(sizeof(struct expr));
 			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 				// first sub
 				emit(sub,$2,tmp_one,$2,yylineno,0);
 				//then assign
@@ -474,7 +475,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 			   	tmpexpr=malloc(sizeof(struct expr));
 			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 				// first assign
 				emit(assign,$1,NULL,tmpexpr,yylineno,0);
 				//then sub
@@ -766,8 +767,14 @@ funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char))
 
 const    : number {		$$=$1;	}
          | STRING {
-                /*printf("STRINGGG %s \n",yylval.stringValue );*/
-                insert_rvalue_list(yylval.stringValue ,1);
+                printf("STRINGGG %s \n",Lex_string );
+				tmpnode=malloc(sizeof(struct symbol_table_binding));
+				tmpnode->value.var = malloc(sizeof(struct variable));
+				tmpnode->value.var->name = malloc((strlen(Lex_string) + 1) * sizeof(char));
+				strcpy(tmpnode->value.var->name, Lex_string);
+				$$ = (struct expr *)malloc(sizeof(struct expr));
+				$$ = new_expr(conststring_e,tmpnode,NULL,0,Lex_string,'\0',NULL);
+
          } //TODO: DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
          | NIL	 	{ $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
          | TRUE 	{ $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
@@ -785,18 +792,17 @@ number   : INTEGER {
     					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
     					printf("%f\n",$1 );
     					printf("%f\n",($$)->numconst );
-				}
+					}
          | FLOAT	{
-		              result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
-
-		              struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
-		              newnode->value.var = malloc(sizeof(struct variable));
-		              newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
-		              strcpy(newnode->value.var->name, result);
-		              $$ = (struct expr *)malloc(sizeof(struct expr));
-		              $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
-		              printf("%f\n",$1 );
-         		}
+			            result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
+			            struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
+			            newnode->value.var = malloc(sizeof(struct variable));
+			            newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
+			            strcpy(newnode->value.var->name, result);
+			            $$ = (struct expr *)malloc(sizeof(struct expr));
+			            $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
+			            printf("%f\n",$1 );
+					}
          ;
 
 idlist   : IDENTIFIER { argumentF( $1, yylineno, (scope + 1)); } multi_id

@@ -6,10 +6,8 @@
 int token_count = 0;
 
 /*#define YY_DECL struct alpha_token_t* alpha_yylex(void * yylval)*/
-
+char* Lex_string;
 int scope;
-int print_list();
-struct alpha_token_t* add_alpha_token(int token_num, char* type, char* val, int line);
 
 int yywarning(char *text){
     printf("Warning in line %d : %s\n",yylineno,text );
@@ -215,6 +213,8 @@ int stringHandler(){
 	  	}
         if (c == '\"') {
             add_alpha_token(++token_count, "STRING", buff, yylineno);
+			Lex_string = malloc(baseofre*sizeof(char));
+			strcpy(Lex_string,buff);
             return 1;
         }
 
