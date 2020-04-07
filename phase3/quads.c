@@ -55,7 +55,7 @@ char* enum_toString_opCodes(iopcode sym) {
 		case 17:
 				return "param";
 		case 18:
-				return "ret";
+				return "return";
 		case 19:
 				return "getretval";
 		case 20:

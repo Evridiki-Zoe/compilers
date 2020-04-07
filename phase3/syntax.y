@@ -134,23 +134,27 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | ifstmt 	{ printf(RED "if stmt \n" RESET); }
       | whilestmt 	{ printf(RED "while stmt \n" RESET); }
       | forstmt 	{ printf(RED "for stmt \n" RESET); }
-      | returnstmt 	{ printf(RED "return stmt \n" RESET);
-                              if( insideFunc > 0) {
-                                    // ok
-                              } else {
-                                    printf("Error: RETURN STMT outside of function in line %d\n",yylineno);
-                                    exit(EXIT_FAILURE);
-                              } }
-      | BREAK SEMICOLON { printf(RED "break \n" RESET);
-                              if( insideLoop > 0) {
-                              // ok
-                              } else {
-                                    printf("Error: BREAK STMT outside of loop in line %d\n",yylineno);
-                                    exit(EXIT_FAILURE);
-                              } }
+      | returnstmt 	{
+		  				  printf(RED "return stmt \n" RESET);
+                          if( insideFunc > 0) {
+                                // ok
+                          } else {
+                                printf("Error: RETURN STMT outside of function in line %d\n",yylineno);
+                                exit(EXIT_FAILURE);
+                          }
+						  }
+      | BREAK SEMICOLON {
+		  				  printf(RED "break \n" RESET);
+	                      if( insideLoop > 0) {
+	                      	emit(jump,NULL,NULL,NULL,yylineno,999);
+	                      } else {
+	                            printf("Error: BREAK STMT outside of loop in line %d\n",yylineno);
+	                            exit(EXIT_FAILURE);
+	                          }
+						   }
       | CONTINUE SEMICOLON { printf(RED "continue \n" RESET);
                               if( insideLoop > 0) {
-                              // ok
+                              	emit(jump,NULL,NULL,NULL,yylineno,999);
                               } else {
                                     printf("Error: CONTINUE STMT outside of loop in line %d\n",yylineno);
                                     exit(EXIT_FAILURE);
@@ -161,13 +165,13 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       ;
 
 expr  :
- 		 assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
+ 		 assignmexpr {printf(RED "ASSIGNMENT \n" RESET);
 					result =malloc(5*sizeof(char));
 					sprintf(result,"_%d",rvalues++);
 					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
 					emit(assign,$1,NULL,$$,yylineno,0);
-					}
+			}
       |  expr PLUS expr {
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
@@ -776,7 +780,7 @@ funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char))
 //rvalue is const mazi me libfunc kai userfunc?
 
 const    : number {		$$=$1;	}
-         | STRING {
+         | STRING 	{
                 printf("STRINGGG %s \n",Lex_string );
 				tmpnode=malloc(sizeof(struct symbol_table_binding));
 				tmpnode->value.var = malloc(sizeof(struct variable));
@@ -784,14 +788,13 @@ const    : number {		$$=$1;	}
 				strcpy(tmpnode->value.var->name, Lex_string);
 				$$ = (struct expr *)malloc(sizeof(struct expr));
 				$$ = new_expr(conststring_e,tmpnode,NULL,0,Lex_string,'\0',NULL);
-
-         } //TODO: DEN EXOUME KANEI O LEX NA APOTHIKEYEI TO STRING
+			}
          | NIL	 	{ $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
          | TRUE 	{ $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
          | FALSE 	{ $$ = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL ); }
          ;
 
-number   : INTEGER {
+number   : INTEGER 	{
      					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
 
     					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
@@ -839,7 +842,8 @@ whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
 						emit(if_eq,$4,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis while
 
-					} R_PARENTHES stmt {
+						}
+						R_PARENTHES stmt {
 						insideLoop--;
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tou expr tis  while
 						printf(RED "while(expr) stmt\n" RESET); }
@@ -851,13 +855,23 @@ forstmt	: FOR L_PARENTHES { insideLoop++; } elist SEMICOLON expr {
 						emit(if_eq,$6,true_expr,NULL,yylineno,999); // jump stin arxi tis for
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for
 
-					} SEMICOLON elist {
+					}
+					 SEMICOLON elist {
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
-					} R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
+					}
+					 R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
     		;
 
-returnstmt	: RETURN expr  SEMICOLON {printf(RED "return expression; \n" RESET);}
-    			| RETURN SEMICOLON  { printf(RED "return; \n" RESET);}
+returnstmt	: RETURN expr  SEMICOLON {
+					printf(RED "return expression; \n" RESET);
+					emit(ret,NULL,NULL,$2,yylineno,0);
+					emit(jump,NULL,NULL,NULL,yylineno,999);//end of func
+				}
+    			| RETURN SEMICOLON  {
+					printf(RED "return; \n" RESET);
+					emit(ret,NULL,NULL,NULL,yylineno,0);
+					emit(jump,NULL,NULL,NULL,yylineno,999);//end of func
+				}
     			;
 
 %%
