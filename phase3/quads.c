@@ -11,6 +11,8 @@ extern struct SymTable_struct *table;
 extern struct symbol_table_binding* true_expr_sym;
 extern struct symbol_table_binding* false_expr_sym;
 extern struct symbol_table_binding* nil_expr_sym;
+extern struct symbol_table_binding* number_one;
+
 extern int yylineno, scope;
 extern int rvalues;
 
@@ -81,6 +83,7 @@ void initialize_quad_table(){
 	true_expr_sym=malloc(sizeof(struct symbol_table_binding));
 	false_expr_sym=malloc(sizeof(struct symbol_table_binding));
 	nil_expr_sym=malloc(sizeof(struct symbol_table_binding));
+	number_one=malloc(sizeof(struct symbol_table_binding));
 
 	true_expr_sym->value.var = malloc(sizeof(struct variable));
 	true_expr_sym->value.var->name = malloc(5* sizeof(char));
@@ -102,6 +105,15 @@ void initialize_quad_table(){
 	nil_expr_sym->value.var->line = 0;
 	nil_expr_sym->symbol_type = 4;
 	nil_expr_sym->value.var->scope = 0;
+
+	number_one->value.var = malloc(sizeof(struct variable));
+	number_one->value.var->name = malloc(5* sizeof(char));
+	strcpy(number_one->value.var->name, "1");// newnode->value.var->name = name;
+	number_one->value.var->line = 0;
+	number_one->symbol_type = 4;
+	number_one->value.var->scope = 0;
+
+
 
 }
 
@@ -218,6 +230,7 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
 			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);;
 			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
+			return lvalue;
 }
 
 void print_quads(){

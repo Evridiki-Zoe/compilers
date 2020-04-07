@@ -22,6 +22,7 @@ extern double QuadNo;
 extern struct symbol_table_binding* true_expr_sym;
 extern struct symbol_table_binding* false_expr_sym;
 extern struct symbol_table_binding* nil_expr_sym;
+extern struct symbol_table_binding* number_one;
 
 int ref = 1;
 int args = 0;
@@ -158,7 +159,8 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | SEMICOLON { printf(RED "semicolon \n" RESET);}
       ;
 
-expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
+expr  :
+ 		 assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
 					result =malloc(5*sizeof(char));
 					sprintf(result,"_%d",rvalues++);
 					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
@@ -398,12 +400,86 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
-      | MINUS expr { printf(RED " - expression \n" RESET); }
+      | MINUS expr {
+		  		printf(RED " - expression \n" RESET);
+				result =malloc(5*sizeof(char));
+	 		   	sprintf(result,"_%d",rvalues++);
+				tmpnode = malloc(sizeof(struct symbol_table_binding));
+	 		   	tmpnode =insertVar(result,yylineno,scope);
+				tmpexpr=malloc(sizeof(struct expr));
+   			 	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+				emit(uminus,$2,NULL,tmpexpr,yylineno,0);
+   			}
       | NOT expr { printf(RED "NOT expression\n" RESET); }
-      | PPLUS lvalue { check_for_funcname(yylval.stringValue); }
-      | lvalue { check_for_funcname(yylval.stringValue); } PPLUS { printf(RED "lvalue++\n" RESET); }
-      | MMINUS lvalue { check_for_funcname(yylval.stringValue); printf(RED "--lvalue\n" RESET); }
-      | lvalue { check_for_funcname(yylval.stringValue);  } MMINUS { printf(RED "lvalue--\n" RESET); }
+      | PPLUS lvalue {
+		  		printf(RED "++lvalue dassa\n" RESET);
+		   		check_for_funcname(yylval.stringValue);
+				result =malloc(5*sizeof(char));
+			   	sprintf(result,"_%d",rvalues++);
+				printf("geia\n" );
+			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+			   	tmpnode =insertVar(result,yylineno,scope);
+			   	tmpexpr=malloc(sizeof(struct expr));
+			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+				//new expr for number 1
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+				// first add
+				emit(add,$2,tmp_one,$2,yylineno,0);
+				//then assign
+			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
+	   }
+      | lvalue  PPLUS {
+		  		check_for_funcname(yylval.stringValue); 
+		  		printf(RED "lvalue++\n" RESET);
+				result =malloc(5*sizeof(char));
+			   	sprintf(result,"_%d",rvalues++);
+				printf("geia\n" );
+			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+			   	tmpnode =insertVar(result,yylineno,scope);
+			   	tmpexpr=malloc(sizeof(struct expr));
+			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+				//new expr for number 1
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+				// first assing
+				emit(assign,$1,NULL,tmpexpr,yylineno,0);
+				//then add
+				emit(add,$1,tmp_one,$1,yylineno,0);
+			 }
+      | MMINUS lvalue {
+		  		check_for_funcname(yylval.stringValue);
+				printf(RED "--lvalue\n" RESET);
+				result =malloc(5*sizeof(char));
+			   	sprintf(result,"_%d",rvalues++);
+				printf("geia\n" );
+			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+			   	tmpnode =insertVar(result,yylineno,scope);
+			   	tmpexpr=malloc(sizeof(struct expr));
+			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+				//new expr for number 1
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+				// first sub
+				emit(sub,$2,tmp_one,$2,yylineno,0);
+				//then assign
+			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
+
+  			}
+      | lvalue  MMINUS {
+		  		 check_for_funcname(yylval.stringValue);
+		  		printf(RED "lvalue--\n" RESET);
+				result =malloc(5*sizeof(char));
+			   	sprintf(result,"_%d",rvalues++);
+				printf("geia\n" );
+			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+			   	tmpnode =insertVar(result,yylineno,scope);
+			   	tmpexpr=malloc(sizeof(struct expr));
+			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+				//new expr for number 1
+                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,0,"",'\0',NULL);
+				// first assign
+				emit(assign,$1,NULL,tmpexpr,yylineno,0);
+				//then sub
+				emit(sub,$1,tmp_one,$1,yylineno,0);
+			}
       | primary { printf(RED "primary\n" RESET); $$=$1; }
       ;
 
@@ -710,7 +786,7 @@ number   : INTEGER {
     					printf("%f\n",$1 );
     					printf("%f\n",($$)->numconst );
 				}
-         | FLOAT {
+         | FLOAT	{
 		              result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
 
 		              struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
@@ -720,7 +796,7 @@ number   : INTEGER {
 		              $$ = (struct expr *)malloc(sizeof(struct expr));
 		              $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
 		              printf("%f\n",$1 );
-         }
+         		}
          ;
 
 idlist   : IDENTIFIER { argumentF( $1, yylineno, (scope + 1)); } multi_id
