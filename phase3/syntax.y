@@ -102,7 +102,7 @@ struct symbol_table_binding *tmpnode;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER
 //%type<stringValue>    //  lvalue
-%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem
+%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -449,7 +449,11 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
          | member { printf(RED "lvalue:: member\n" RESET); }
          ;
 
-member   : lvalue DOT IDENTIFIER { printf(RED "member:: lvalue.id \n" RESET); }
+member   : lvalue DOT IDENTIFIER {
+                printf("member:: lvalue(%s).id(%s) \n",$1->sym->value.var->name, $3);
+                $$ = member_item($1, $3);
+
+         }
          | lvalue L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
          | call DOT IDENTIFIER { printf(RED "member:: call.id\n" RESET); }
          | call L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: call[expression]\n" RESET); }

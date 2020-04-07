@@ -11,6 +11,8 @@ extern struct SymTable_struct *table;
 extern struct symbol_table_binding* true_expr_sym;
 extern struct symbol_table_binding* false_expr_sym;
 extern struct symbol_table_binding* nil_expr_sym;
+extern int yylineno, scope;
+extern int rvalues;
 
 char* enum_toString_opCodes(iopcode sym) {
 	switch (sym) {
@@ -197,7 +199,26 @@ struct symbol_table_binding* SearchFunction(char* name){
 }
 
 
+struct expr* emit_iftable_item(struct expr* exp){
 
+		if(exp->type != tableitem_e) return exp;
+		else {
+  		char *name =malloc(5*sizeof(char));
+      sprintf(name,"_%d",rvalues++);
+      struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
+     	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
+
+			emit(tablegetelem,exp,exp->index,result,yylineno,0);
+			return exp;
+		}
+}
+
+struct expr* member_item(struct expr* lvalue ,char* name){
+			lvalue = emit_iftable_item(lvalue);
+			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
+			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);;
+			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
+}
 
 void print_quads(){
 	printf("------------------------------------------------\n" );

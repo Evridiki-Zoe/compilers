@@ -104,3 +104,6 @@ void initialize_quad_table();
 void print_quads();
 
 struct symbol_table_binding* SearchFunction(char* name);
+
+struct expr* emit_iftable_item(struct expr* exp);
+struct expr* member_item(struct expr* lvalue ,char* name);
