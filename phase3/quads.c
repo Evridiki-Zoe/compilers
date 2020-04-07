@@ -215,7 +215,7 @@ void print_quads(){
 
 			continue;
 		}
-		else if(quads[i].opcode== 10){//gia to if_eq
+		else if(quads[i].opcode>= 10 && quads[i].opcode<= 15  ){//gia to if_eq
 			if (quads[i].arg1!=NULL) {
 				if( quads[i].arg1->sym !=NULL)
 				printf(" %s", quads[i].arg1->sym->value.var->name );

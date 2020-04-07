@@ -255,10 +255,10 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_greater,$1,$3,NULL,yylineno,10);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,10);
-            emit(assign,true_expr,NULL,$$,yylineno,10);
-            emit(jump,NULL,NULL,NULL,yylineno,20);
+            emit(if_greater,$1,$3,NULL,yylineno,QuadNo+3);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
+            emit(assign,true_expr,NULL,$$,yylineno,0);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
        }
@@ -271,10 +271,10 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_greatereq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(if_greatereq,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            emit(jump,NULL,NULL,NULL,yylineno,20);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr LESS expr {
@@ -286,10 +286,10 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_less,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(if_less,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            emit(jump,NULL,NULL,NULL,yylineno,20);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
       }
@@ -302,10 +302,10 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_lesseq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(if_lesseq,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            emit(jump,NULL,NULL,NULL,yylineno,20);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr EQUAL expr {
@@ -352,10 +352,10 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_not_eq,$1,$3,NULL,yylineno,0);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(if_not_eq,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            emit(jump,NULL,NULL,NULL,yylineno,20);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr AND expr {
@@ -368,11 +368,11 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
             emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
-            emit(jump,NULL,NULL,NULL,yylineno,10); // jump assign false
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+6); // jump assign false
             emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3);//ass true an true h methepomeno gia pollapla and (?)
-            emit(jump,NULL,NULL,NULL,yylineno,10); // jump assing false
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4); // jump assing false
             emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
-            emit(jump,NULL,NULL,NULL,yylineno,10); // jump under ass false
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3); // jump under ass false
             emit(assign,false_expr,NULL,$$,yylineno,0); // =false
 
       }
@@ -385,12 +385,12 @@ expr  : assignmexpr { printf(RED "ASSIGNMENT \n" RESET);
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+5);//THELEI SWSTO LABEL
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);// den allazei kati alla to exo gia na einai idio me to online
             emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,20);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
             emit(assign,true_expr,NULL,$$,yylineno,0);
-            emit(jump,NULL,NULL,NULL,yylineno,10);
+            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
       }
