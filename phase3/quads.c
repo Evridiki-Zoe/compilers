@@ -235,7 +235,7 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope); //mporei na thelei adespoto :/
 			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);
 			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
-			return item; //????
+			//return item; //????
 }
 
 void print_quads(){
@@ -271,20 +271,20 @@ void print_quads(){
 
 		if (quads[i].res!=NULL) {
 			if( quads[i].res->sym !=NULL)
-			printf(" %s", quads[i].res->sym->value.var->name );
+			printf(" %s\t", quads[i].res->sym->value.var->name );
 
-			if (quads[i].res->index!=NULL) {
+		/*	if (quads[i].res->index!=NULL) {
 				if( quads[i].res->index->sym !=NULL)
 				printf(" (INDEX %s)", quads[i].res->index->sym->value.var->name );
-			}
+			}*/
 		}
 		if (quads[i].arg1!=NULL) {
 			if( quads[i].arg1->sym !=NULL)
-			printf(" %s", quads[i].arg1->sym->value.var->name );
+			printf(" %s\t", quads[i].arg1->sym->value.var->name );
 		}
 		if (quads[i].arg2!=NULL) {
 			if( quads[i].arg2->sym !=NULL)
-			printf(" %s", quads[i].arg2->sym->value.var->name );
+			printf(" %s\t", quads[i].arg2->sym->value.var->name );
 		}
 
 		printf("  [line %d]\n",quads[i].line );
