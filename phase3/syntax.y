@@ -504,7 +504,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
                    ref = 1;
 
                    if($1->type != tableitem_e && $4->type == tableitem_e){
-                   printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
+//                   printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
 
                    result =malloc(5*sizeof(char));
                    sprintf(result,"_%d",rvalues++);
@@ -570,7 +570,6 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
          ;
 
 member   : lvalue DOT IDENTIFIER {
-                printf("member:: lvalue(%s).id(%s) \n",$1->sym->value.var->name, $3);
                 $$ = member_item($1, $3);
 
 
