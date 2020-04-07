@@ -164,14 +164,25 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | SEMICOLON { printf(RED "semicolon \n" RESET);}
       ;
 
+
 expr  :
- 		 assignmexpr {printf(RED "ASSIGNMENT \n" RESET);
+ 		 assignmexpr {
+          printf(RED "ASSIGNMENT \n" RESET);
 					result =malloc(5*sizeof(char));
 					sprintf(result,"_%d",rvalues++);
-					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
-					emit(assign,$1,NULL,$$,yylineno,0);
-			}
+          struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+
+          if($1->type == tableitem_e){
+              struct expr* tempexp = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
+              emit(tablegetelem,$1->index,$1,tempexp,yylineno,0);
+
+          }else{
+    					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
+
+    					emit(assign,$1,NULL,$$,yylineno,0);
+          }
+
+					}
       |  expr PLUS expr {
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
@@ -489,16 +500,26 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       ;
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
-							     arrayFlag = 0; ref = 1;
+							     arrayFlag = 0;
+                   ref = 1;
 
                    if($1->type == tableitem_e){
                         result =malloc(5*sizeof(char));
                         sprintf(result,"_%d",rvalues++);
                         struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                         struct expr* tempexp = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
-                        emit(table_setelem,$4,$1,tempexp,yylineno,0);
+                        emit(table_setelem,$1->index,$4,tempexp,yylineno,0);
+
+                        struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
+                        tmp_index->value.var = malloc(sizeof(struct variable));
+                        tmp_index->value.var->name = malloc((strlen($1->index->sym->value.var->name) + 1) * sizeof(char));
+                        strcpy(tmp_index->value.var->name, $1->index->sym->value.var->name);
+                        tmp_index->next = NULL;
+
+                        struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,tempexp,0,"",'\0',NULL);
+                        $$ = returned_exp;
                    }else{
-							     emit(assign,$4,NULL,$1,yylineno,0);
+							            emit(assign,$4,NULL,$1,yylineno,0);
                    }
 						  }
               ;

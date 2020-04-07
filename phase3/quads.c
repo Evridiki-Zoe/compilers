@@ -222,7 +222,7 @@ struct expr* emit_iftable_item(struct expr* exp){
   		char *name =malloc(5*sizeof(char));
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
-     	struct expr* result = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
+     	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 //mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
@@ -231,11 +231,15 @@ struct expr* emit_iftable_item(struct expr* exp){
 }
 
 struct expr* member_item(struct expr* lvalue ,char* name){
+     	printf("PRIN: lv(%s) name(%s)\n",lvalue->sym->value.var->name, name);
 			lvalue = emit_iftable_item(lvalue);
+			printf("member item: lv(%s) name(%s)\n",lvalue->sym->value.var->name, name);
 			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope); //mporei na thelei adespoto :/
 			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);
 			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
-			//return item; //????
+			printf("returned item: %s \n",item->sym->value.var->name);
+
+			return item; //????
 }
 
 void print_quads(){
