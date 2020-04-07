@@ -201,12 +201,17 @@ struct symbol_table_binding* SearchFunction(char* name){
 
 struct expr* emit_iftable_item(struct expr* exp){
 
-		if(exp->type != tableitem_e) return exp;
+		if(exp->type != tableitem_e){
+			 printf("eimai to %s kai den eimai table item \n",exp->sym->value.var->name );
+			 return exp;
+	  }
 		else {
+			printf("eimai to %s kai eimai table item \n",exp->sym->value.var->name );
   		char *name =malloc(5*sizeof(char));
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
-     	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
+     	struct expr* result = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
+//mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
 			return exp;
@@ -215,9 +220,10 @@ struct expr* emit_iftable_item(struct expr* exp){
 
 struct expr* member_item(struct expr* lvalue ,char* name){
 			lvalue = emit_iftable_item(lvalue);
-			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
-			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);;
+			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope); //mporei na thelei adespoto :/
+			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);
 			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
+			return item; //????
 }
 
 void print_quads(){
@@ -254,6 +260,11 @@ void print_quads(){
 		if (quads[i].res!=NULL) {
 			if( quads[i].res->sym !=NULL)
 			printf(" %s", quads[i].res->sym->value.var->name );
+
+			if (quads[i].res->index!=NULL) {
+				if( quads[i].res->index->sym !=NULL)
+				printf(" (INDEX %s)", quads[i].res->index->sym->value.var->name );
+			}
 		}
 		if (quads[i].arg1!=NULL) {
 			if( quads[i].arg1->sym !=NULL)
@@ -263,6 +274,7 @@ void print_quads(){
 			if( quads[i].arg2->sym !=NULL)
 			printf(" %s", quads[i].arg2->sym->value.var->name );
 		}
+
 		printf("  [line %d]\n",quads[i].line );
 	}
 	printf("------------------------------------------------\n" );
