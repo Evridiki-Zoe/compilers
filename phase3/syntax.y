@@ -522,7 +522,7 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
 						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
 
             printf( RED "lvalue:: doublecolon\n" RESET);}
-         | member { printf(RED "lvalue:: member\n" RESET); }
+         | member { printf(RED "lvalue:: member\n" RESET); $$ = $1; }
          ;
 
 member   : lvalue DOT IDENTIFIER {
