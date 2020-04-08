@@ -137,6 +137,8 @@ void insert_rvalue_list(char* name, rvalue_type type){
 	newnode->type = type;
 	newnode->next = r_value_head;
 	r_value_head = newnode;
+
+
 }
 
 void print_list_rvalues(){

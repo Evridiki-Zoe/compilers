@@ -1,2 +1,1 @@
-t.c.u.t.e = x;
-//x = table.a.b.c.d;
+a(b,c,e,r,q,we,asd);

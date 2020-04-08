@@ -104,7 +104,7 @@ struct symbol_table_binding *tmpnode;
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
-%type<expression>       expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
+%type<expression>      funcdef call expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -164,25 +164,14 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       | SEMICOLON { printf(RED "semicolon \n" RESET);}
       ;
 
-
 expr  :
- 		 assignmexpr {
-          printf(RED "ASSIGNMENT \n" RESET);
+ 		 assignmexpr {printf(RED "ASSIGNMENT \n" RESET);
 					result =malloc(5*sizeof(char));
 					sprintf(result,"_%d",rvalues++);
-          struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-
-          if($1->type == tableitem_e){
-              struct expr* tempexp = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
-              emit(tablegetelem,$1->index,$1,tempexp,yylineno,0);
-
-          }else{
-    					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
-
-    					emit(assign,$1,NULL,$$,yylineno,0);
-          }
-
-					}
+					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
+					emit(assign,$1,NULL,$$,yylineno,0);
+			}
       |  expr PLUS expr {
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
@@ -500,32 +489,14 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
       ;
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
-							     arrayFlag = 0;
-                   ref = 1;
+							     arrayFlag = 0; ref = 1;
 
-                   if($1->type == tableitem_e){
-                        result =malloc(5*sizeof(char));
-                        sprintf(result,"_%d",rvalues++);
-                        struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-                        struct expr* tempexp = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
-                        emit(table_setelem,$1->index,$4,tempexp,yylineno,0);
-
-                        struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
-                        tmp_index->value.var = malloc(sizeof(struct variable));
-                        tmp_index->value.var->name = malloc((strlen($1->index->sym->value.var->name) + 1) * sizeof(char));
-                        strcpy(tmp_index->value.var->name, $1->index->sym->value.var->name);
-                        tmp_index->next = NULL;
-
-                        struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,tempexp,0,"",'\0',NULL);
-                        $$ = returned_exp;
-                   }else{
-							            emit(assign,$4,NULL,$1,yylineno,0);
-                   }
+                
 						  }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
-         | call { printf(RED "primary:: call\n" RESET); }
+         | call {printf(RED "primary:: call\n" RESET);  }
          | objectdef { printf(RED "primary:: objectdef\n" RESET);
 /*                result =malloc(5*sizeof(char));
                 sprintf(result,"_%d",rvalues++);
@@ -563,28 +534,67 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
 member   : lvalue DOT IDENTIFIER {
                 printf("member:: lvalue(%s).id(%s) \n",$1->sym->value.var->name, $3);
                 $$ = member_item($1, $3);
-
-
          }
          | lvalue L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
          | call DOT IDENTIFIER { printf(RED "member:: call.id\n" RESET); }
          | call L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: call[expression]\n" RESET); }
          ;
 
-call   : call L_PARENTHES elist R_PARENTHES { printf(RED "call:: call (elist)\n" RESET); }
-       | lvalue callsuffix { check_if_exists( $1->sym->value.var->name, scope); printf(RED "call:: lvalue callsuffix\n" RESET); }
-       | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES { printf(RED "call:: (funcdef)(elist)\n" RESET); }
+call   : call L_PARENTHES elist R_PARENTHES {
+				printf(RED "call:: call (elist)\n" RESET);
+				result =malloc(5*sizeof(char));
+				sprintf(result,"_%d",rvalues++);
+				tmpnode=malloc(sizeof(struct symbol_table_binding));
+				tmpnode =insertVar(result,yylineno,scope);
+				tmpexpr=malloc(sizeof(struct expr));
+				tmpexpr= new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+				emit(call,NULL,NULL,$1,yylineno,0);
+				emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
+				$$=tmpexpr;
+ 			}
+       | lvalue callsuffix {
+		   			check_if_exists( $1->sym->value.var->name, scope);
+					printf(RED "call:: lvalue callsuffix\n" RESET);
+					emit(call,NULL,NULL,$1,yylineno,0);
+					result =malloc(5*sizeof(char));
+	   			 	sprintf(result,"_%d",rvalues++);
+		  			 tmpnode=malloc(sizeof(struct symbol_table_binding));
+		   			 tmpnode =insertVar(result,yylineno,scope);
+		  			 tmpexpr=malloc(sizeof(struct expr));
+		   			 tmpexpr= new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+		  			 emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
+					 $$=tmpexpr;
+
+				}
+       | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES {
+		   			printf(RED "call:: (funcdef)(elist)\n" RESET);
+					emit(call,NULL,NULL,$2,yylineno,0);
+					result =malloc(5*sizeof(char));
+	   			 	sprintf(result,"_%d",rvalues++);
+		  			 tmpnode=malloc(sizeof(struct symbol_table_binding));
+		   			 tmpnode =insertVar(result,yylineno,scope);
+		  			 tmpexpr=malloc(sizeof(struct expr));
+		   			 tmpexpr= new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+		  			 emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
+					 $$=tmpexpr;
+	   			}
        ;
 
 callsuffix : L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: (elist)\n" RESET); }
            | DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: ..id(elist)\n" RESET); }
            ;
 
-elist   : expr multi_exprs { args++; printf(RED "elist:: \n" RESET); }
+elist   : expr multi_exprs {
+	 				args++; printf(RED "elist:: \n" RESET);
+					emit(param,$1,NULL,NULL,yylineno,0);
+				}
         | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
         ;
 
-multi_exprs	:  COMMA expr multi_exprs { args++; printf(RED "multiexpr commma expr exprs\n" RESET); }
+multi_exprs	:  COMMA expr multi_exprs {
+					args++; printf(RED "multiexpr commma expr exprs\n" RESET);
+					emit(param,$2,NULL,NULL,yylineno,0);
+				}
         	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
       	;
 
@@ -609,9 +619,9 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                         //to index:: ena symbol (oxi sto hash), me onoma to index tou stoixeiou
                       	struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
                         tmp_index->value.var = malloc(sizeof(struct variable));
-                    		tmp_index->value.var->name = malloc((strlen(name) + 1) * sizeof(char));
+                    	tmp_index->value.var->name = malloc((strlen(name) + 1) * sizeof(char));
                         strcpy(tmp_index->value.var->name, name);
-	                      tmp_index->next = NULL;
+	                     tmp_index->next = NULL;
                         //adespoto symbol pou den prepei na mpei sto hash!
 
                         struct expr* tmp_expr_index = new_expr(newtable_e,tmp_index,NULL,0,"",'\0',NULL);
@@ -778,8 +788,26 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {ex
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++); newFunction(result, yylineno, scope);
-      free(result); } idlist R_PARENTHES { make_not_accessible(scope+1); } block  { make_accessible_again(scope+1); insideFunc--;}
+funcdef  : FUNCTION L_PARENTHES {
+				insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++);
+				tmpnode=malloc(sizeof(struct symbol_table_binding));
+				tmpnode=newFunction(result, yylineno, scope);
+				tmpexpr=malloc(sizeof(struct expr));
+				tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
+
+
+				emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
+  			  	emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
+      			free(result);
+			} idlist R_PARENTHES { make_not_accessible(scope+1); } block  {
+
+				 make_accessible_again(scope+1); insideFunc--;
+				 tmpexpr=malloc(sizeof(struct expr));
+
+				 //Thelei to expr tou function
+				 emit(funcend,NULL,NULL,NULL,yylineno,0);
+			}
+
          | FUNCTION IDENTIFIER {
 			 tmpnode=malloc(sizeof(struct symbol_table_binding));
 			 tmpnode= newFunction( $2, yylineno, scope);
@@ -787,14 +815,16 @@ funcdef  : FUNCTION L_PARENTHES {insideFunc++; result = malloc(2 * sizeof(char))
 			 tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
 			  emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
 			  emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
-		  } L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
-			  make_accessible_again(scope+1); insideFunc--;
 
+		  	}
+			   L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
+			  make_accessible_again(scope+1); insideFunc--;
 			  tmpnode=malloc(sizeof(struct symbol_table_binding));
- 			  tmpnode= SearchFunction($2);
+ 			  tmpnode= SearchFunction( $2);
+ 			  tmpexpr=malloc(sizeof(struct expr));
  			  tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-			  printf("%d\n",yylineno );
 			  emit(funcend,tmpexpr,NULL,NULL,yylineno,0);
+			  $$=tmpexpr;
 		   	}
          ;
 
