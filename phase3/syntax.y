@@ -165,13 +165,23 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
       ;
 
 expr  :
- 		 assignmexpr {printf(RED "ASSIGNMENT \n" RESET);
-					result =malloc(5*sizeof(char));
-					sprintf(result,"_%d",rvalues++);
-					struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-					$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
-					emit(assign,$1,NULL,$$,yylineno,0);
-			}
+      assignmexpr {
+           printf(RED "ASSIGNMENT \n" RESET);
+           result =malloc(5*sizeof(char));
+           sprintf(result,"_%d",rvalues++);
+           struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+
+           if($1->type == tableitem_e){
+               struct expr* tempexp = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
+               emit(tablegetelem,$1->index,$1,tempexp,yylineno,0);
+
+           }else{
+               $$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
+
+               emit(assign,$1,NULL,$$,yylineno,0);
+           }
+
+       }
       |  expr PLUS expr {
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
