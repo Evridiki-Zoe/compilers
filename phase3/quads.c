@@ -215,16 +215,16 @@ struct symbol_table_binding* SearchFunction(char* name){
 
 struct expr* emit_iftable_item(struct expr* exp){
 
-		if(exp->type != tableitem_e)
+		if(exp->type != tableitem_e){
+			printf("den eimai table %s \n",exp->sym->value.var->name);
 			 return exp;
-
+		 }
 		else {
   		char *name =malloc(5*sizeof(char));
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
      	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 //mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
-
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
 			return result;
 		}

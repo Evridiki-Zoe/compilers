@@ -1,5 +1,9 @@
+a().b;
+//a().b = 99;
+//a()[b];
+
 //t.a.b.c.d = x.k.v;
-t.a = x.k.v.v.l;
+//t.a = x.k.v.v.l;
 
 
 //a(b,c,e,r,q,we,asd);
