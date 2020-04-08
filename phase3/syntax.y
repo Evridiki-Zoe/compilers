@@ -501,20 +501,35 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
 							     arrayFlag = 0;
                    ref = 1;
-
                    if($1->type != tableitem_e && $4->type == tableitem_e){
-//                   printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
+                             //gia na grafetai to d apo to x=t.a.b.c.d;
+                            // printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
 
-                   result =malloc(5*sizeof(char));
-                   sprintf(result,"_%d",rvalues++);
-                   struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-                   struct expr* tmp_table = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
+                             result =malloc(5*sizeof(char));
+                             sprintf(result,"_%d",rvalues++);
+                             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                             struct expr* tmp_table = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
 
-                   emit(tablegetelem,$4,$4->index,tmp_table,yylineno,0);
-                   emit(assign,tmp_table,NULL,$1,yylineno,0);
+                             emit(tablegetelem,$4,$4->index,tmp_table,yylineno,0);
+                             emit(assign,tmp_table,NULL,$1,yylineno,0);
 
                    }
                    else if($1->type == tableitem_e){
+                          // printf("else if:: lvalue(%s with type %d) = eq(%s with index %s and index type %d ) \n",$1->sym->value.var->name,$1->type, $4->sym->value.var->name, $4->index->sym->value.var->name,$4->index->type);
+
+
+                         if($4->index!= NULL && $4->index->type == conststring_e){
+                                //gia na grafetai to v apo to t.a.b.c.d = x.k.v;
+                                  //   printf("ektos:: lvalue(%s with type %d) = eq(%s with index %s and index type %d ) \n",$1->sym->value.var->name,$1->type, $4->sym->value.var->name, $4->index->sym->value.var->name,$4->index->type);
+                                     result =malloc(5*sizeof(char));
+                                     sprintf(result,"_%d",rvalues++);
+                                     struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                                     struct expr* tmp_table = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
+                                     emit(tablegetelem,$4,$4->index,tmp_table,yylineno,0);
+                                     $4 = tmp_table;
+
+                                     //tablegetelem ^3        "v"      ^4
+                           }
 
                         emit(table_setelem,$1->index,$4,$1,yylineno,0);
 //                                          e         x 2
