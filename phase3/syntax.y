@@ -381,16 +381,17 @@ expr  :
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+            // struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+            // struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
-            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+6); // jump assign false
-            emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3);//ass true an true h methepomeno gia pollapla and (?)
-            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4); // jump assing false
-            emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
-            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3); // jump under ass false
-            emit(assign,false_expr,NULL,$$,yylineno,0); // =false
+            // emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
+            // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+6); // jump assign false
+            // emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3);//ass true an true h methepomeno gia pollapla and (?)
+            // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4); // jump assing false
+            // emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
+            // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3); // jump under ass false
+            // emit(assign,false_expr,NULL,$$,yylineno,0); // =false
+			emit(and,$1,$3,$$,yylineno,0);
 
       }
       |  expr OR expr {
@@ -399,16 +400,17 @@ expr  :
             struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
             $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
-
-            emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+5);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);// den allazei kati alla to exo gia na einai idio me to online
-            emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
-            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
-            emit(assign,true_expr,NULL,$$,yylineno,0);
-            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
-            emit(assign,false_expr,NULL,$$,yylineno,0);
+            // struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+            // struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+			//
+            // emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+5);//THELEI SWSTO LABEL
+            // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);// den allazei kati alla to exo gia na einai idio me to online
+            // emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
+            // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
+            // emit(assign,true_expr,NULL,$$,yylineno,0);
+            // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+            // emit(assign,false_expr,NULL,$$,yylineno,0);
+			emit(and,$1,$3,$$,yylineno,0);
 
       }
       | term { $$=$1; }
@@ -587,7 +589,7 @@ member   : lvalue DOT IDENTIFIER {
                 $$ = member_item($1, $3);
          }
          | lvalue L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
-         | call DOT IDENTIFIER { printf(RED "member:: call.id\n" RESET); }
+         | call DOT IDENTIFIER {$$ = member_item($1, $3); printf(RED "member:: call.id\n" RESET); }
          | call L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: call[expression]\n" RESET); }
          ;
 
