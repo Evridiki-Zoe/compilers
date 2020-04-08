@@ -215,12 +215,10 @@ struct symbol_table_binding* SearchFunction(char* name){
 
 struct expr* emit_iftable_item(struct expr* exp){
 
-		if(exp->type != tableitem_e){
-			 printf("eimai to %s kai den eimai table item \n",exp->sym->value.var->name );
+		if(exp->type != tableitem_e)
 			 return exp;
-	  }
+
 		else {
-			printf("eimai to %s kai eimai table item \n",exp->sym->value.var->name );
   		char *name =malloc(5*sizeof(char));
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
@@ -233,15 +231,21 @@ struct expr* emit_iftable_item(struct expr* exp){
 }
 
 struct expr* member_item(struct expr* lvalue ,char* name){
-     	printf("PRIN: lv(%s) name(%s)\n",lvalue->sym->value.var->name, name);
 			lvalue = emit_iftable_item(lvalue);
-			printf("member item: lv(%s) name(%s)\n",lvalue->sym->value.var->name, name);
-			struct symbol_table_binding* newnode =insertVar(name,yylineno,scope); //mporei na thelei adespoto :/
+
+			struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
+			newnode->value.var = malloc(sizeof(struct variable));
+			newnode->value.var->name = malloc((strlen(name) + 1) * sizeof(char));
+			strcpy(newnode->value.var->name,name);
+			newnode->value.var->line = yylineno;
+			newnode->symbol_type = 1;
+			newnode->value.var->scope = scope;
+			newnode->next = NULL;
+
 			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);
 			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
-			printf("returned item: %s \n",item->sym->value.var->name);
 
-			return item; //????
+			return item;
 }
 
 void print_quads(){
