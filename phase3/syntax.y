@@ -109,7 +109,7 @@ int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
-%type<expression>      funcdef call expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
+%type<expression>      funcname funcdef call expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -969,54 +969,36 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  : FUNCTION L_PARENTHES {
-				insideFunc++; result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++);
-				tmpnode=malloc(sizeof(struct symbol_table_binding));
-				tmpnode=newFunction(result, yylineno, scope);
-				tmpexpr=malloc(sizeof(struct expr));
-				tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-
-
-				emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
-  			  	emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
-      			free(result);
-			} idlist R_PARENTHES { make_not_accessible(scope+1); } block  {
-
-				 make_accessible_again(scope+1); insideFunc--;
-				 tmpexpr=malloc(sizeof(struct expr));
-
-				 //Thelei to expr tou function
-				 emit(funcend,NULL,NULL,NULL,yylineno,0);
-
-printf("here I am\n");
-//NOPE
-        result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs);
- 				tmpnode=malloc(sizeof(struct symbol_table_binding));
- 				tmpnode=newFunction(result, yylineno, scope);
- 				//NOPE
-        $$ = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-			}
-
-         | FUNCTION IDENTIFIER {
-			 tmpnode=malloc(sizeof(struct symbol_table_binding));
-			 tmpnode= newFunction( $2, yylineno, scope);
-			 tmpexpr=malloc(sizeof(struct expr));
-			 tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-			  emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
-			  emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
-
-		  	}
-			   L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
-			  make_accessible_again(scope+1); insideFunc--;
-			  tmpnode=malloc(sizeof(struct symbol_table_binding));
- 			  tmpnode= SearchFunction( $2);
- 			  tmpexpr=malloc(sizeof(struct expr));
- 			  tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-			  emit(funcend,tmpexpr,NULL,NULL,yylineno,0);
-			  $$=tmpexpr;
+funcdef  :  FUNCTION funcname  L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
+			  make_accessible_again(scope+1);
+			  insideFunc--;
+			  emit(funcend,$2,NULL,NULL,yylineno,0);
+			  $$=$2;
 		   	}
          ;
 
+
+funcname : IDENTIFIER {
+					tmpnode=malloc(sizeof(struct symbol_table_binding));
+					tmpnode= newFunction( $1, yylineno, scope);
+					tmpexpr=malloc(sizeof(struct expr));
+					tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
+					emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
+					emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
+					$$=tmpexpr;
+			}
+		 | /*empty*/ {
+					 result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++);
+					 tmpnode=malloc(sizeof(struct symbol_table_binding));
+					 tmpnode=newFunction(result, yylineno, scope);
+					 tmpexpr=malloc(sizeof(struct expr));
+					 tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
+
+					 emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
+					 emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
+					 free(result);
+					 $$=tmpexpr;
+		 }
 //rvalue is const mazi me libfunc kai userfunc?
 
 const    : number {		$$=$1;	}
