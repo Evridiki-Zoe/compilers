@@ -12,7 +12,8 @@ struct symbol_table_binding* nil_expr_sym;
 struct symbol_table_binding* number_one;
 
 struct quad *quads=NULL;
-
+int scope_spaces[50];
+tmpoffset=0;
 
 int main(void) {
 

@@ -33,12 +33,14 @@ typedef struct variable{
     char			*name;
 	unsigned int 	line;
 	unsigned int 	scope;
+	int 			offset;
 } variable;
 
 typedef struct function{
     char				*name;
 	unsigned int 		line;
 	unsigned int 		scope;
+	int 				totalVars;
  	struct arguments 	*args_list;
 } function;
 
@@ -52,7 +54,7 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 	bool accessible ;
 
 	symbol_space scope_space;
-	int offset;
+
   struct symbol_table_binding *next;
 };
 
@@ -79,6 +81,7 @@ void hide_symbols(int scope);
 struct symbol_table_binding* insertVar(char* name , int line , int scope);
 struct symbol_table_binding* localVar(char* name, int line, int scope);
 char* enum_toString(symtype sym);
+char* enum_toString_symbolSpace(symbol_space sym);
 int free_table(void);
 void free_list();
 int print_table();

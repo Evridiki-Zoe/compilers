@@ -16,6 +16,11 @@ extern struct symbol_table_binding* number_one;
 extern int yylineno, scope;
 extern int rvalues;
 
+extern int  scope_spaces[50];
+
+int stack_top=-1;
+
+
 char* enum_toString_opCodes(iopcode sym) {
 	switch (sym) {
 		case 0:
@@ -303,4 +308,19 @@ void print_quads(){
 	printf("------------------------------------------------\n" );
 
 
+}
+
+
+//Stack functions
+
+int pop(){
+	int data = scope_spaces[stack_top];
+	stack_top -= 1;
+	return data;
+}
+
+int push(int num){
+	stack_top++;
+    scope_spaces[stack_top] = num;
+	return 0;
 }

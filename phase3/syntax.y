@@ -24,7 +24,7 @@ extern struct symbol_table_binding* false_expr_sym;
 extern struct symbol_table_binding* nil_expr_sym;
 extern struct symbol_table_binding* number_one;
 extern char* Lex_string;
-
+extern int tmpoffset;
 int ref = 1;
 int args = 0;
 char *result;
@@ -969,12 +969,16 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  :  FUNCTION funcname  L_PARENTHES { insideFunc++;} idlist R_PARENTHES { make_not_accessible(scope+1); } block {
+funcdef  :  FUNCTION funcname  L_PARENTHES {push(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES { tmpoffset=0; make_not_accessible(scope+1); } block {
 			  make_accessible_again(scope+1);
 			  insideFunc--;
 			  emit(funcend,$2,NULL,NULL,yylineno,0);
+			  $2->sym->value.func->totalVars=tmpoffset;
 			  $$=$2;
+
+			  tmpoffset=pop();
 		   	}
+
          ;
 
 

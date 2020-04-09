@@ -17,7 +17,8 @@ int lastActiveFunc = 0;
 extern int args;
 extern struct SymTable_struct *table;
 extern struct alpha_token_t *head;
-
+extern int tmpoffset;
+extern int insideFunc;
 
 int argumentF(char *name, int line, int scope) {
 	struct symbol_table_binding *tmp;
@@ -216,6 +217,11 @@ struct symbol_table_binding* insert_hash_table(char *name, symtype sym_type, int
 		newnode->value.var->line = line;
 		newnode->symbol_type = sym_type;
 		newnode->value.var->scope = scope;
+		//offsetthings
+		newnode->value.var->offset = tmpoffset++;
+		if (sym_type==2) newnode->scope_space=formal_arg;
+		else if(insideFunc) newnode->scope_space=function_loc;
+		else newnode->scope_space=program_var;
 
 	} else if(sym_type == 3 || sym_type == 4){ //an einai function
 		newnode->value.func = malloc(sizeof(struct function));
@@ -225,6 +231,7 @@ struct symbol_table_binding* insert_hash_table(char *name, symtype sym_type, int
 		newnode->symbol_type = sym_type;
 		newnode->value.func->scope = scope;
 		newnode->value.func->args_list = NULL;
+		newnode->value.func->totalVars=0;
 	}
 
 	newnode->active = active;
@@ -543,6 +550,15 @@ void free_list() {
 		free(prev);
 	}
 }
+
+char* enum_toString_symbolSpace(symbol_space sym){
+	if (sym==0)		return "program var";
+	else if(sym==1) return "formal arg";
+	else 			return "function_loc";
+
+}
+
+
 /*prints table*/
 int print_table(){
   	size_t i = 0, scope = 0;
@@ -560,10 +576,10 @@ int print_table(){
 			curr = table->pinakas[i];
 			while(curr != NULL) {
 				if((curr->symbol_type == 0 || curr->symbol_type == 1 || curr->symbol_type == 2) && curr->value.var->scope == scope )
-      				printf("\n \"%s\" [%s variable] (line %d) (scope %d)", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope);
+      				printf("\n \"%s\" [%s variable] (line %d) (scope %d) (offset %d on %s) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope,curr->value.var->offset,enum_toString_symbolSpace(curr->scope_space));
 
 				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope ) {
-			 		printf("\n \"%s\" [%s function] (line %d) (scope %d)", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope);
+			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) (total vars %d)", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope, curr->value.func->totalVars);
 					//printf gia oti mpikan swsta <3
 					// struct arguments *tmp = curr->value.func->args_list;
 					// //printf("arg1 %s arg2 %s",tmp->name, tmp->next->name);
