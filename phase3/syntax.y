@@ -146,7 +146,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
                       struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                       struct expr* tmp_expr = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
                       emit(tablegetelem,$1,$1->index,tmp_expr,yylineno,0);
-
+		      flag_fortable = 0;
                     }
             }
       }
