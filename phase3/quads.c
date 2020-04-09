@@ -220,6 +220,8 @@ struct expr* emit_iftable_item(struct expr* exp){
 			 return exp;
 		 }
 		else {
+			printf("eimai table %s \n",exp->sym->value.var->name);
+
   		char *name =malloc(5*sizeof(char));
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
@@ -244,7 +246,6 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 
 			struct expr* index = new_expr(conststring_e,newnode,NULL,0,name,'\0',NULL);
 			struct expr* item = new_expr(tableitem_e,lvalue->sym,index,0,"",'\0',NULL);
-
 			return item;
 }
 

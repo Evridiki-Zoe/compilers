@@ -39,6 +39,11 @@ char** table;
 
 struct expr *tmpexpr;
 struct symbol_table_binding *tmpnode;
+
+
+int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
+// kaluvei thn periptwsh tou  a().b.j.k.l; epeidh den grafetai to teleutaio stoixeio
+
 %}
 
 /*%glr-parser*/
@@ -130,7 +135,21 @@ multi_stmts : stmt multi_stmts { printf(RED "stmt multi_stmt\n" RESET);}
             | /*empty*/ {printf(RED "multi_stmts empty\n" RESET);}
             ;
 
-stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
+stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
+            if(flag_fortable == 1){//ignore
+            }else{
+                  if($1 != NULL && $1->type == tableitem_e && $1->index !=NULL){
+
+                  printf("EDW MESA THA PREPEI NA MPAINEI MONO STHN PERIPTWSH TYPOU: a().b.j.k.l; otidhpote allo einai lathos!\n");
+                      result =malloc(5*sizeof(char));
+                      sprintf(result,"_%d",rvalues++);
+                      struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                      struct expr* tmp_expr = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
+                      emit(tablegetelem,$1,$1->index,tmp_expr,yylineno,0);
+
+                    }
+            }
+      }
       | ifstmt 	{ printf(RED "if stmt \n" RESET); }
       | whilestmt 	{ printf(RED "while stmt \n" RESET); }
       | forstmt 	{ printf(RED "for stmt \n" RESET); }
@@ -166,13 +185,14 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET); }
 
 expr  :
       assignmexpr {
+
            printf("ASSIGNMENT \n");
            result =malloc(5*sizeof(char));
            sprintf(result,"_%d",rvalues++);
            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 
            if($1->type == tableitem_e){
-
+               flag_fortable = 1;
                struct expr* tempexp = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
                emit(tablegetelem,$1->index,$1,tempexp,yylineno,0);
 
@@ -412,7 +432,7 @@ expr  :
               // emit(assign,false_expr,NULL,$$,yylineno,0);
   			emit(and,$1,$3,$$,yylineno,0);
       }
-      | term { $$=$1; }
+      | term { $$=$1; printf(RED"term\n"RESET); }
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
@@ -426,24 +446,23 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
    			 	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				emit(uminus,$2,NULL,tmpexpr,yylineno,0);
    			}
-      | NOT expr { printf(RED "NOT expression\n" RESET); }
-      | NOT expr {
-		  		printf(RED "NOT expression\n" RESET);
-				result =malloc(5*sizeof(char));
-	            sprintf(result,"_%d",rvalues++);
-	            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-	            $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
+        | NOT expr {
+              printf(RED "NOT expression\n" RESET);
+            result =malloc(5*sizeof(char));
+                  sprintf(result,"_%d",rvalues++);
+                  struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+                  $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-	            struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-				struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
+                  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
 
-	            emit(if_eq,$2,true_expr,NULL,yylineno,QuadNo+5);//THELEI SWSTO LABEL
-	            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);
-	            emit(assign,true_expr,NULL,$$,yylineno,0);
-	            emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
-	            emit(assign,false_expr,NULL,$$,yylineno,0);
+                  emit(if_eq,$2,true_expr,NULL,yylineno,QuadNo+5);//THELEI SWSTO LABEL
+                  emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);
+                  emit(assign,true_expr,NULL,$$,yylineno,0);
+                  emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+                  emit(assign,false_expr,NULL,$$,yylineno,0);
 
-	  }
+      }
       | PPLUS lvalue {
 		  		printf(RED "++lvalue dassa\n" RESET);
 		   		check_for_funcname(yylval.stringValue);
@@ -513,7 +532,19 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 				//then sub
 				emit(sub,$1,tmp_one,$1,yylineno,0);
 			}
-      | primary { printf(RED "primary\n" RESET); $$=$1; }
+      | primary { printf(RED "primary\n" RESET); $$=$1;
+//      printf("(lvalue->primary is %s) and its index %s\n",$1->sym->value.var->name,$1->index->sym->value.var->name);
+
+/*        if($1 != NULL && $1->index !=NULL){
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            struct expr* tmp_expr = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
+            emit(tablegetelem,$1,$1->index,tmp_expr,yylineno,0);
+
+          }
+*/
+      }
       ;
 
 assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
@@ -600,17 +631,19 @@ lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
 						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
 
             printf( RED "lvalue:: doublecolon\n" RESET);}
-         | member { printf(RED "lvalue:: member\n" RESET); $$ = $1; }
+         | member { printf(RED "lvalue:: member\n" RESET); $$ = $1;}
          ;
 
 member   : lvalue DOT IDENTIFIER {
+printf("(lvalue is %s) . (id is %s)\n",$1->sym->value.var->name,$3);
                 $$ = member_item($1, $3);
+                printf("META(lvalue is %s) . (id is %s)\n",$1->sym->value.var->name,$3);
+
          }
          | lvalue L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: lvalue[expression]\n" RESET); }
          | call DOT IDENTIFIER {
 
-            //ayto htan mia kahmenh prospathei, mhn tou dineis shmasia
-/*              struct symbol_table_binding *tmp_symbol_id = malloc(sizeof(struct symbol_table_binding));
+              struct symbol_table_binding *tmp_symbol_id = malloc(sizeof(struct symbol_table_binding));
               tmp_symbol_id->value.var = malloc(sizeof(struct variable));
               tmp_symbol_id->value.var->name = malloc((strlen($3) + 1) * sizeof(char));
               strcpy(tmp_symbol_id->value.var->name, $3);
@@ -620,15 +653,17 @@ member   : lvalue DOT IDENTIFIER {
               struct expr* tmpexpr_id= new_expr(tableitem_e,tmp_symbol_id,NULL,0,"",'\0',NULL);
 
               $1->index = tmpexpr_id;
-              $$ = emit_iftable_item($1);
-*/
+              printf("(%s)'s index is %s\n", $1->sym->value.var->name,$1->index->sym->value.var->name);
 
-
+              //$1 = emit_iftable_item($1);
 
               //ayto sketo pernaei to a().b; !!!!!!!!!!!
-              //$$ = member_item($1, $3); //prepei to $1 na einai table item
+              struct expr* tmp_exression = member_item($1, $3); //prepei to $1 na einai table item
+              printf("MEMBER SAYS type returned is %d\n", tmp_exression->type);
+              $$ = tmp_exression;
 
 
+/*
 
 
 
@@ -650,11 +685,9 @@ member   : lvalue DOT IDENTIFIER {
               //adespoto symbol pou den prepei na mpei sto hash!
 
               struct expr* tmpexpr_id= new_expr(tableitem_e,tmp_symbol_id,NULL,0,"",'\0',NULL);
-
+$$ = tmpexpr_id;
               emit(tablegetelem,$1,tmpexpr_id,tmpexpr,yylineno,0);
-
-
-
+*/
          }
          | call L_SBRACKET expr R_SBRACKET { arrayFlag = 1; printf(RED "member:: call[expression]\n" RESET); }
          ;
@@ -682,7 +715,7 @@ call   : call L_PARENTHES elist R_PARENTHES {
 		  			 tmpexpr=malloc(sizeof(struct expr));
 
              //MPOREI NA EINAI LATHOS TYPE !!!!!!!!!!!!
-		   			 tmpexpr= new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL); //PRIN HTAN VAR
+		   			 tmpexpr= new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL); //PRIN HTAN VAR
 		  			 emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
 					 $$=tmpexpr;
 
@@ -750,7 +783,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                         result = malloc(2 * sizeof(char));
                         sprintf(result, "_%d", rvalues++);
                         struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
-                        struct expr* temp_elem = new_expr(tableitem_e,tmp_symbol,NULL,0,"",'\0',NULL);
+                        struct expr* temp_elem = new_expr(var_e,tmp_symbol,NULL,0,"",'\0',NULL);
 
                         emit(table_setelem,tmp_expr_index ,tmp , temp_elem,yylineno,0);
                         printf("ELEMENTS: %s \n", tmp->sym->value.var->name );
