@@ -42,7 +42,7 @@ struct symbol_table_binding *tmpnode;
 
 
 int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
-// kaluvei thn periptwsh tou  a().b.j.k.l; kai thn a()[b][r][w]; epeidh den grafetai to teleutaio stoixeio
+// kaluvei thn periptwsh tou  a().b.j.k.l; kai thn a()[b][r][w];  kai to a[7].b[8]; epeidh den grafetai to teleutaio stoixeio
 
 %}
 
@@ -140,9 +140,11 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
             }else{
             // kaluvei thn periptwsh tou  a().b.j.k.l; kai thn a()[b][r][u][w]; epeidh den grafetai to teleutaio stoixeio
             //den tha prepe na pianei periptwseis opws: t.c.u.t.e = x; oute x = table.a.b.c.d  giati tote tha graftoun duo fores ta teleutaia
+            //apparently pianei kai to a[7].b[8];
+
                   if($1 != NULL && $1->type == tableitem_e && $1->index !=NULL){
 
-                  printf("EDW MESA THA PREPEI NA MPAINEI MONO STHN PERIPTWSH TYPOU: a().b.j.k.l; h a()[b][r][u]; otidhpote allo einai lathos!\n");
+                  printf("EDW MESA THA PREPEI NA MPAINEI MONO STHN PERIPTWSH TYPOU: a().b.j.k.l; h a()[b][r][u]; otidhpote allo mporei na einai lathos!\n");
                       result =malloc(5*sizeof(char));
                       sprintf(result,"_%d",rvalues++);
                       struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
@@ -719,6 +721,7 @@ $$ = tmpexpr_id;
          ;
 
 call   : call L_PARENTHES elist R_PARENTHES {
+
 				printf(RED "call:: call (elist)\n" RESET);
 				result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
@@ -732,7 +735,7 @@ call   : call L_PARENTHES elist R_PARENTHES {
  			}
        | lvalue callsuffix {
 		   			check_if_exists( $1->sym->value.var->name, scope);
-					printf(RED "call:: lvalue callsuffix\n" RESET);
+          if($1->type == 1) $1 = member_item($1, $1->index->sym->value.var->name);
 					emit(call,NULL,NULL,$1,yylineno,0);
 					result =malloc(5*sizeof(char));
 	   			 	sprintf(result,"_%d",rvalues++);
