@@ -612,7 +612,7 @@ primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
 */
                 $$ = $1;
          }
-         | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); }
+         | L_PARENTHES funcdef R_PARENTHES { printf(RED "primary:: (funcdef)\n" RESET); $$ = $2; }
          | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
          ;
 
@@ -932,7 +932,7 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem {
                   }
                   ;
 
-indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { printf(RED "ind elem {expr:expr}\n" RESET);
+indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr(%s) : expr(%s)}\n",$2->sym->value.var->name,$4->sym->value.var->name);
                   result = malloc(2 * sizeof(char));
                   sprintf(result, "_%d", rvalues++);
                   struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
@@ -987,6 +987,14 @@ funcdef  : FUNCTION L_PARENTHES {
 
 				 //Thelei to expr tou function
 				 emit(funcend,NULL,NULL,NULL,yylineno,0);
+
+printf("here I am\n");
+//NOPE
+        result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs);
+ 				tmpnode=malloc(sizeof(struct symbol_table_binding));
+ 				tmpnode=newFunction(result, yylineno, scope);
+ 				//NOPE
+        $$ = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
 			}
 
          | FUNCTION IDENTIFIER {
