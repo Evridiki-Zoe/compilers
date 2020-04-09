@@ -216,11 +216,11 @@ struct symbol_table_binding* SearchFunction(char* name){
 struct expr* emit_iftable_item(struct expr* exp){
 
 		if(exp->type != tableitem_e){
-			printf("den eimai table %s \n",exp->sym->value.var->name);
+		//	printf("den eimai table %s \n",exp->sym->value.var->name);
 			 return exp;
 		 }
 		else {
-			printf("eimai table %s \n",exp->sym->value.var->name);
+	//		printf("eimai table %s \n",exp->sym->value.var->name);
 
   		char *name =malloc(5*sizeof(char));
       sprintf(name,"_%d",rvalues++);
