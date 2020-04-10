@@ -1,17 +1,6 @@
-if(x==0){
-
-
-y=1;
-k=0;
-o=0;
-}else {
-
-y=1;
-k=1;
-}
-
-
-if ( x) {
-
- y=1;
+while(x==0) {
+break ;
+continue; 
+break  ;
+break ;
 }

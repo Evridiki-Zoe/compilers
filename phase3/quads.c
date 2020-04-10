@@ -16,9 +16,12 @@ extern struct symbol_table_binding* number_one;
 extern int yylineno, scope;
 extern int rvalues;
 
-extern int  scope_spaces[50];
-
+extern int  scope_spaces[];
+extern int 	flow_Break[50];
+extern int flow_Continue[50];
 int stack_top=-1;
+int break_top=-1;
+int continue_top=-1;
 
 
 char* enum_toString_opCodes(iopcode sym) {
@@ -255,6 +258,40 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 }
 
 
+//proto orisma to quad pou prepei na paei se periptosi continue , to deftero se periptosi break
+int patchFlow(double con,double bre){
+	int tmp=-1;
+//For breaks
+	if (!isEmptyB()) tmp=pop_B();
+
+	
+	while (tmp >= con ) {
+		printf("Break at quad %d\n",tmp );
+		quads[tmp].label=bre;
+
+		if (!isEmptyB()) tmp=pop_B();
+		else break;
+	}
+	if(tmp < con) push_B(tmp); // An vrike break ekso apo tin trexousa loupa
+
+	//----------------
+	if (!isEmptyC()) tmp=pop_C();
+	else return 0;
+
+	while (tmp >= con ) {
+
+		quads[tmp].label=con;
+
+		if (!isEmptyC()) tmp=pop_C();
+		else break;
+	}
+	if(tmp < con) push_C(tmp); // An vrike continue ekso apo tin trexousa loupa
+
+
+	return 0;
+}
+
+
 void print_quads(){
 	int i;
 	FILE *fp;
@@ -322,14 +359,55 @@ void print_quads(){
 
 //Stack functions
 
-int pop(){
+
+int pop_SP(){
 	int data = scope_spaces[stack_top];
 	stack_top -= 1;
 	return data;
 }
 
-int push(int num){
+int push_SP(int num){
 	stack_top++;
     scope_spaces[stack_top] = num;
 	return 0;
+}
+
+int pop_B(){
+	int data = flow_Break[break_top];
+	break_top -= 1;
+
+	return data;
+}
+
+int push_B(int num){
+
+	break_top++;
+    flow_Break[break_top] = num;
+	return 0;
+}
+
+int isEmptyB(){
+	if (break_top<0) return 1;
+	else return 0;
+}
+//------------------------------------------------------
+
+int pop_C(){
+	int data = flow_Continue[continue_top];
+	continue_top -= 1;
+
+	return data;
+}
+//gia to stack continue
+
+int push_C(int num){
+	printf("%d\n",num );
+	continue_top++;
+    flow_Continue[continue_top] = num;
+	return 0;
+}
+
+int isEmptyC(){
+	if (continue_top<0) return 1;
+	else return 0;
 }

@@ -26,6 +26,9 @@ extern struct symbol_table_binding* number_one;
 extern char* Lex_string;
 extern int tmpoffset;
 extern struct quad *quads;
+extern int scope_spaces[];
+extern int flow_Break[50];
+extern int flow_Continue[50];
 int ref = 1;
 int args = 0;
 char *result;
@@ -174,6 +177,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 		  				  printf(RED "break \n" RESET);
 	                      if( insideLoop > 0) {
 	                      	emit(jump,NULL,NULL,NULL,yylineno,999);
+							push_B((int)QuadNo-1);
 	                      } else {
 	                            printf("Error: BREAK STMT outside of loop in line %d\n",yylineno);
 	                            exit(EXIT_FAILURE);
@@ -182,6 +186,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
       | CONTINUE SEMICOLON { printf(RED "continue \n" RESET);
                               if( insideLoop > 0) {
                               	emit(jump,NULL,NULL,NULL,yylineno,999);
+								push_C((int)QuadNo-1);
                               } else {
                                     printf("Error: CONTINUE STMT outside of loop in line %d\n",yylineno);
                                     exit(EXIT_FAILURE);
@@ -972,7 +977,7 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  :  funcstart funcname  L_PARENTHES {push(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES { tmpoffset=0; make_not_accessible(scope+1); } block {
+funcdef  :  funcstart funcname  L_PARENTHES {push_SP(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES { tmpoffset=0; make_not_accessible(scope+1); } block {
 			  make_accessible_again(scope+1);
 			  insideFunc--;
 			  emit(funcend,$2,NULL,NULL,yylineno,0);
@@ -980,7 +985,7 @@ funcdef  :  funcstart funcname  L_PARENTHES {push(tmpoffset); tmpoffset=0; insid
 			  $$=$2;
 			  printf("funcstart %d\n",(int)$1 );
 			  quads[(int)$1].label=QuadNo+1;
-			  tmpoffset=pop();
+			  tmpoffset=pop_SP();
 		   	}
 
          ;
@@ -1093,6 +1098,7 @@ whilestmt : whilestart whilecond stmt  {
 					emit(jump,NULL,NULL,NULL,yylineno,$1); //$1 quadno stin arxi tou sxpr tis while
 					quads[((int)$2)].label=QuadNo+1;
 					printf(RED "while(expr) stmt\n" RESET);
+					patchFlow($1,QuadNo+1);
 			};
 
 whilestart : WHILE {$$=QuadNo+1;}
@@ -1133,6 +1139,8 @@ forstmt : FOR  L_PARENTHES { insideLoop++; } for_elist SEMICOLON  for_cond  SEMI
 				quads[(int)$6-1].label=QuadNo+1; /*gia to jump sto telos tou for */
 				quads[(int)$6-2].label=$8+1; /*if_eq jump arxi for*/
 				quads[(int)$8-1].label=$4+1; /*gia jump sto cond tis for*/
+
+				patchFlow((int)$6+1,(int)QuadNo+1);
 
 			}
 

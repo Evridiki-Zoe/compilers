@@ -108,10 +108,19 @@ struct symbol_table_binding* SearchFunction(char* name);
 struct expr* emit_iftable_item(struct expr* exp);
 struct expr* member_item(struct expr* lvalue ,char* name);
 
+int  patchFlow(double  con , double bre);
+
 char* enum_toString_opCodes(iopcode sym);
 
 //Stack functions
 
-int pop();
+int pop_SP();
+int push_SP(int num);
 
-int push(int num);
+int pop_B();
+int push_B(int num);
+int isEmptyB();
+
+int pop_C();
+int push_C(int num);
+int isEmptyC();
