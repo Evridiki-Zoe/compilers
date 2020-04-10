@@ -798,6 +798,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                   //edw tupwnontai ola ta stoixeia tou pinaka
                   struct expr* tmp = $2;
                   int i = 0;
+
                   while(tmp->sym!= NULL) {
                         char* name =malloc(5*sizeof(char));
                         sprintf(name,"%d",i);
@@ -811,8 +812,6 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
 
                         struct expr* tmp_expr_index = new_expr(newtable_e,tmp_index,NULL,0,"",'\0',NULL);
 
-                        result = malloc(2 * sizeof(char));
-                        sprintf(result, "_%d", rvalues++);
                         struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
                         struct expr* temp_elem = new_expr(var_e,tmp_symbol,NULL,0,"",'\0',NULL);
 
@@ -821,7 +820,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                         tmp = tmp->next;
                         i++;
                   }
-
+                  rvalues++;
                   $$ = tmp_table;// epistrefw pros ta panw olo to table
             }
             |  L_SBRACKET {
