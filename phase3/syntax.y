@@ -108,7 +108,7 @@ int current_rvals = 0;
     char *stringValue;
 	struct expr* expression;
 }
-%type<intValue>         INTEGER if_start whilestart whilecond
+%type<intValue>         INTEGER if_start whilestart whilecond funcstart
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
@@ -134,7 +134,7 @@ int current_rvals = 0;
 program  :  multi_stmts
          ;
 
-multi_stmts : {current_rvals = 0; 
+multi_stmts : {current_rvals = 0;
 		} stmt {rvalues = current_rvals;} multi_stmts { printf(RED "stmt multi_stmt\n" RESET);}
             | /*empty*/ {printf(RED "multi_stmts empty\n" RESET);}
             ;
@@ -973,17 +973,19 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  :  FUNCTION funcname  L_PARENTHES {push(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES { tmpoffset=0; make_not_accessible(scope+1); } block {
+funcdef  :  funcstart funcname  L_PARENTHES {push(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES { tmpoffset=0; make_not_accessible(scope+1); } block {
 			  make_accessible_again(scope+1);
 			  insideFunc--;
 			  emit(funcend,$2,NULL,NULL,yylineno,0);
 			  $2->sym->value.func->totalVars=tmpoffset;
 			  $$=$2;
-
+			  printf("funcstart %d\n",(int)$1 );
+			  quads[(int)$1].label=QuadNo+1;
 			  tmpoffset=pop();
 		   	}
 
          ;
+funcstart : FUNCTION { emit(jump,NULL,NULL,NULL,yylineno,999); $$=QuadNo-1; }
 
 
 funcname : IDENTIFIER {
@@ -991,7 +993,7 @@ funcname : IDENTIFIER {
 					tmpnode= newFunction( $1, yylineno, scope);
 					tmpexpr=malloc(sizeof(struct expr));
 					tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
-					emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
+
 					emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
 					$$=tmpexpr;
 			}
@@ -1002,7 +1004,7 @@ funcname : IDENTIFIER {
 					 tmpexpr=malloc(sizeof(struct expr));
 					 tmpexpr = new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
 
-					 emit(jump,NULL,NULL,NULL,yylineno,999); // jump sto telos tis func
+
 					 emit(funcstart,tmpexpr,NULL,NULL,yylineno,0);
 					 free(result);
 					 $$=tmpexpr;
