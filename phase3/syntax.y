@@ -25,6 +25,7 @@ extern struct symbol_table_binding* nil_expr_sym;
 extern struct symbol_table_binding* number_one;
 extern char* Lex_string;
 extern int tmpoffset;
+extern struct quad *quads;
 int ref = 1;
 int args = 0;
 char *result;
@@ -105,7 +106,7 @@ int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
     char *stringValue;
 	struct expr* expression;
 }
-%type<intValue>         INTEGER
+%type<intValue>         INTEGER if_start
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
@@ -1052,14 +1053,34 @@ multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, (scope+1)); } multi_id
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
-ifstmt  : if_start R_PARENTHES  stmt  ELSE  {emit(jump,NULL,NULL,NULL,yylineno,999); /*Sto telos tis else*/}  stmt { printf(RED "if(exprsession) stmt else stmt\n" RESET); }
-        | if_start  R_PARENTHES  stmt  { printf(RED "if(exprsession) stmt\n" RESET); }
+ifstmt  : if_start R_PARENTHES  stmt  ELSE  {
+
+				emit(jump,NULL,NULL,NULL,yylineno,999); /*Sto telos tis else*/
+				//Kanoume patch to jump mesa stin else se periptosi pou apotixei i if
+				quads[((int)$1)].label=QuadNo+1;
+				//Pername stin tmp mas to quad no tis kainourgias jump ekso apo tin else
+				$1=QuadNo-1;
+
+			}  stmt {
+				//Pigenoume sto quad tis jump pano apo tin else kai kanoume patch to label sto quad kato apo tin
+   			 	//teleftaia entoli toy stmt tis else !!!
+				printf(RED "if(exprsession) stmt else stmt\n" RESET);
+				quads[((int)$1)].label=QuadNo+1;
+			}
+        | if_start  R_PARENTHES  stmt  {
+			 printf(RED "if(exprsession) stmt\n" RESET);
+			 //Pigenoume sto quad tis jump kai kanoume patch to label sto quad kato apo tin
+			 //teleftaia entoli toy stmt !!!
+			 quads[((int)$1)].label=QuadNo+1;
+		 }
         ;
 
 if_start: IF L_PARENTHES expr {
 				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tou if
 				emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis if
+				//Pername sto if_start to index tou quad tis jump
+				$$=QuadNo-1;
 			}
 
 whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
