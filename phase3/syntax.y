@@ -1075,18 +1075,22 @@ whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
 						printf(RED "while(expr) stmt\n" RESET); }
     			;
 
-forstmt	: FOR L_PARENTHES { insideLoop++; } elist SEMICOLON expr {
+forstmt	: FOR L_PARENTHES { insideLoop++; } for_elist SEMICOLON expr {
 
 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 						emit(if_eq,$6,true_expr,NULL,yylineno,999); // jump stin arxi tis for
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for
 
 					}
-					 SEMICOLON elist {
+					 SEMICOLON for_elist {
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
 					}
 					 R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
     		;
+
+for_elist : expr multi_exprs {printf(RED "for_elist:: \n" RESET);  }
+        | /*emty*/ { printf(RED "for_elist:: empty\n" RESET); }
+        ;
 
 returnstmt	: RETURN expr  SEMICOLON {
 					printf(RED "return expression; \n" RESET);
