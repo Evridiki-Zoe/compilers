@@ -45,6 +45,8 @@ struct symbol_table_binding *tmpnode;
 int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
 // kaluvei thn periptwsh tou  a().b.j.k.l; kai thn a()[b][r][w];  kai to a[7].b[8]; epeidh den grafetai to teleutaio stoixeio
 
+int current_rvals = 0;
+
 %}
 
 /*%glr-parser*/
@@ -132,7 +134,8 @@ int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
 program  :  multi_stmts
          ;
 
-multi_stmts : stmt multi_stmts { printf(RED "stmt multi_stmt\n" RESET);}
+multi_stmts : {current_rvals = 0; 
+		} stmt {rvalues = current_rvals;} multi_stmts { printf(RED "stmt multi_stmt\n" RESET);}
             | /*empty*/ {printf(RED "multi_stmts empty\n" RESET);}
             ;
 
