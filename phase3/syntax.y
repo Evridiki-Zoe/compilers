@@ -108,7 +108,7 @@ int current_rvals = 0;
     char *stringValue;
 	struct expr* expression;
 }
-%type<intValue>         INTEGER if_start whilestart whilecond funcstart
+%type<intValue>         INTEGER if_start whilestart whilecond funcstart for_cond for_end for_elist
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
@@ -1109,35 +1109,52 @@ whilecond : L_PARENTHES{ insideLoop++; } expr {
 						R_PARENTHES {$$=QuadNo-1;}
 			;
 
-// whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
+
+
+// forstmt	: FOR L_PARENTHES { insideLoop++; } for_elist SEMICOLON expr {
 //
 // 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-// 						emit(if_eq,$4,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
-// 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis while
+// 						emit(if_eq,$6,true_expr,NULL,yylineno,999); // jump stin arxi tis for
+// 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for
 //
-// 						}
-// 						R_PARENTHES stmt {
-// 						insideLoop--;
-// 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tou expr tis  while
-// 						printf(RED "while(expr) stmt\n" RESET); }
-//     			;
+// 					}
+// 					 SEMICOLON for_elist {
+// 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
+// 					}
+// 					 R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
+//     		;
+									//			--arxi cond $4			--arxi extra ent$6	--arxi somatos for	$8
+forstmt : FOR  L_PARENTHES { insideLoop++; } for_elist SEMICOLON  for_cond  SEMICOLON for_end R_PARENTHES stmt {
 
-forstmt	: FOR L_PARENTHES { insideLoop++; } for_elist SEMICOLON expr {
+				printf(RED "for(elist; expr;elist) stmt\n" RESET);
+				insideLoop--;
+				printf("for elist %d for cond %d for end%d\n",(int)$4,(int)$6 , (int)$8 );
+				emit(jump,NULL,NULL,NULL,yylineno,$6+1); /*jump stin arxi tou 2ou elist*/
+				quads[(int)$6-1].label=QuadNo+1; /*gia to jump sto telos tou for */
+				quads[(int)$6-2].label=$8+1; /*if_eq jump arxi for*/
+				quads[(int)$8-1].label=$4+1; /*gia jump sto cond tis for*/
 
-						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-						emit(if_eq,$6,true_expr,NULL,yylineno,999); // jump stin arxi tis for
-						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for
+			}
 
-					}
-					 SEMICOLON for_elist {
-						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
-					}
-					 R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
-    		;
+;
 
-for_elist : expr multi_exprs {printf(RED "for_elist:: \n" RESET);  }
+for_elist : expr multi_exprs {printf(RED "for_elist:: \n" RESET); $$=QuadNo;  }
         | /*emty*/ { printf(RED "for_elist:: empty\n" RESET); }
         ;
+
+
+for_cond : expr  {
+						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						emit(if_eq,$1,true_expr,NULL,yylineno,999); // jump stin arxi tis for
+						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for
+						$$=QuadNo;
+					};
+
+for_end : for_elist {
+
+   				emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
+				$$=QuadNo;
+		};
 
 returnstmt	: RETURN expr  SEMICOLON {
 					printf(RED "return expression; \n" RESET);
