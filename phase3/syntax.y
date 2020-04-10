@@ -106,7 +106,7 @@ int flag_fortable = 0; //elpizw na brw kalutero tropo na to kanw
     char *stringValue;
 	struct expr* expression;
 }
-%type<intValue>         INTEGER if_start
+%type<intValue>         INTEGER if_start whilestart whilecond
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
@@ -1083,18 +1083,40 @@ if_start: IF L_PARENTHES expr {
 				$$=QuadNo-1;
 			}
 
-whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
+
+whilestmt : whilestart whilecond stmt  {
+					insideLoop--;
+					emit(jump,NULL,NULL,NULL,yylineno,$1); //$1 quadno stin arxi tou sxpr tis while
+					quads[((int)$2)].label=QuadNo+1;
+					printf(RED "while(expr) stmt\n" RESET);
+			};
+
+whilestart : WHILE {$$=QuadNo+1;}
+			;
+
+whilecond : L_PARENTHES{ insideLoop++; } expr {
 
 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-						emit(if_eq,$4,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
+						emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis while
+						printf("quadno%d\n",(int)QuadNo );
 
 						}
-						R_PARENTHES stmt {
-						insideLoop--;
-						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tou expr tis  while
-						printf(RED "while(expr) stmt\n" RESET); }
-    			;
+						R_PARENTHES {$$=QuadNo-1;}
+			;
+
+// whilestmt	: WHILE L_PARENTHES{ insideLoop++; } expr {
+//
+// 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+// 						emit(if_eq,$4,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
+// 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis while
+//
+// 						}
+// 						R_PARENTHES stmt {
+// 						insideLoop--;
+// 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tou expr tis  while
+// 						printf(RED "while(expr) stmt\n" RESET); }
+//     			;
 
 forstmt	: FOR L_PARENTHES { insideLoop++; } for_elist SEMICOLON expr {
 
