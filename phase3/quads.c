@@ -254,40 +254,48 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 			return item;
 }
 
+
 void print_quads(){
-	printf("------------------------------------------------\n" );
 	int i;
+	FILE *fp;
+
+	fp = stdout;
+	//fp = fopen ("quads.txt","w"); // gia na grapsei se arxeio
+
+	fprintf(fp,"------------------------------------------------\n" );
+
 	for ( i = 0; i < QuadNo; i++) {
 
-		printf("%d: %s",i+1,enum_toString_opCodes(quads[i].opcode) );
+		fprintf(fp, "%d: %s",i+1,enum_toString_opCodes(quads[i].opcode) );
+
 		if(quads[i].opcode== 0){ //gia to assign
 			if (quads[i].res!=NULL) {
 				if( quads[i].res->sym !=NULL)
-				printf(" %s", quads[i].res->sym->value.var->name );
+				fprintf(fp," %s", quads[i].res->sym->value.var->name );
 			}
-			if (quads[i].arg1->sym!=NULL) printf(" %s",quads[i].arg1->sym->value.var->name);
-			printf("  [line %d]\n",quads[i].line );
+			if (quads[i].arg1->sym!=NULL) fprintf(fp," %s",quads[i].arg1->sym->value.var->name);
+			fprintf(fp,"  [line %d]\n",quads[i].line );
 
 			continue;
 		}
 		else if(quads[i].opcode>= 10 && quads[i].opcode<= 15  ){//gia to if_eq
 			if (quads[i].arg1!=NULL) {
 				if( quads[i].arg1->sym !=NULL)
-				printf(" %s", quads[i].arg1->sym->value.var->name );
+				fprintf(fp," %s", quads[i].arg1->sym->value.var->name );
 			}
-			printf(" %s",quads[i].arg2->sym->value.var->name);
-			printf(" %d",quads[i].label );
-			printf("  [line %d]\n",quads[i].line );
+			fprintf(fp," %s",quads[i].arg2->sym->value.var->name);
+			fprintf(fp," %d",quads[i].label );
+			fprintf(fp,"  [line %d]\n",quads[i].line );
 
 			continue;
 		}
 		if (quads[i].opcode==25) {
-			printf(" %d",quads[i].label );
+			fprintf(fp," %d",quads[i].label );
 		}
 
 		if (quads[i].res!=NULL) {
 			if( quads[i].res->sym !=NULL)
-			printf(" %s\t", quads[i].res->sym->value.var->name );
+			fprintf(fp," %s\t", quads[i].res->sym->value.var->name );
 
 		/*	if (quads[i].res->index!=NULL) {
 				if( quads[i].res->index->sym !=NULL)
@@ -296,17 +304,18 @@ void print_quads(){
 		}
 		if (quads[i].arg1!=NULL) {
 			if( quads[i].arg1->sym !=NULL)
-			printf(" %s\t", quads[i].arg1->sym->value.var->name );
+			fprintf(fp," %s\t", quads[i].arg1->sym->value.var->name );
 		}
 		if (quads[i].arg2!=NULL) {
 			if( quads[i].arg2->sym !=NULL)
-			printf(" %s\t", quads[i].arg2->sym->value.var->name );
+			fprintf(fp," %s\t", quads[i].arg2->sym->value.var->name );
 		}
 
-		printf("  [line %d]\n",quads[i].line );
+		fprintf(fp,"  [line %d]\n",quads[i].line );
 	}
-	printf("------------------------------------------------\n" );
+	fprintf(fp,"------------------------------------------------\n" );
 
+	fclose (fp);
 
 }
 
