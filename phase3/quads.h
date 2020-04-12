@@ -91,6 +91,14 @@ struct quad{
 	unsigned line;
 };
 
+struct call {
+
+  struct expr* elist;
+  unsigned char method;
+	char* name;
+
+};
+
 void insert_rvalue_list(char* name, rvalue_type type);
 
 void print_list_rvalues();
@@ -107,6 +115,7 @@ struct symbol_table_binding* SearchFunction(char* name);
 
 struct expr* emit_iftable_item(struct expr* exp);
 struct expr* member_item(struct expr* lvalue ,char* name);
+struct expr* make_call (struct expr* lv, struct expr* elist);
 
 int  patchFlow(double  con , double bre);
 

@@ -109,13 +109,15 @@ int current_rvals = 0;
     double intValue;
     double floatValue;
     char *stringValue;
-	struct expr* expression;
+	  struct expr* expression;
+    struct call* callexpr;
 }
 %type<intValue>         INTEGER if_start whilestart whilecond funcstart for_cond for_end for_elist
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
-%type<expression>      funcname funcdef call expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member
+%type<expression>      funcname funcdef call expr const term primary number assignmexpr lvalue elist objectdef multi_exprs_for_table elist_for_table TRUE FALSE NIL indexed  indexedelem  multi_indexedelem member multi_exprs
+%type<callexpr>        callsuffix methodcall normcall
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
@@ -731,7 +733,7 @@ $$ = tmpexpr_id;
 
 call   : call L_PARENTHES elist R_PARENTHES {
 
-				printf(RED "call:: call (elist)\n" RESET);
+/*				printf(RED "call:: call (elist)\n" RESET);
 				result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
 				tmpnode=malloc(sizeof(struct symbol_table_binding));
@@ -741,9 +743,12 @@ call   : call L_PARENTHES elist R_PARENTHES {
 				emit(call,NULL,NULL,$1,yylineno,0);
 				emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
 				$$=tmpexpr;
+*/
+        $$ = make_call($1, $3);
+
  			}
        | lvalue callsuffix {
-		   			check_if_exists( $1->sym->value.var->name, scope);
+		/*   			check_if_exists( $1->sym->value.var->name, scope);
           if($1->type == 1) $1 = member_item($1, $1->index->sym->value.var->name);
 					emit(call,NULL,NULL,$1,yylineno,0);
 					result =malloc(5*sizeof(char));
@@ -753,11 +758,21 @@ call   : call L_PARENTHES elist R_PARENTHES {
 		  			 tmpexpr=malloc(sizeof(struct expr));
 		   			 tmpexpr= new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
 		  			 emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
-					 $$=tmpexpr;
+				  // $$=tmpexpr;
+*/
+
+          $1 = emit_iftable_item($1);
+          if ($2->method ){
+                struct expr* t = $1;
+                $1 = emit_iftable_item(member_item(t, $2->name));
+                $2->elist->next = t ;
+          }
+
+          $$ = make_call($1, $2->elist);
 
 				}
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES {
-		   			printf(RED "call:: (funcdef)(elist)\n" RESET);
+/*		   			printf(RED "call:: (funcdef)(elist)\n" RESET);
 					emit(call,NULL,NULL,$2,yylineno,0);
 					result =malloc(5*sizeof(char));
 	   			 	sprintf(result,"_%d",rvalues++);
@@ -767,25 +782,82 @@ call   : call L_PARENTHES elist R_PARENTHES {
 		   			 tmpexpr= new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
 		  			 emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
 					 $$=tmpexpr;
-	   			}
+*/
+          $$ = make_call($2, $5);
+
+  			}
        ;
 
-callsuffix : L_PARENTHES elist R_PARENTHES { printf(RED"callsuffix:: (elist)"RESET); }
-           | DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "callsuffix:: ..id(elist)\n" RESET); }
+callsuffix : normcall { printf(RED"callsuffix:: (elist)\n"RESET);
+                $$ = $1;
+           }
+           | methodcall { printf(RED "callsuffix:: ..id(elist)\n" RESET);
+                $$ = $1;
+           }
+           ;
+
+normcall : L_PARENTHES elist R_PARENTHES  { printf("normcall \n");
+            struct expr* tmp = $2;
+            while(tmp!=NULL && tmp->sym != NULL) {
+                 printf("elist:: %s\n", tmp->sym->value.var->name);
+                 tmp = tmp->next;
+             }
+              $$->elist = $2;
+              $$->method = 0;
+              $$->name = NULL;
+         }
+         ;
+
+methodcall : DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "methodcall\n" RESET);
+                $$->elist = $4;
+                $$->method = 1;
+                $$->name = $2;
+           }
            ;
 
 elist   : expr multi_exprs {
-	 				args++; printf(RED "elist:: \n" RESET);
-					emit(param,$1,NULL,NULL,yylineno,0);
+	 				args++; printf("elist::%s \n",$1->sym->value.var->name);
+//					emit(param,$1,NULL,NULL,yylineno,0);
+          struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
+          newnode->value.var = malloc(sizeof(struct variable));
+          newnode->value.var->name = malloc((strlen($1->sym->value.var->name) + 1) * sizeof(char));
+          strcpy(newnode->value.var->name, $1->sym->value.var->name);
+          newnode->value.var->line = yylineno;
+          newnode->symbol_type = 1;
+          newnode->value.var->scope = scope;
+          newnode->next = NULL;
+
+          struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$2);
+          $$ = temp_elem;
 				}
-        | /*emty*/ { printf(RED "elist:: empty\n" RESET); args = 0; }
+        | /*emty*/ { printf(RED "elist:: empty\n" RESET);
+                args = 0;
+                struct expr* temp_elem = new_expr(var_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
+                $$ = temp_elem;
+        }
         ;
 
 multi_exprs	:  COMMA expr multi_exprs {
-					args++; printf(RED "multiexpr commma expr exprs\n" RESET);
-					emit(param,$2,NULL,NULL,yylineno,0);
+					args++; printf("multiexpr commma expr(%s) exprs\n", $2->sym->value.var->name);
+//					emit(param,$2,NULL,NULL,yylineno,0);
+
+          struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
+          newnode->value.var = malloc(sizeof(struct variable));
+          newnode->value.var->name = malloc((strlen($2->sym->value.var->name) + 1) * sizeof(char));
+          strcpy(newnode->value.var->name, $2->sym->value.var->name);
+          newnode->value.var->line = yylineno;
+          newnode->symbol_type = 1;
+          newnode->value.var->scope = scope;
+          newnode->next = NULL;
+
+          struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$3);
+          // bazw sto next to epomeno stoixeio
+          $$ = temp_elem; //pernaw to neo expression me to next, sto $$
 				}
-        	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET); }
+        	|  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET);
+                  struct expr* temp_elem = new_expr(var_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
+                  $$ = temp_elem;
+        }
       	;
 
 

@@ -1,6 +1,7 @@
-while(x==0) {
-break ;
-continue; 
-break  ;
-break ;
-}
+//test1().test2(a,b,c,v,e);
+
+//test1.test2(a,b,l);
+
+//(function a(){})(k,l);
+
+(function(a,b,c){::print(a);})(a(), b()(), (function(x){return x;})(c()));

@@ -257,6 +257,34 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 			return item;
 }
 
+struct expr* make_call (struct expr* lv, struct expr* elist) {
+			 struct expr* func = emit_iftable_item(lv);
+
+			 /*ftiaxnw ena reversed list mesa se ena stack*/
+			 struct expr* reversed_stack[20];
+			 int rev_stack_top=-1;
+
+			 while (elist != NULL && elist->sym != NULL) {
+    				rev_stack_top++; //push
+				 		reversed_stack[rev_stack_top] =  malloc(sizeof(struct expr));
+					  reversed_stack[rev_stack_top] = elist;//push
+						//	emit(param, NULL, NULL, elist,yylineno,0);
+						elist = elist->next;
+				}
+				while(rev_stack_top>=0){
+							emit(param, NULL, NULL,reversed_stack[rev_stack_top],yylineno,0); //pop
+							rev_stack_top -= 1;//pop
+				}
+				emit(call, func,NULL, NULL,yylineno,0);
+				char* name =malloc(5*sizeof(char));
+				sprintf(name,"_%d",rvalues++);
+				struct symbol_table_binding* tmpnode=malloc(sizeof(struct symbol_table_binding));
+				tmpnode =insertVar(name,yylineno,scope);
+				struct expr* result = new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+				emit(getretval,NULL,NULL,result,yylineno,0);
+				return result;
+}
+
 
 //proto orisma to quad pou prepei na paei se periptosi continue , to deftero se periptosi break
 int patchFlow(double con,double bre){
@@ -264,7 +292,7 @@ int patchFlow(double con,double bre){
 //For breaks
 	if (!isEmptyB()) tmp=pop_B();
 
-	
+
 	while (tmp >= con ) {
 		printf("Break at quad %d\n",tmp );
 		quads[tmp].label=bre;
