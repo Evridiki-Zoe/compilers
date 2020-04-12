@@ -344,7 +344,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 
 	if (scope == 0) flag = 0;
 	//check gia anonymous vars
-	if (name[0]=='_') return insert_hash_table(name, flag, line, true, scope);
+
 	/*
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR
@@ -357,6 +357,19 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	 */
 	hash = hash_function(name);//briskw pou kanei hash to stoixeio
 	curr = table->pinakas[hash];//paw se ayth th thesh
+
+	if (name[0]=='_') {
+		curr = table->pinakas[hash];
+		while (curr) {
+			if(strcmp(name, curr->value.var->name) == 0  && curr->value.var->scope == scope) {
+				return curr;
+			}
+			curr = curr->next;
+		}
+
+		return insert_hash_table(name, flag, 0, true, scope);
+	}
+
 
 	tmp = table->pinakas[lastActiveFunc];
 
