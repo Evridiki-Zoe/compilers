@@ -450,7 +450,7 @@ expr  :
       | term { $$=$1; printf(RED"term\n"RESET); }
       ;
 
-term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
+term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); $$ = $2; }
       | MINUS expr {
 		  		printf(RED " - expression \n" RESET);
 				result =malloc(5*sizeof(char));
@@ -460,6 +460,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 				tmpexpr=malloc(sizeof(struct expr));
    			 	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				emit(uminus,$2,NULL,tmpexpr,yylineno,0);
+        $$ = tmpexpr;
    			}
         | NOT expr {
               printf(RED "NOT expression\n" RESET);
@@ -471,7 +472,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
                   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
 
-                  emit(if_eq,$2,true_expr,NULL,yylineno,QuadNo+5);//THELEI SWSTO LABEL
+                  emit(if_eq,$2,true_expr,NULL,yylineno,QuadNo+5);
                   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);
                   emit(assign,true_expr,NULL,$$,yylineno,0);
                   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
@@ -483,7 +484,6 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 		   		check_for_funcname(yylval.stringValue);
 				result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
-				printf("geia\n" );
 			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
 			   	tmpnode =insertVar(result,yylineno,scope);
 			   	tmpexpr=malloc(sizeof(struct expr));
@@ -494,6 +494,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 				emit(add,$2,tmp_one,$2,yylineno,0);
 				//then assign
 			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
+         $$ = tmpexpr;
 	   }
       | lvalue  PPLUS {
 		  		check_for_funcname(yylval.stringValue);
@@ -511,6 +512,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 				emit(assign,$1,NULL,tmpexpr,yylineno,0);
 				//then add
 				emit(add,$1,tmp_one,$1,yylineno,0);
+        $$ = tmpexpr;
 			 }
       | MMINUS lvalue {
 		  		check_for_funcname(yylval.stringValue);
@@ -528,6 +530,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 				emit(sub,$2,tmp_one,$2,yylineno,0);
 				//then assign
 			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
+          $$ = tmpexpr;
 
   			}
       | lvalue  MMINUS {
@@ -546,19 +549,10 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); }
 				emit(assign,$1,NULL,tmpexpr,yylineno,0);
 				//then sub
 				emit(sub,$1,tmp_one,$1,yylineno,0);
+       $$ = tmpexpr;
 			}
       | primary { printf(RED "primary\n" RESET); $$=$1;
 //      printf("(lvalue->primary is %s) and its index %s\n",$1->sym->value.var->name,$1->index->sym->value.var->name);
-
-/*        if($1 != NULL && $1->index !=NULL){
-            result =malloc(5*sizeof(char));
-            sprintf(result,"_%d",rvalues++);
-            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-            struct expr* tmp_expr = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
-            emit(tablegetelem,$1,$1->index,tmp_expr,yylineno,0);
-
-          }
-*/
       }
       ;
 
