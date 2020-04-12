@@ -126,7 +126,7 @@ int current_rvals = 0;
 %nonassoc	GREATER GREATER_EQUAL LESS LESS_EQUAL
 %left	      PLUS MINUS
 %left	      MULT DIV MOD
-%right	NOT PPLUS MMINUS
+%right	NOT PPLUS MMINUS UMINUS 
 %left	      DOT DOTS
 %left	      L_SBRACKET R_SBRACKET
 %left	      L_PARENTHES R_PARENTHES
@@ -451,7 +451,7 @@ expr  :
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); $$ = $2; }
-      | MINUS expr {
+      | MINUS expr %prec UMINUS {
 		  		printf(RED " - expression \n" RESET);
 				result =malloc(5*sizeof(char));
 	 		   	sprintf(result,"_%d",rvalues++);
@@ -460,7 +460,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); $$ 
 				tmpexpr=malloc(sizeof(struct expr));
    			 	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
 				emit(uminus,$2,NULL,tmpexpr,yylineno,0);
-        $$ = tmpexpr;
+                        $$ = tmpexpr;
    			}
         | NOT expr {
               printf(RED "NOT expression\n" RESET);
@@ -600,10 +600,10 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
 
                         struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,$1,0,"",'\0',NULL);
                         $$ = returned_exp;
-                   }else{
-							            emit(assign,$4,NULL,$1,yylineno,0);
+                   } else {
+				emit(assign,$4,NULL,$1,yylineno,0);
                    }
-						  }
+			}
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
@@ -624,7 +624,9 @@ primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
 lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
 						tmpnode=malloc(sizeof(struct symbol_table_binding));
 						tmpnode= insertVar( yylval.stringValue, yylineno, scope);
-						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
+                                    printf("id\n");
+                                   
+						$$ = new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
          | LOCAL IDENTIFIER {
 						printf(RED "lvalue:: local identifier\n" RESET);
 						tmpnode=malloc(sizeof(struct symbol_table_binding));

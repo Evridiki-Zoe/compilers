@@ -36,7 +36,7 @@ typedef struct variable{
 	int 			offset;
 } variable;
 
-typedef struct function{
+typedef struct function {
     char				*name;
 	unsigned int 		line;
 	unsigned int 		scope;
@@ -51,7 +51,7 @@ struct symbol_table_binding{ /*NODE OF THE TABLE*/
 		function 	*func;
 	} value;
 	bool 			active;
-	bool accessible ;
+	bool 			accessible ;
 
 	symbol_space scope_space;
 

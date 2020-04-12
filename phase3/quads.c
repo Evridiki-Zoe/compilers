@@ -188,7 +188,7 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad) );
 	}
 	struct quad* new_quad = malloc(sizeof(struct quad));
-
+	printf("type: %d\n", opcode);
 	new_quad->arg1 = malloc(sizeof(struct expr ));
 	new_quad->arg2 = malloc(sizeof(struct expr ));
 	new_quad->res = malloc(sizeof(struct expr ));
