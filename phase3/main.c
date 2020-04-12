@@ -15,6 +15,7 @@ struct quad *quads=NULL;
 int scope_spaces[50];
 int flow_Break[50];
 int flow_Continue[50];
+int flow_Return[50];
 int tmpoffset=0;
 
 int main(void) {

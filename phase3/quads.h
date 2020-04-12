@@ -118,7 +118,7 @@ struct expr* member_item(struct expr* lvalue ,char* name);
 struct expr* make_call (struct expr* lv, struct expr* elist);
 
 int  patchFlow(double  con , double bre);
-
+int patchReturn(int from , int to);
 char* enum_toString_opCodes(iopcode sym);
 
 //Stack functions
@@ -133,3 +133,7 @@ int isEmptyB();
 int pop_C();
 int push_C(int num);
 int isEmptyC();
+
+int pop_R();
+int push_R(int num);
+int isEmptyR();

@@ -169,9 +169,8 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
       | forstmt 	{ printf(RED "for stmt \n" RESET); }
       | returnstmt 	{
 		  				  printf(RED "return stmt \n" RESET);
-                          if( insideFunc > 0) {
-                                // ok
-                          } else {
+                          if( insideFunc > 0) push_R((int)QuadNo-1);
+						  else {
                                 printf("Error: RETURN STMT outside of function in line %d\n",yylineno);
                                 exit(EXIT_FAILURE);
                           }
@@ -1065,6 +1064,8 @@ funcdef  :  funcstart funcname  L_PARENTHES {push_SP(tmpoffset); tmpoffset=0; in
 			  printf("funcstart %d\n",(int)$1 );
 			  quads[(int)$1].label=QuadNo+1;
 			  tmpoffset=pop_SP();
+
+			  patchReturn((int)$1,(int)QuadNo);
 		   	}
 
          ;

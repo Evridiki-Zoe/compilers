@@ -19,9 +19,11 @@ extern int rvalues;
 extern int  scope_spaces[];
 extern int 	flow_Break[50];
 extern int flow_Continue[50];
+extern int flow_Return[50];
 int stack_top=-1;
 int break_top=-1;
 int continue_top=-1;
+int return_top=-1;
 
 
 char* enum_toString_opCodes(iopcode sym) {
@@ -319,6 +321,25 @@ int patchFlow(double con,double bre){
 	return 0;
 }
 
+int patchReturn(int from , int to){
+	int tmp;
+	if (!isEmptyR()) tmp=pop_R();
+	else return 0;
+
+	while (tmp >= from ) {
+
+		quads[tmp].label=to;
+
+		if (!isEmptyR()) tmp=pop_R();
+		else break;
+	}
+	if(tmp < from) push_R(tmp); // An vrike continue ekso apo tin trexousa loupa
+
+
+	return 0;
+
+}
+
 
 void print_quads(){
 	int i;
@@ -437,5 +458,27 @@ int push_C(int num){
 
 int isEmptyC(){
 	if (continue_top<0) return 1;
+	else return 0;
+}
+
+//------------------------------------------------------
+
+int pop_R(){
+	int data = flow_Return[return_top];
+	return_top -= 1;
+
+	return data;
+}
+//gia to stack return
+
+int push_R(int num){
+	printf("%d\n",num );
+	return_top++;
+    flow_Return[return_top] = num;
+	return 0;
+}
+
+int isEmptyR(){
+	if (return_top<0) return 1;
 	else return 0;
 }
