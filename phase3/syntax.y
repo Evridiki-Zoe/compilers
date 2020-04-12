@@ -103,6 +103,7 @@ int current_rvals = 0;
 %token STRING
 %token IDENTIFIER
 
+
 /*The %union declaration modifies the type of yylval*/
 %union
 {
@@ -126,7 +127,7 @@ int current_rvals = 0;
 %nonassoc	GREATER GREATER_EQUAL LESS LESS_EQUAL
 %left	      PLUS MINUS
 %left	      MULT DIV MOD
-%right	NOT PPLUS MMINUS UMINUS 
+%right	NOT PPLUS MMINUS UMINUS
 %left	      DOT DOTS
 %left	      L_SBRACKET R_SBRACKET
 %left	      L_PARENTHES R_PARENTHES
@@ -222,6 +223,7 @@ expr  :
 		  		result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
 		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+          printf(" expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
 
             /*compile time type check*/
             if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 8 || ($1)->type == 4 )
@@ -235,7 +237,7 @@ expr  :
               exit(EXIT_FAILURE);
             }
               }
-      |  expr MINUS expr{
+      |  expr MINUS expr {
 
             /*compile time type check*/
             if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
@@ -450,17 +452,26 @@ expr  :
       | term { $$=$1; printf(RED"term\n"RESET); }
       ;
 
-term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); $$ = $2; }
-      | MINUS expr %prec UMINUS {
+term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
+      /*    result =malloc(5*sizeof(char));
+          sprintf(result,"_%d",rvalues++);
+          tmpnode = malloc(sizeof(struct symbol_table_binding));
+          tmpnode =insertVar(result,yylineno,scope);
+          tmpexpr=malloc(sizeof(struct expr));
+          tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+        */
+          $$ = $2;
+      }
+      | MINUS expr %prec UMINUS  {
 		  		printf(RED " - expression \n" RESET);
-				result =malloc(5*sizeof(char));
+				  result =malloc(5*sizeof(char));
 	 		   	sprintf(result,"_%d",rvalues++);
-				tmpnode = malloc(sizeof(struct symbol_table_binding));
+				  tmpnode = malloc(sizeof(struct symbol_table_binding));
 	 		   	tmpnode =insertVar(result,yylineno,scope);
-				tmpexpr=malloc(sizeof(struct expr));
+				  tmpexpr=malloc(sizeof(struct expr));
    			 	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-				emit(uminus,$2,NULL,tmpexpr,yylineno,0);
-                        $$ = tmpexpr;
+				  emit(uminus,$2,NULL,tmpexpr,yylineno,0);
+          $$ = tmpexpr;
    			}
         | NOT expr {
               printf(RED "NOT expression\n" RESET);
@@ -470,7 +481,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); $$ 
                   $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
                   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-            struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
+                  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
 
                   emit(if_eq,$2,true_expr,NULL,yylineno,QuadNo+5);
                   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);
@@ -482,7 +493,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET); $$ 
       | PPLUS lvalue {
 		  		printf(RED "++lvalue dassa\n" RESET);
 		   		check_for_funcname(yylval.stringValue);
-				result =malloc(5*sizeof(char));
+				  result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
 			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
 			   	tmpnode =insertVar(result,yylineno,scope);
@@ -600,10 +611,11 @@ assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringV
 
                         struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,$1,0,"",'\0',NULL);
                         $$ = returned_exp;
-                   } else {
-				emit(assign,$4,NULL,$1,yylineno,0);
+                   }else{
+							            emit(assign,$4,NULL,$1,yylineno,0);
+
                    }
-			}
+						  }
               ;
 
 primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
@@ -621,12 +633,10 @@ primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
          | const { printf(RED "primary:: const\n" RESET);  $$=$1; }
          ;
 
-lvalue   : IDENTIFIER { printf(RED "lvalue:: id %s\n" RESET, $1);
+lvalue   : IDENTIFIER { printf( "lvalue:: id %s\n", $1);
 						tmpnode=malloc(sizeof(struct symbol_table_binding));
 						tmpnode= insertVar( yylval.stringValue, yylineno, scope);
-                                    printf("id\n");
-                                   
-						$$ = new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
+						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
          | LOCAL IDENTIFIER {
 						printf(RED "lvalue:: local identifier\n" RESET);
 						tmpnode=malloc(sizeof(struct symbol_table_binding));
@@ -729,8 +739,8 @@ $$ = tmpexpr_id;
 
 call   : call L_PARENTHES elist R_PARENTHES {
 
-/*				printf(RED "call:: call (elist)\n" RESET);
-				result =malloc(5*sizeof(char));
+				printf(RED "call:: call (elist)\n" RESET);
+/*				result =malloc(5*sizeof(char));
 				sprintf(result,"_%d",rvalues++);
 				tmpnode=malloc(sizeof(struct symbol_table_binding));
 				tmpnode =insertVar(result,yylineno,scope);
@@ -756,20 +766,21 @@ call   : call L_PARENTHES elist R_PARENTHES {
 		  			 emit(getretval,NULL,NULL,tmpexpr,yylineno,0);
 				  // $$=tmpexpr;
 */
-
           $1 = emit_iftable_item($1);
           if ($2->method ){
                 struct expr* t = $1;
+                t->next = $2->elist;
                 $1 = emit_iftable_item(member_item(t, $2->name));
-                $2->elist->next = t ;
+                $2->elist = t ;
+
           }
 
           $$ = make_call($1, $2->elist);
 
 				}
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES {
-/*		   			printf(RED "call:: (funcdef)(elist)\n" RESET);
-					emit(call,NULL,NULL,$2,yylineno,0);
+		   			printf(RED "call:: (funcdef)(elist)\n" RESET);
+/*					emit(call,NULL,NULL,$2,yylineno,0);
 					result =malloc(5*sizeof(char));
 	   			 	sprintf(result,"_%d",rvalues++);
 		  			 tmpnode=malloc(sizeof(struct symbol_table_binding));
@@ -793,18 +804,17 @@ callsuffix : normcall { printf(RED"callsuffix:: (elist)\n"RESET);
            ;
 
 normcall : L_PARENTHES elist R_PARENTHES  { printf("normcall \n");
-            struct expr* tmp = $2;
-            while(tmp!=NULL && tmp->sym != NULL) {
-                 printf("elist:: %s\n", tmp->sym->value.var->name);
-                 tmp = tmp->next;
-             }
+              $$ = malloc(sizeof(struct call));
               $$->elist = $2;
               $$->method = 0;
               $$->name = NULL;
+
          }
          ;
 
 methodcall : DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "methodcall\n" RESET);
+                $$ = malloc(sizeof(struct call));
+
                 $$->elist = $4;
                 $$->method = 1;
                 $$->name = $2;
@@ -812,7 +822,8 @@ methodcall : DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "methodc
            ;
 
 elist   : expr multi_exprs {
-	 				args++; printf("elist::%s \n",$1->sym->value.var->name);
+	 				args++;
+          // printf("elist::%s \n",$1->sym->value.var->name);
 //					emit(param,$1,NULL,NULL,yylineno,0);
           struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
           newnode->value.var = malloc(sizeof(struct variable));
