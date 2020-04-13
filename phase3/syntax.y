@@ -195,7 +195,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
                               } else {
                                     printf("Error: CONTINUE STMT outside of loop in line %d\n",yylineno);
                                     exit(EXIT_FAILURE);
-                              } 
+                              }
       }
       | block { printf(RED "block \n" RESET);}
       | funcdef { printf(RED "funcdef \n" RESET);}
@@ -334,7 +334,7 @@ expr  :
             } else {
                   printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
                   exit(EXIT_FAILURE);
-            } 
+            }
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -378,7 +378,7 @@ expr  :
       }
       |  expr NEQUAL expr {
             //compile time type check- MPOREI NA EINAI LATHOS
-            if( ($1)->type ==1 && ($3)->type ==11 ){ 
+            if( ($1)->type ==1 && ($3)->type ==11 ){
                   //table and nil ok
             }
             else if(oneIsVar($1, $3)) {
@@ -737,7 +737,7 @@ lvalue   : IDENTIFIER { printf( "lvalue:: id %s\n", $1);
          | DCOLON IDENTIFIER {
             tmpnode=malloc(sizeof(struct symbol_table_binding));
             if((tmpnode=global_exists($2)) == NULL) {
-                  printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno); 
+                  printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno);
                   exit(EXIT_FAILURE);
             }
 
@@ -1000,7 +1000,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
             }
             |  L_SBRACKET {
                     result =malloc(5*sizeof(char));
-                    sprintf(result,"_%d",rvalues++);
+                    sprintf(result,"_%d",rvalues);
                     struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                     struct expr* tmp_table = new_expr(newtable_e,newnode,NULL,0,"",'\0',NULL);
                     emit(tablecreate,NULL,NULL,tmp_table,yylineno,0);
@@ -1009,12 +1009,12 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
             indexed R_SBRACKET {
                    printf(RED "objectdef:: indexed\n" RESET);
                    struct expr* tmp = $3;
-
+/*
                     while(tmp->sym!= NULL) {
                           printf("INDEXED first: %s second %s \n", tmp->sym->value.var->name, tmp->index->sym->value.var->name );
                           tmp = tmp->next;
                     }
-
+*/
                     result =malloc(5*sizeof(char));
                     sprintf(result,"_%d",rvalues++);
                     struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
@@ -1112,7 +1112,7 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem {
 
 indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr(%s) : expr(%s)}\n",$2->sym->value.var->name,$4->sym->value.var->name);
                   result = malloc(2 * sizeof(char));
-                  sprintf(result, "_%d", rvalues++);
+                  sprintf(result, "_%d", rvalues);
                   struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
                   struct expr* temp_elem = new_expr(tableitem_e,tmp_symbol,NULL,0,"",'\0',NULL);
                   emit(table_setelem,$2,$4,temp_elem,yylineno,0);

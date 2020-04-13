@@ -15,7 +15,9 @@ test1.test2(a,b,l);
 sprite..move(dx,dy);
 */
 
-4 == 9;
+kappa = [ {4: 5}, {2:18}, {1: 2},{"bool": false}];
+
+//4 == 9;
 
 //(function(a,b,c){::print(a);})(a(), b()(), (function(x){return x;})(c()));
 
