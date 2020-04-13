@@ -122,6 +122,8 @@ struct expr* emit_iftable_item(struct expr* exp);
 struct expr* member_item(struct expr* lvalue ,char* name);
 struct expr* make_call (struct expr* lv, struct expr* elist);
 
+struct expr* apotimhsh_seboolean(struct expr* expr);
+
 int  patchFlow(double  con , double bre);
 int patchReturn(int from , int to);
 char* enum_toString_opCodes(iopcode sym);
