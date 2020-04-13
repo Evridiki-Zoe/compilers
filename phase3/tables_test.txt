@@ -30,3 +30,17 @@ lamda = --table[3][9];
 //t.c.u.t.e = x;
 //t.c.u.t.e = x++;
 //x = table.a.b.c.d;
+
+/*table[a][w][3] == 1;
+table[a] == 1;
+
+table[a] != 1;
+table[a][w][3] != 1;
+*/
+
+/*table[a] == table2[k];
+table[a] != table2[k];
+
+table[a][4] == table2[k];
+table[a] == table2[p][k]; //ayto ginetai me allh seira ston online alla einai swsto
+*/

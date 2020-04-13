@@ -354,6 +354,13 @@ expr  :
       // printf("to expr1 apotimatai se: %s, typou %d\n", expr1_apotimhsh_seboolean->sym->value.var->name, expr1_apotimhsh_seboolean->type);
       // printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym->value.var->name, expr2_apotimhsh_seboolean->type);
 
+      if($1->type == 1){
+            $1=member_item($1, $1->sym->value.var->name);
+      }
+      if($3->type == 1){
+            $3=member_item($3, $3->sym->value.var->name);
+      }
+
             //compile time type check
             if( ($1)->type == 1 && ($3)->type == 11 ){ //table and nil ok
             }
@@ -370,7 +377,7 @@ expr  :
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-            emit(if_eq,$1,$3,NULL,yylineno,QuadNo+3);//THELEI SWSTO LABEL
+            emit(if_eq,$1,$3,NULL,yylineno,QuadNo+3);
             emit(jump,NULL,NULL,NULL,yylineno,QuadNo+4);
             emit(assign,true_expr,NULL,$$,yylineno,0);
             emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
@@ -378,6 +385,15 @@ expr  :
       }
       |  expr NEQUAL expr {
             //compile time type check- MPOREI NA EINAI LATHOS
+            if($1->type == 1){
+                  $1=member_item($1, $1->sym->value.var->name);
+            }
+            if($3->type == 1){
+                  $3=member_item($3, $3->sym->value.var->name);
+            }
+
+
+
             if( ($1)->type ==1 && ($3)->type ==11 ){
                   //table and nil ok
             }
@@ -755,7 +771,7 @@ member : lvalue DOT IDENTIFIER {
          | lvalue L_SBRACKET expr R_SBRACKET {
                 arrayFlag = 1;
                 printf(RED"member:: lvalue[expression]\n"RESET);
-                printf("(lvalue is %s) [expr] \n",$1->sym->value.var->name);
+                printf("(lvalue is %s) [expr %s] \n",$1->sym->value.var->name, $3->sym->value.var->name);
 
                 $$ = member_item($1, $3->sym->value.var->name);
          }

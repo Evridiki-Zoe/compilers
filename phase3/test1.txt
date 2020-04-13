@@ -15,7 +15,19 @@ test1.test2(a,b,l);
 sprite..move(dx,dy);
 */
 
-kappa = [ {4: 5}, {2:18}, {1: 2},{"bool": false}];
+/*table[a][w][3] == 1;
+table[a] == 1;
+
+table[a] != 1;
+table[a][w][3] != 1;
+*/
+
+/*table[a] == table2[k];
+table[a] != table2[k];
+
+table[a][4] == table2[k];
+*/
+table[a] == table2[p][k];
 
 //4 == 9;
 
