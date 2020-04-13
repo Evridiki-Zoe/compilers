@@ -173,9 +173,9 @@ struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struc
 	expr_node->type = expr_type;
 	expr_node->sym = sym;
 	expr_node->index = index;
-	expr_node->numconst=numconst;
-	expr_node->strconst=strconst;
-	expr_node->boolconst=boolconst;
+	expr_node->numconst = numconst;
+	expr_node->strconst = strconst;
+	expr_node->boolconst = boolconst;
 	expr_node->next = next;
 
 	return expr_node;
@@ -184,24 +184,22 @@ struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struc
 
 void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res_expr, int line, int label){
 	QuadNo++;
-	if (QuadNo==QuadsSize) {
-		QuadsSize*=2;
+	if (QuadNo == QuadsSize) {
+		QuadsSize *= 2;
 		printf("realloc in emit\n" );
-		quads= (struct quad*)realloc(quads,QuadsSize * sizeof(struct quad) );
+		quads = (struct quad*)realloc(quads, QuadsSize * sizeof(struct quad) );
 	}
 	struct quad* new_quad = malloc(sizeof(struct quad));
-	printf("type: %d\n", opcode);
 	new_quad->arg1 = malloc(sizeof(struct expr ));
 	new_quad->arg2 = malloc(sizeof(struct expr ));
 	new_quad->res = malloc(sizeof(struct expr ));
-	new_quad->opcode=opcode;
+	new_quad->opcode = opcode;
 	new_quad->arg1 = arg1;
 	new_quad->arg2 = arg2;
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
-//	printf("emit :: %f\n",new_quad->arg1->numconst );
-	quads[(int)QuadNo-1]=*new_quad;
+	quads[(int)QuadNo-1]= *new_quad;
 }
 
 

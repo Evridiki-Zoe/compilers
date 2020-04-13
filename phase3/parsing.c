@@ -343,8 +343,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	assert(table && name);
 
 	if (scope == 0) flag = 0;
-	//check gia anonymous vars
-
+	
 	/*
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR

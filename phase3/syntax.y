@@ -201,7 +201,6 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 expr  :
       assignmexpr {
 
-           printf("ASSIGNMENT \n");
            result =malloc(5*sizeof(char));
            sprintf(result,"_%d",rvalues++);
            struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
@@ -219,10 +218,11 @@ expr  :
 
        }
       |  expr PLUS expr {
-		  		result =malloc(5*sizeof(char));
-				sprintf(result,"_%d",rvalues++);
-		  		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-          printf(" expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+		result =malloc(5*sizeof(char));
+		sprintf(result,"_%d",rvalues++);
+            printf("result: %s\n", result);
+		struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
+            printf(" expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
 
             /*compile time type check*/
             if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 8 || ($1)->type == 4 )
@@ -232,7 +232,7 @@ expr  :
 
             }
             else{
-              printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+              printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
               exit(EXIT_FAILURE);
             }
               }
@@ -248,7 +248,7 @@ expr  :
           					emit(sub,$1,$3,$$,yylineno,0);
                 }
                 else{
-                  printf("Compile time error: cannot sub 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                  printf("Compile time error: cannot sub 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
                   exit(EXIT_FAILURE);
                 }
   	  			}
@@ -264,7 +264,7 @@ expr  :
                 					emit(mul,$1,$3,$$,yylineno,0);
                 }
                 else{
-                  printf("Compile time error: cannot multiple 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                  printf("Compile time error: cannot multiple 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
                   exit(EXIT_FAILURE);
                 }
   				}
@@ -273,14 +273,14 @@ expr  :
                 /*compile time type check*/
                 if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
                             && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 4  || ($3)->type == 8) ) {
-                  				  	result =malloc(5*sizeof(char));
-                  				  	sprintf(result,"_%d",rvalues++);
-                  				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-                  				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-                  				  	emit(Div,$1,$3,$$,yylineno,0);
+                  				  	result = malloc(2 * sizeof(char));
+                  				  	sprintf(result,"_%d", rvalues++);
+                  				  	struct symbol_table_binding *newnode = insertVar(result, yylineno, scope);
+                  				  	$$ = new_expr(const_num_e, newnode, NULL, 0, "", '\0', NULL);
+                  				  	emit(Div, $1, $3, $$, yylineno, 0);
                 }
                 else{
-                  printf("Compile time error: cannot div 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                  printf("Compile time error: cannot div 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
                   exit(EXIT_FAILURE);
                 }
       }
@@ -289,14 +289,14 @@ expr  :
       /*compile time type check*/
       if( ( ($1)->type == 0 || ($1)->type == 1 || ($1)->type == 4 || ($1)->type == 8 )
                   && (($3)->type == 0 || ($3)->type == 1 || ($3)->type == 4  || ($3)->type == 8) ) {
-          				  	result =malloc(5*sizeof(char));
-          				  	sprintf(result,"_%d",rvalues++);
-          				  	struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
-          				  	$$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL);
-          				  	emit(mod,$1,$3,$$,yylineno,0);
+          				  	result = malloc(2 * sizeof(char));
+          				  	sprintf(result,"_%d", rvalues++);
+          				  	struct symbol_table_binding *newnode = insertVar(result, yylineno, scope);
+          				  	$$ = new_expr(const_num_e, newnode, NULL, 0, "", '\0', NULL);
+          				  	emit(mod, $1, $3, $$, yylineno, 0);
             }
             else{
-              printf("Compile time error: cannot mod 2 numbers of different type:: expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+              printf("Compile time error: cannot mod 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
               exit(EXIT_FAILURE);
             }
   				}
@@ -370,7 +370,7 @@ expr  :
                 ($3)->type ==8 || ($3)->type == 9 || ($3)->type ==10 || ($3)->type ==11) ){//ok
             }
             else if( ($1)->type != ($3)->type){
-                printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
                 exit(EXIT_FAILURE);
             }
             result =malloc(5*sizeof(char));
