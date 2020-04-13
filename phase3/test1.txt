@@ -12,8 +12,21 @@ test1.test2(a,b,l);
 
 (function a(){})(k,l);
 
-*/
 sprite..move(dx,dy);
+*/
+
+kapa++;
+table[3]++;
+
+++kapa;
+++table[3];
+
+
+kapa--;
+table[3]--;
+
+--kapa;
+--table[3];
 
 //(function(a,b,c){::print(a);})(a(), b()(), (function(x){return x;})(c()));
 

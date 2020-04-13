@@ -473,8 +473,8 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
           $$ = tmpexpr;
    			}
         | NOT expr {
-              printf(RED "NOT expression\n" RESET);
-            result =malloc(5*sizeof(char));
+                  printf(RED "NOT expression\n" RESET);
+                  result =malloc(5*sizeof(char));
                   sprintf(result,"_%d",rvalues++);
                   struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                   $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
@@ -491,7 +491,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
       }
       | PPLUS lvalue {
 		  		printf(RED "++lvalue dassa\n" RESET);
-		   		check_for_funcname(yylval.stringValue);
+          check_for_funcname($2->sym->value.var->name);
 				  result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
 			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
@@ -507,8 +507,8 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
          $$ = tmpexpr;
 	   }
       | lvalue  PPLUS {
-		  		check_for_funcname(yylval.stringValue);
-		  		printf(RED "lvalue++\n" RESET);
+		  		check_for_funcname($1->sym->value.var->name);
+		  		printf(RED "lvalue++\n" RESET);// $1->sym->value.var->name, $1->index->sym->value.var->name);
 				result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
 				printf("geia\n" );
@@ -523,9 +523,10 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
 				//then add
 				emit(add,$1,tmp_one,$1,yylineno,0);
         $$ = tmpexpr;
+
 			 }
       | MMINUS lvalue {
-		  		check_for_funcname(yylval.stringValue);
+      check_for_funcname($2->sym->value.var->name);
 				printf(RED "--lvalue\n" RESET);
 				result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
@@ -544,7 +545,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
 
   			}
       | lvalue  MMINUS {
-		  		 check_for_funcname(yylval.stringValue);
+      check_for_funcname($1->sym->value.var->name);
 		  		printf(RED "lvalue--\n" RESET);
 				result =malloc(5*sizeof(char));
 			   	sprintf(result,"_%d",rvalues++);
@@ -566,7 +567,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
       }
       ;
 
-assignmexpr   : lvalue { if(!arrayFlag && ref) check_for_funcname(yylval.stringValue);  } EQ expr {
+assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->value.var->name);  } EQ expr {
 							     arrayFlag = 0;
                    ref = 1;
 
