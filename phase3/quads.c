@@ -28,9 +28,10 @@ int continue_top=-1;
 int return_top=-1;
 
 int oneIsVar(struct expr *op1, struct expr *op2) {
-	if(op1->type == 0 || op2->type == 0) return 1;
+	if(op1->type == 0 || op2->type == 0 || op1->type == 1 || op2->type == 1) return 1;
 	return 0;
 }
+
 int checkTypes(struct expr *op1, struct expr *op2) {
 	if(( (op1)->type == 0 || (op1)->type == 1 || (op1)->type == 8 || (op1)->type == 4 )
             && ((op2)->type == 0 || (op2)->type == 1 || (op2)->type == 8  || (op2)->type == 4) ) {
@@ -39,12 +40,12 @@ int checkTypes(struct expr *op1, struct expr *op2) {
 	else return 0;		
 }
 
-struct expr* smallFunc(iopcode opcode) {
+struct expr* smallFunc(expr_t expr) {
 	result = malloc(2 * sizeof(char));
 	sprintf(result, "_%d", rvalues++);
 	struct symbol_table_binding *newnode = insertVar(result,yylineno,scope);
 
-	return new_expr(opcode, newnode, NULL, 0, "", '\0', NULL);
+	return new_expr(expr, newnode, NULL, 0, "", '\0', NULL);
 }
 
 char* enum_toString_opCodes(iopcode sym) {

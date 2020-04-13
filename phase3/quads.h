@@ -103,7 +103,7 @@ int oneIsVar(struct expr *op1, struct expr *op2);
 
 int checkTypes(struct expr *op1, struct expr *op2);
 
-struct expr* smallFunc(iopcode opcode);
+struct expr* smallFunc(expr_t expr);
 
 void insert_rvalue_list(char* name, rvalue_type type);
 

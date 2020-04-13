@@ -354,12 +354,11 @@ expr  :
       // printf("to expr1 apotimatai se: %s, typou %d\n", expr1_apotimhsh_seboolean->sym->value.var->name, expr1_apotimhsh_seboolean->type);
       // printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym->value.var->name, expr2_apotimhsh_seboolean->type);
 
-      //IDIOS TYPOS I ENA APO TA DIO EINAI VAR
-            //compile time type check- MPOREI NA EINAI LATHOS
+            //compile time type check
             if( ($1)->type == 1 && ($3)->type == 11 ){ //table and nil ok
             }
             else if(oneIsVar($1, $3)) {
-                  //
+                  //ok
             }
             else if( ($1)->type != ($3)->type){
                 printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
