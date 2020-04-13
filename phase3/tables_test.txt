@@ -1,3 +1,18 @@
+/*table[3][9]++;
+kappa = table[3][9]++;
+
+table[3][9]--;
+lamda = table[3][9]--;
+
+++table[3][9][x];
+kappa = ++table[3][9];
+
+--table[3][9];
+lamda = --table[3][9];
+*/
+
+//a()[b][r][u][2]++;
+
 //a()[b][r][u][2];
 
 //a()[b][r][7][false]=2;
@@ -9,10 +24,9 @@
 //a[7].b[9].l();
 //a[7].b[9]();
 //a[7].b[8];
-
+//a[7].b[8]++;
 
 
 //t.c.u.t.e = x;
-
+//t.c.u.t.e = x++;
 //x = table.a.b.c.d;
-

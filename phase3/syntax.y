@@ -152,6 +152,8 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
             //den tha prepe na pianei periptwseis opws: t.c.u.t.e = x; oute x = table.a.b.c.d  giati tote tha graftoun duo fores ta teleutaia
             //apparently pianei kai to a[7].b[8];
 
+            //pianei kai to table[x];, mporei na pianei ki alles periptwseis pou den exw skeftei akoma
+
                   if($1 != NULL && $1->type == tableitem_e && $1->index !=NULL){
 
                   printf("EDW MESA THA PREPEI NA MPAINEI MONO STHN PERIPTWSH TYPOU: a().b.j.k.l; h a()[b][r][u]; otidhpote allo mporei na einai lathos!\n");
@@ -448,7 +450,7 @@ expr  :
               // emit(assign,false_expr,NULL,$$,yylineno,0);
   			emit(and,$1,$3,$$,yylineno,0);
       }
-      | term { $$=$1; printf(RED"term\n"RESET); }
+      | term { $$=$1; printf(RED"term(%s)\n"RESET, $1->sym->value.var->name); }
       ;
 
 term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
@@ -459,7 +461,8 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
           tmpexpr=malloc(sizeof(struct expr));
           tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
         */
-          $$ = $2;
+
+        $$ = $2;
       }
       | MINUS expr %prec UMINUS  {
 		  		printf(RED " - expression \n" RESET);
@@ -492,77 +495,185 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
       | PPLUS lvalue {
 		  		printf(RED "++lvalue dassa\n" RESET);
           check_for_funcname($2->sym->value.var->name);
-				  result =malloc(5*sizeof(char));
-			   	sprintf(result,"_%d",rvalues++);
-			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
-			   	tmpnode =insertVar(result,yylineno,scope);
-			   	tmpexpr=malloc(sizeof(struct expr));
-			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-				// first add
-				emit(add,$2,tmp_one,$2,yylineno,0);
-				//then assign
-			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
-         $$ = tmpexpr;
+
+          char * name = NULL;
+          if($2->type == 1){
+              name = malloc(sizeof(char)* strlen($2->index->sym->value.var->name));
+              strcpy(name,$2->index->sym->value.var->name);
+
+              $2 = member_item($2, $2->sym->value.var->name);
+
+              tmpnode = malloc(sizeof(struct symbol_table_binding));
+              tmpnode =insertVar(result,yylineno,scope);
+              tmpexpr=malloc(sizeof(struct expr));
+              tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+              //new expr for number 1
+              struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+              // first add
+              emit(add,$2,tmp_one,$2,yylineno,0);
+
+              struct expr* returned_expr = $2;
+
+              struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
+              tmpnode->value.var = malloc(sizeof(struct variable));
+              tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
+              strcpy(tmpnode->value.var->name, name);
+              tmpnode->next = NULL;
+              struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
+              emit(table_setelem,tmp_expr,$2,$2->index,yylineno,0);
+
+              $$ = returned_expr;
+              $$->type = 0;
+
+          } else{
+              result =malloc(5*sizeof(char));
+              sprintf(result,"_%d",rvalues++);
+    			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+    			   	tmpnode =insertVar(result,yylineno,scope);
+    			   	tmpexpr=malloc(sizeof(struct expr));
+    			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+      				//new expr for number 1
+              struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+      				// first add
+      				emit(add,$2,tmp_one,$2,yylineno,0);
+      				//then assign
+      			  emit(assign,$2,NULL,tmpexpr,yylineno,0);
+              $$ = tmpexpr;
+              }
 	   }
       | lvalue  PPLUS {
 		  		check_for_funcname($1->sym->value.var->name);
-		  		printf(RED "lvalue++\n" RESET);// $1->sym->value.var->name, $1->index->sym->value.var->name);
-				result =malloc(5*sizeof(char));
-			   	sprintf(result,"_%d",rvalues++);
-				printf("geia\n" );
+          result =malloc(5*sizeof(char));
+  			  sprintf(result,"_%d",rvalues++);
+          //printf("eimai ena kahmeno table %s\n",$1->index->sym->value.var->name);
+
+          char * name = NULL;
+          if($1->type == 1){
+              name = malloc(sizeof(char)* strlen($1->index->sym->value.var->name));
+              strcpy(name,$1->index->sym->value.var->name);
+
+              $1 = member_item($1, $1->sym->value.var->name);
+              //printf("name is %s \neimai ena kahmeno table %s, %s\n",name, $1->sym->value.var->name, $1->index->sym->value.var->name);
+          }
+
 			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
 			   	tmpnode =insertVar(result,yylineno,scope);
 			   	tmpexpr=malloc(sizeof(struct expr));
 			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-				// first assing
-				emit(assign,$1,NULL,tmpexpr,yylineno,0);
-				//then add
-				emit(add,$1,tmp_one,$1,yylineno,0);
-        $$ = tmpexpr;
+				  //new expr for number 1
+          struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+				  // first assing
+				  emit(assign,$1,NULL,tmpexpr,yylineno,0);
+				  //then add
+				  emit(add,$1,tmp_one,$1,yylineno,0);
+          $$ = tmpexpr;
+
+          if(name!= NULL){
+              //$$ =???;
+              struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
+              tmpnode->value.var = malloc(sizeof(struct variable));
+              tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
+              strcpy(tmpnode->value.var->name, name);
+              tmpnode->next = NULL;
+              struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
+              emit(table_setelem,tmp_expr,$1,$1->index,yylineno,0);
+          }
 
 			 }
       | MMINUS lvalue {
-      check_for_funcname($2->sym->value.var->name);
-				printf(RED "--lvalue\n" RESET);
-				result =malloc(5*sizeof(char));
-			   	sprintf(result,"_%d",rvalues++);
-				printf("geia\n" );
-			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
-			   	tmpnode =insertVar(result,yylineno,scope);
-			   	tmpexpr=malloc(sizeof(struct expr));
-			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-				// first sub
-				emit(sub,$2,tmp_one,$2,yylineno,0);
-				//then assign
-			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
-          $$ = tmpexpr;
+          check_for_funcname($2->sym->value.var->name);
+  				printf(RED "--lvalue\n" RESET);
+
+
+          char * name = NULL;
+          if($2->type == 1){
+              name = malloc(sizeof(char)* strlen($2->index->sym->value.var->name));
+              strcpy(name,$2->index->sym->value.var->name);
+
+              $2 = member_item($2, $2->sym->value.var->name);
+
+              tmpnode = malloc(sizeof(struct symbol_table_binding));
+              tmpnode =insertVar(result,yylineno,scope);
+              tmpexpr=malloc(sizeof(struct expr));
+              tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+              //new expr for number 1
+              struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+              // first add
+              emit(sub,$2,tmp_one,$2,yylineno,0);
+
+              struct expr* returned_expr = $2;
+
+              struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
+              tmpnode->value.var = malloc(sizeof(struct variable));
+              tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
+              strcpy(tmpnode->value.var->name, name);
+              tmpnode->next = NULL;
+              struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
+              emit(table_setelem,tmp_expr,$2,$2->index,yylineno,0);
+
+              $$ = returned_expr;
+              $$->type = 0;
+
+          } else{
+      				result =malloc(5*sizeof(char));
+      			  sprintf(result,"_%d",rvalues++);
+      				printf("geia\n" );
+    			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+    			   	tmpnode =insertVar(result,yylineno,scope);
+    			   	tmpexpr=malloc(sizeof(struct expr));
+    			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+    				  //new expr for number 1
+              struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+      				// first sub
+      				emit(sub,$2,tmp_one,$2,yylineno,0);
+      				//then assign
+    			   	emit(assign,$2,NULL,tmpexpr,yylineno,0);
+              $$ = tmpexpr;
+          }
 
   			}
       | lvalue  MMINUS {
-      check_for_funcname($1->sym->value.var->name);
-		  		printf(RED "lvalue--\n" RESET);
-				result =malloc(5*sizeof(char));
-			   	sprintf(result,"_%d",rvalues++);
-				printf("geia\n" );
-			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
-			   	tmpnode =insertVar(result,yylineno,scope);
-			   	tmpexpr=malloc(sizeof(struct expr));
-			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-				//new expr for number 1
-                struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-				// first assign
-				emit(assign,$1,NULL,tmpexpr,yylineno,0);
-				//then sub
-				emit(sub,$1,tmp_one,$1,yylineno,0);
-       $$ = tmpexpr;
+            check_for_funcname($1->sym->value.var->name);
+            printf(RED "lvalue--\n" RESET);
+
+            result =malloc(5*sizeof(char));
+            sprintf(result,"_%d",rvalues++);
+            //printf("eimai ena kahmeno table %s\n",$1->index->sym->value.var->name);
+
+            char * name = NULL;
+            if($1->type == 1){
+                name = malloc(sizeof(char)* strlen($1->index->sym->value.var->name));
+                strcpy(name,$1->index->sym->value.var->name);
+
+                $1 = member_item($1, $1->sym->value.var->name);
+                //printf("name is %s \neimai ena kahmeno table %s, %s\n",name, $1->sym->value.var->name, $1->index->sym->value.var->name);
+            }
+
+  			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
+  			   	tmpnode =insertVar(result,yylineno,scope);
+  			   	tmpexpr=malloc(sizeof(struct expr));
+  			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+  			  	//new expr for number 1
+            struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+    				// first assign
+    				emit(assign,$1,NULL,tmpexpr,yylineno,0);
+    				//then sub
+    				emit(sub,$1,tmp_one,$1,yylineno,0);
+            $$ = tmpexpr;
+
+            if(name!= NULL){
+                 //$$ =???;
+                 struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
+                 tmpnode->value.var = malloc(sizeof(struct variable));
+                 tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
+                 strcpy(tmpnode->value.var->name, name);
+                 tmpnode->next = NULL;
+                 struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
+                 emit(table_setelem,tmp_expr,$1,$1->index,yylineno,0);
+            }
 			}
-      | primary { printf(RED "primary\n" RESET); $$=$1;
+      | primary {
+          printf(RED "primary\n" RESET); $$=$1;
 //      printf("(lvalue->primary is %s) and its index %s\n",$1->sym->value.var->name,$1->index->sym->value.var->name);
       }
       ;
@@ -662,8 +773,10 @@ member   : lvalue DOT IDENTIFIER {
          }
          | lvalue L_SBRACKET expr R_SBRACKET {
                 arrayFlag = 1;
-                $$ = member_item($1, $3->sym->value.var->name);
                 printf(RED"member:: lvalue[expression]\n"RESET);
+                printf("(lvalue is %s) [expr] \n",$1->sym->value.var->name);
+
+                $$ = member_item($1, $3->sym->value.var->name);
          }
          | call DOT IDENTIFIER {
 
