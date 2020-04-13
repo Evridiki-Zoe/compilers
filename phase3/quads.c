@@ -257,6 +257,65 @@ struct expr* member_item(struct expr* lvalue ,char* name){
 			return item;
 }
 
+struct expr* apotimhsh_seboolean(struct expr* expr){
+				// xreiazete sto and/not/or/ (mporei kai ==, !=)
+				struct expr* expr_apotimhsh_seboolean;
+				if(expr->type == 0); //den kserw
+				else if(expr->type == 1){ // prepei na briskw thn timh tou t[1] kai na th sygkrinw me to 0 opws sto const_num_e
+				        //nomizw ayto tha ginei 5h fash ??
+				        /*int arithmos =atoi(expr->index->sym->value.var->name);
+				        printf("o arithmos einai: %d\n", arithmos);
+				        if(arithmos!=0)
+				                  expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+				        else
+				                    expr_apotimhsh_seboolean= new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+				        */
+				}
+				else if(expr->type == 2){
+				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+				}
+				else if(expr->type == 3){
+				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+
+				}
+				else if(expr->type == 4){ //an h ekfrash ==0 tote flase alliws true, nomizw oti ayto tha ginei run time
+
+				}
+				else if(expr->type == 5){  //na epistrefetai h idia h ekfrash(?)
+				            //todo
+				}
+				else if(expr->type == 7){ //new table
+				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+				}
+				else if(expr->type == 8){
+				        int arithmos =atoi(expr->sym->value.var->name);
+				        printf("o arithmos einai: %d\n", arithmos);
+				        if(arithmos!=0)
+				                  expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+				        else
+				                    expr_apotimhsh_seboolean= new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+				}
+				else if(expr->type == 9){  //na epistrefetai h idia h ekfrash(?)
+				            //todo
+				}
+				else if(expr->type == 10){ //string
+
+				        if(strcmp(expr->sym->value.var->name, "") != 0 )
+				                  expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+				        else
+				                    expr_apotimhsh_seboolean= new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+				}
+				else if(expr->type == 11){ //nil
+				      expr_apotimhsh_seboolean = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+				}
+
+				return expr_apotimhsh_seboolean;
+
+}
+
 struct expr* make_call (struct expr* lv, struct expr* elist) {
 			 struct expr* func = emit_iftable_item(lv);
 

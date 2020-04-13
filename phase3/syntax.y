@@ -365,6 +365,15 @@ expr  :
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr EQUAL expr {
+
+//metatroph twn expr1 kai expr2 se bool expr
+struct expr* expr1_apotimhsh_seboolean = apotimhsh_seboolean($1);
+struct expr* expr2_apotimhsh_seboolean = apotimhsh_seboolean($3);
+
+printf("to expr1 apotimatai se: %s, typou %d\n", expr1_apotimhsh_seboolean->sym->value.var->name, expr1_apotimhsh_seboolean->type);
+printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym->value.var->name, expr2_apotimhsh_seboolean->type);
+
+
             //compile time type check- MPOREI NA EINAI LATHOS
             if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
             }
