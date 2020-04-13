@@ -27,7 +27,10 @@ int break_top=-1;
 int continue_top=-1;
 int return_top=-1;
 
-
+int oneIsVar(struct expr *op1, struct expr *op2) {
+	if(op1->type == 0 || op2->type == 0) return 1;
+	return 0;
+}
 int checkTypes(struct expr *op1, struct expr *op2) {
 	if(( (op1)->type == 0 || (op1)->type == 1 || (op1)->type == 8 || (op1)->type == 4 )
             && ((op2)->type == 0 || (op2)->type == 1 || (op2)->type == 8  || (op2)->type == 4) ) {
@@ -36,7 +39,7 @@ int checkTypes(struct expr *op1, struct expr *op2) {
 	else return 0;		
 }
 
-struct expr* dothings(iopcode opcode) {
+struct expr* smallFunc(iopcode opcode) {
 	result = malloc(2 * sizeof(char));
 	sprintf(result, "_%d", rvalues++);
 	struct symbol_table_binding *newnode = insertVar(result,yylineno,scope);
@@ -290,9 +293,11 @@ struct expr* apotimhsh_seboolean(struct expr* expr){
 				        */
 				}
 				else if(expr->type == 2){
+					printf("bool\n");
 				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				}
 				else if(expr->type == 3){
+					printf("const_bool\n");
 				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 
 				}
@@ -303,16 +308,17 @@ struct expr* apotimhsh_seboolean(struct expr* expr){
 				            //todo
 				}
 				else if(expr->type == 7){ //new table
+					printf("const_bool\n");
 				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				}
 				else if(expr->type == 8){
 				        int arithmos =atoi(expr->sym->value.var->name);
 				        printf("o arithmos einai: %d\n", arithmos);
-				        if(arithmos!=0)
-				                  expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-				        else
-				                    expr_apotimhsh_seboolean= new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
-
+				        if(arithmos!=0) {
+				        	expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						} else {
+				            expr_apotimhsh_seboolean= new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+						}
 				}
 				else if(expr->type == 9){  //na epistrefetai h idia h ekfrash(?)
 				            //todo
@@ -329,9 +335,7 @@ struct expr* apotimhsh_seboolean(struct expr* expr){
 				      expr_apotimhsh_seboolean = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 				}
-
 				return expr_apotimhsh_seboolean;
-
 }
 
 struct expr* make_call (struct expr* lv, struct expr* elist) {

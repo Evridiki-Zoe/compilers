@@ -223,18 +223,18 @@ expr  :
        }
       |  expr PLUS expr {
             if(checkTypes($1, $3) == 1) {
-                  $$ = dothings(arithmeticexp_e);
+                  $$ = smallFunc(arithmeticexp_e);
                   emit(add, $1, $3, $$, yylineno, 0);
             }
             else{
-              printf("Compile time error: cannot add 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
+              printf("Compile time error: cannot ADD 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
               exit(EXIT_FAILURE);
             }
       }
       |  expr MINUS expr {
             /*compile time type check*/
             if(checkTypes($1, $3) == 1) {
-                  $$ = dothings(arithmeticexp_e);
+                  $$ = smallFunc(arithmeticexp_e);
                   emit(sub, $1, $3, $$, yylineno, 0);
             }
             else{
@@ -245,7 +245,7 @@ expr  :
       |  expr MULT expr {
                 /*compile time type check*/
             if(checkTypes($1, $3) == 1) {
-                  $$ = dothings(arithmeticexp_e);
+                  $$ = smallFunc(arithmeticexp_e);
                   emit(mul, $1, $3, $$, yylineno, 0);
             }
             else{
@@ -256,10 +256,10 @@ expr  :
       | expr DIV expr {
             /*compile time type check*/
             if(checkTypes($1, $3) == 1) {
-                  $$ = dothings(const_num_e);
+                  $$ = smallFunc(const_num_e);
                   emit(Div, $1, $3, $$, yylineno, 0);
             }
-            else{
+            else {
                   printf("Compile time error: cannot div 2 numbers of different type:: expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
                   exit(EXIT_FAILURE);
             }
@@ -267,7 +267,7 @@ expr  :
       | expr MOD expr {
             /*compile time type check*/
             if(checkTypes($1, $3) == 1) {
-                  $$ = dothings(const_num_e);
+                  $$ = smallFunc(const_num_e);
                   emit(mod, $1, $3, $$, yylineno, 0);
             }
             else {
@@ -276,14 +276,12 @@ expr  :
             }
   	}
       |  expr GREATER expr {
-            // if(($1->type == 0 || $1->type == 8 || $1->type == 1 || $1->type == 4) && ($3->type == 0 || $3->type == 8 || $3->type == 1 || $1->type == 4) ) {
-            //      //ok 
-            // } else {
-            //       printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
-            //       exit(EXIT_FAILURE);
-            // }
-
-            $$ = dothings(boolexp_e);
+            if(checkTypes($1, $3) == 1) {
+                  $$ = smallFunc(boolexp_e);
+            } else {
+                  printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
+                  exit(EXIT_FAILURE);
+            }
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -294,16 +292,14 @@ expr  :
             emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
             emit(assign,false_expr,NULL,$$,yylineno,0);
 
-       }
+      }
       |  expr GREATER_EQUAL expr {
-            // if(($1->type == 0 || $1->type == 8 || $1->type == 1 || $1->type == 4) && ($3->type == 0 || $3->type == 8 || $3->type == 1 || $1->type == 4) ) {
-            //      //ok 
-            // } else {
-            //       printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
-            //       exit(EXIT_FAILURE);
-            // }
-
-            $$ = dothings(boolexp_e);
+            if(checkTypes($1, $3) == 1) {
+                  $$ = smallFunc(boolexp_e);
+            } else {
+                  printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
+                  exit(EXIT_FAILURE);
+            }
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -315,14 +311,12 @@ expr  :
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr LESS expr {
-            // if(($1->type == 0 || $1->type == 8 || $1->type == 1 || $1->type == 4) && ($3->type == 0 || $3->type == 8 || $3->type == 1 || $1->type == 4) ) {
-            //      //ok 
-            // } else {
-            //       printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
-            //       exit(EXIT_FAILURE);
-            // }
-
-            $$ = dothings(boolexp_e);
+            if(checkTypes($1, $3) == 1) {
+                  $$ = smallFunc(boolexp_e);
+            } else {
+                  printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
+                  exit(EXIT_FAILURE);
+            }
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -335,14 +329,12 @@ expr  :
 
       }
       |  expr LESS_EQUAL expr {
-            // if(($1->type == 0 || $1->type == 8 || $1->type == 1 || $1->type == 4) && ($3->type == 0 || $3->type == 8 || $3->type == 1 || $1->type == 4) ) {
-            //      //ok 
-            // } else {
-            //       printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
-            //       exit(EXIT_FAILURE);
-            // } 
-
-            $$ = dothings(boolexp_e);
+            if(checkTypes($1, $3) == 1) {
+                  $$ = smallFunc(boolexp_e);
+            } else {
+                  printf("Cannot compare these two values, because they have different types, line: %d\n", yylineno);
+                  exit(EXIT_FAILURE);
+            } 
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -355,26 +347,26 @@ expr  :
       }
       |  expr EQUAL expr {
 
-//metatroph twn expr1 kai expr2 se bool expr
-struct expr* expr1_apotimhsh_seboolean = apotimhsh_seboolean($1);
-struct expr* expr2_apotimhsh_seboolean = apotimhsh_seboolean($3);
+      //metatroph twn expr1 kai expr2 se bool expr
+      // struct expr* expr1_apotimhsh_seboolean = apotimhsh_seboolean($1);
+      // struct expr* expr2_apotimhsh_seboolean = apotimhsh_seboolean($3);
 
-printf("to expr1 apotimatai se: %s, typou %d\n", expr1_apotimhsh_seboolean->sym->value.var->name, expr1_apotimhsh_seboolean->type);
-printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym->value.var->name, expr2_apotimhsh_seboolean->type);
+      // printf("to expr1 apotimatai se: %s, typou %d\n", expr1_apotimhsh_seboolean->sym->value.var->name, expr1_apotimhsh_seboolean->type);
+      // printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym->value.var->name, expr2_apotimhsh_seboolean->type);
 
-
+      //IDIOS TYPOS I ENA APO TA DIO EINAI VAR
             //compile time type check- MPOREI NA EINAI LATHOS
-            if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
+            if( ($1)->type == 1 && ($3)->type == 11 ){ //table and nil ok
             }
-            else if(($1)->type ==0 && (($3)->type ==1 || ($3)->type == 4 ||
-                ($3)->type ==8 || ($3)->type == 9 || ($3)->type ==10 || ($3)->type ==11) ){//ok
+            else if(oneIsVar($1, $3)) {
+                  //
             }
             else if( ($1)->type != ($3)->type){
                 printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
                 exit(EXIT_FAILURE);
             }
 
-            $$ = dothings(boolexp_e);
+            $$ = smallFunc(boolexp_e);
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -387,17 +379,18 @@ printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym-
       }
       |  expr NEQUAL expr {
             //compile time type check- MPOREI NA EINAI LATHOS
-            if( ($1)->type ==1 && ($3)->type ==11 ){//table and nil ok
+            if( ($1)->type ==1 && ($3)->type ==11 ){ 
+                  //table and nil ok
             }
-            else if(($1)->type ==0 && (($3)->type ==1 || ($3)->type == 4 ||
-                ($3)->type ==8 || ($3)->type == 9 || ($3)->type ==10 || ($3)->type ==11) ){//ok
+            else if(oneIsVar($1, $3)) {
+                  //ok
             }
             else if( ($1)->type != ($3)->type){
-                printf("Compile time error: cannot COMPARE 2 different types! expr1 is %d and expr2 is %d\n",($1)->type, ($3)->type );
+                printf("Compile time error: cannot COMPARE 2 different types! expr1 is %d and expr2 is %d, line %d\n",($1)->type, ($3)->type, yylineno );
                 exit(EXIT_FAILURE);
             }
 
-            $$ = dothings(boolexp_e);
+            $$ = smallFunc(boolexp_e);
 
             struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
             struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -409,7 +402,7 @@ printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym-
             emit(assign,false_expr,NULL,$$,yylineno,0);
       }
       |  expr AND expr {
-            $$ = dothings(boolexp_e);
+            $$ = smallFunc(boolexp_e);
 
             // struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
                // struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -421,10 +414,10 @@ printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym-
                // emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
                // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3); // jump under ass false
                // emit(assign,false_expr,NULL,$$,yylineno,0); // =false
-   			emit(and,$1,$3,$$,yylineno,0);
+   		emit(and,$1,$3,$$,yylineno,0);
       }
       |  expr OR expr {
-            $$ = dothings(boolexp_e);
+            $$ = smallFunc(boolexp_e);
 
             // struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
               // struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -469,7 +462,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
                   // struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                   // $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-            $$ = dothings(boolexp_e);
+            $$ = smallFunc(boolexp_e);
 
                   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
                   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
@@ -620,7 +613,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
               $$ = tmpexpr;
           }
 
-  			}
+  	}
       | lvalue  MMINUS {
             check_for_funcname($1->sym->value.var->name);
             printf(RED "lvalue--\n" RESET);

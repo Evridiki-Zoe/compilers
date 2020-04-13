@@ -99,10 +99,11 @@ struct call {
 
 };
 
+int oneIsVar(struct expr *op1, struct expr *op2);
 
 int checkTypes(struct expr *op1, struct expr *op2);
 
-struct expr* dothings(iopcode opcode);
+struct expr* smallFunc(iopcode opcode);
 
 void insert_rvalue_list(char* name, rvalue_type type);
 
