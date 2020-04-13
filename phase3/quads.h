@@ -99,6 +99,11 @@ struct call {
 
 };
 
+
+int checkTypes(struct expr *op1, struct expr *op2);
+
+struct expr* dothings(iopcode opcode);
+
 void insert_rvalue_list(char* name, rvalue_type type);
 
 void print_list_rvalues();

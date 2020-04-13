@@ -16,6 +16,8 @@ extern struct symbol_table_binding* number_one;
 extern int yylineno, scope;
 extern int rvalues;
 
+extern char *result;
+
 extern int  scope_spaces[];
 extern int 	flow_Break[50];
 extern int flow_Continue[50];
@@ -25,6 +27,22 @@ int break_top=-1;
 int continue_top=-1;
 int return_top=-1;
 
+
+int checkTypes(struct expr *op1, struct expr *op2) {
+	if(( (op1)->type == 0 || (op1)->type == 1 || (op1)->type == 8 || (op1)->type == 4 )
+            && ((op2)->type == 0 || (op2)->type == 1 || (op2)->type == 8  || (op2)->type == 4) ) {
+			return 1;
+	}
+	else return 0;		
+}
+
+struct expr* dothings(iopcode opcode) {
+	result = malloc(2 * sizeof(char));
+	sprintf(result, "_%d", rvalues++);
+	struct symbol_table_binding *newnode = insertVar(result,yylineno,scope);
+
+	return new_expr(opcode, newnode, NULL, 0, "", '\0', NULL);
+}
 
 char* enum_toString_opCodes(iopcode sym) {
 	switch (sym) {
