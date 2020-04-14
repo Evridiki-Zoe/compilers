@@ -44,3 +44,28 @@ table[a] != table2[k];
 table[a][4] == table2[k];
 table[a] == table2[p][k]; //ayto ginetai me allh seira ston online alla einai swsto
 */
+
+
+//prakseis me table
+//not a[2];
+//x = not table3[2];
+
+//x = c[4] + table2[7];
+//c[4] + table2[7];
+//c[4] - table2[7];
+//c[4] * table2[7];
+//c[4] / table2[7];
+//c[4] % table2[7];
+
+//c[4] > table2[7];
+//c[4] >= table2[7];
+//c[4] < table2[7];
+//c[4] <= table2[7];
+//r= c[4] <= table2[7];
+
+//c[4] == table2[7];
+//c[4] != table2[7];
+//c[4] and table2[7];
+//c[4] or table2[7];
+
+//-table[2];
