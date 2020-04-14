@@ -1,0 +1,38 @@
+/*table1 = [];
+
+table2 = [w1,t,5]; //den douleuei akoma to table2 = [w1,t,5,true];
+
+table3 = [{r:6}, {3:0}];
+*/
+
+
+/*test1().test2(a,b,c,v,e);
+
+test1.test2(a,b,l);
+
+(function a(){})(k,l);
+
+sprite..move(dx,dy);
+*/
+
+/*table[a][w][3] == 1;
+table[a] == 1;
+
+table[a] != 1;
+table[a][w][3] != 1;
+*/
+
+/*table[a] == table2[k];
+table[a] != table2[k];
+
+table[a][4] == table2[k];
+*/
+table[a] == table2[p][k];
+
+//4 == 9;
+
+//(function(a,b,c){::print(a);})(a(), b()(), (function(x){return x;})(c()));
+
+//a[7].b[9].l();
+//a[7].b[9]();
+//a[7].b[8];
