@@ -1,1 +1,1 @@
-a <b  and c>d;
+a   or c;

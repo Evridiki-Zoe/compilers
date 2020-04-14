@@ -238,7 +238,7 @@ expr : assignmexpr {
 	 }
 
  }
- 	| boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1;}
+ 	| boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1; $$->apotimimeno=1;}
 
 	| arexpr { printf("arexpr\n" ); $$=$1; }
 
@@ -255,10 +255,16 @@ expr : assignmexpr {
 		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-			 emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
-			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assign false
-			 emit(if_eq,$3,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
-			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+		  if (!$1->apotimimeno) {
+			  emit(if_eq,$1,true_expr,NULL,yylineno,QuadNo+3);//epomeno expr an true
+ 			  emit(jump,NULL,NULL,NULL,yylineno,555); // jump assign false
+		  }
+		  if (!$3->apotimimeno) {
+			  emit(if_eq,$3,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
+ 			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+		  }
+
+
 			 // emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
 			 // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3); // jump under ass false
 			 // emit(assign,false_expr,NULL,$$,yylineno,0); // =false
@@ -274,10 +280,20 @@ expr : assignmexpr {
 		  }
 
 		  $$ = smallFunc(boolexp_e);
+		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+		   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+		 
 
-		  // struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-			// struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
-		  //
+		  if (!$1->apotimimeno) {
+			  emit(if_eq,$1,true_expr,NULL,yylineno,999);//epomeno expr an true
+ 			  emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2); // jump assign false
+		  }
+		  if (!$3->apotimimeno) {
+			  emit(if_eq,$3,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
+ 			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+		  }
+
+
 			// emit(if_eq,$1,true_expr,NULL,yylineno,999);//THELEI SWSTO LABEL
 			// emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2);// den allazei kati alla to exo gia na einai idio me to online
 			// emit(if_eq,$3,true_expr,NULL,yylineno,999);//THELEI SWSTO LABEL
