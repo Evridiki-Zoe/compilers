@@ -148,6 +148,17 @@ multi_stmts : {current_rvals = 0;
             ;
 
 stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
+					if (exprflag) {
+						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+						emit(assign,true_expr,NULL,$1,yylineno,0);
+						emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+						emit(assign,false_expr,NULL,$1,yylineno,0);
+						exprflag=0;
+						patchLists((int)QuadNo-2,(int)QuadNo);
+					}
+
             if(flag_fortable == 1) {
                   //ignore
             } else {
@@ -168,15 +179,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
                       flag_fortable = 0;
                   }
             }
-			if (exprflag) {
-				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-				struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-				emit(assign,true_expr,NULL,$1,yylineno,0);
-				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
-				emit(assign,false_expr,NULL,$1,yylineno,0);
-				exprflag=0;
-			}
 
       }
       | ifstmt 	{ printf(RED "if stmt \n" RESET); }
@@ -247,7 +250,7 @@ expr :
 	 }
 
  }
- 	| 	boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1; $$->apotimimeno=1;}
+ 	| 	boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1; $$->apotimimeno=1; 	push_True((int)QuadNo-2); push_False((int)QuadNo-1);}
 	| 	arexpr { printf("arexpr\n" ); $$=$1; }
 	|  	expr AND	{
 
@@ -258,6 +261,9 @@ expr :
 		if (!$1->apotimimeno) {
 			emit(if_eq,$1,true_expr,NULL,yylineno,999);//QuadNo +4 mallon
 			emit(jump,NULL,NULL,NULL,yylineno,555); // jump assign false
+			push_True((int)QuadNo-2);
+			push_False((int)QuadNo-1);
+
 		} } expr	{
 		if($1->type == 1){
 			  $1=member_item($1, $1->sym->value.var->name);
@@ -275,7 +281,10 @@ expr :
 		  if (!$4->apotimimeno) {
 			 emit(if_eq,$4,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
  			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+			 push_True((int)QuadNo-2);
+			 push_False((int)QuadNo-1);
 		  }
+
 
 
 			 // emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
@@ -292,7 +301,8 @@ expr :
 			if (!$1->apotimimeno) {
 				emit(if_eq,$1,true_expr,NULL,yylineno,999);//epomeno expr an true
 				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2); // jump assign false
-			} } expr	{
+				push_True((int)QuadNo-2);
+				push_False((int)QuadNo-1);	} } expr	{
 		  if($1->type == 1){
 				$1=member_item($1, $1->sym->value.var->name);
 		  }
@@ -309,6 +319,8 @@ expr :
 		  if (!$4->apotimimeno) {
 			  emit(if_eq,$4,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
  			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+			 push_True((int)QuadNo-2);
+			 push_False((int)QuadNo-1);
 		  }
 
 
@@ -324,16 +336,26 @@ expr :
 			if($2->type == 1){
 				  $2=member_item($2, $2->sym->value.var->name);
 			}
-	  $$ = smallFunc(boolexp_e);
-	  exprflag=1;
-			// struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-			// struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
+
+		  $$ = smallFunc(boolexp_e);
+		  $$->apotimimeno=1;
+		  exprflag=1;
+			struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+			struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
+
+			if (!$2->apotimimeno) {
+  			  emit(if_eq,$2,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
+   			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+  			 push_True((int)QuadNo-2);
+  			 push_False((int)QuadNo-1);
+  		  }
 
 			// emit(if_eq,$2,true_expr,NULL,yylineno,999);
 			// emit(jump,NULL,NULL,NULL,yylineno,555);
 			// emit(assign,true_expr,NULL,$$,yylineno,0);
 			// emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			// emit(assign,false_expr,NULL,$$,yylineno,0);
+
 
 }
 	|	term { $$=$1; printf(RED"term(%s)\n"RESET, $1->sym->value.var->name); }
@@ -460,6 +482,7 @@ boolResexpr :  expr GREATER expr {
 	//  emit(assign,true_expr,NULL,$$,yylineno,0);
 	//  emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 	//  emit(assign,false_expr,NULL,$$,yylineno,0);
+
 
 }
 		|  expr GREATER_EQUAL expr {
@@ -847,6 +870,8 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 					 				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 					 				emit(assign,false_expr,NULL,$4,yylineno,0);
 									exprflag=0;
+									patchLists((int)QuadNo-2,(int)QuadNo);
+
 					 			}
 
                 //   printf("eeeeeem egww (%s)=(%s)\n\n", $1->sym->value.var->name ,$4->sym->value.var->name);
@@ -1432,7 +1457,7 @@ multi_id  : COMMA IDENTIFIER { argumentF(($2), yylineno, (scope+1)); } multi_id
           | /*empty*/ { printf(RED "multi_idlists:: empty\n" RESET); }
           ;
 
-ifstmt  : if_start R_PARENTHES  stmt  ELSE  {
+ifstmt  : if_start  R_PARENTHES  stmt  ELSE  {
 
 				emit(jump,NULL,NULL,NULL,yylineno,999); /*Sto telos tis else*/
 				//Kanoume patch to jump mesa stin else se periptosi pou apotixei i if
@@ -1446,20 +1471,34 @@ ifstmt  : if_start R_PARENTHES  stmt  ELSE  {
 				printf(RED "if(exprsession) stmt else stmt\n" RESET);
 				quads[((int)$1)].label=QuadNo+1;
 	}
-      | if_start  R_PARENTHES  stmt  {
+      | if_start  R_PARENTHES stmt   {
 			 printf(RED "if(exprsession) stmt\n" RESET);
 			 //Pigenoume sto quad tis jump kai kanoume patch to label sto quad kato apo tin
-			 //teleftaia entoli toy stmt !!!
-			 quads[((int)$1)].label=QuadNo+1;
+		 	//teleftaia entoli toy stmt !!!
+		 	quads[((int)$1)].label=QuadNo+1;
 	}
       ;
 
 if_start: IF L_PARENTHES expr {
+
+				if (exprflag) {
+				   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+				   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+				   emit(assign,true_expr,NULL,$3,yylineno,0);
+				   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+				   emit(assign,false_expr,NULL,$3,yylineno,0);
+				   exprflag=0;
+				   patchLists((int)QuadNo-2,(int)QuadNo);
+			   }
 				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tou if
 				emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis if
 				//Pername sto if_start to index tou quad tis jump
 				$$=QuadNo-1;
+
+
+
 			}
 
 
@@ -1475,6 +1514,18 @@ whilestart : WHILE {$$=QuadNo+1;}
 			;
 
 whilecond : L_PARENTHES{ insideLoop++; } expr {
+
+						if (exprflag) {
+						   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+						   emit(assign,true_expr,NULL,$3,yylineno,0);
+						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+						   emit(assign,false_expr,NULL,$3,yylineno,0);
+						   exprflag=0;
+						   patchLists((int)QuadNo-2,(int)QuadNo);
+					   }
+
 
 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 						emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tis while
@@ -1521,6 +1572,18 @@ for_elist : expr multi_exprs {printf(RED "for_elist:: \n" RESET); $$=QuadNo;  }
 
 
 for_cond : expr  {
+						if (exprflag) {
+						   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+						   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+						   emit(assign,true_expr,NULL,$1,yylineno,0);
+						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+						   emit(assign,false_expr,NULL,$1,yylineno,0);
+						   exprflag=0;
+						   patchLists((int)QuadNo-2,(int)QuadNo);
+					   }
+
+
 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 						emit(if_eq,$1,true_expr,NULL,yylineno,999); // jump stin arxi tis for
 						emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika sto telos tis for

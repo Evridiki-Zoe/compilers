@@ -129,6 +129,7 @@ struct expr* apotimhsh_seboolean(struct expr* expr);
 
 int  patchFlow(double  con , double bre);
 int patchReturn(int from , int to);
+int patchLists(int truelabel , int falselabel);
 char* enum_toString_opCodes(iopcode sym);
 
 //Stack functions
@@ -151,3 +152,11 @@ int isEmptyR();
 int pop_E();
 int push_E(int num);
 int isEmptyE();
+
+int pop_True();
+int push_True(int num);
+int isEmptyTrue();
+
+int pop_False();
+int push_False(int num);
+int isEmptyFalse();

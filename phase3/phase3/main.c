@@ -21,6 +21,10 @@ int flow_Return[50];
 int tmpoffset=0;
 int exprflag_stack[50];
 
+int trueList[100];
+int falseList[100];
+
+
 
 int main(void) {
 

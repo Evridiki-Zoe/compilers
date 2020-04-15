@@ -23,6 +23,11 @@ extern int 	flow_Break[50];
 extern int flow_Continue[50];
 extern int flow_Return[50];
 extern int exprflag_stack[50];
+extern int trueList[100];
+extern int falseList[100];
+
+int true_top=-1;
+int false_top=-1;
 int expr_top=-1;
 int stack_top=-1;
 int break_top=-1;
@@ -422,7 +427,17 @@ int patchReturn(int from , int to){
 	return 0;
 
 }
+int patchLists(int truelabel , int falselabel){
 
+	while (!isEmptyTrue()) quads[pop_True()].label=truelabel;
+
+	while(!isEmptyFalse()) quads[pop_False()].label=falselabel;
+
+return 0;
+
+
+
+}
 
 void print_quads(){
 	int i;
@@ -585,5 +600,51 @@ int push_E(int num){
 
 int isEmptyE(){
 	if (expr_top<0) return 1;
+	else return 0;
+}
+
+
+//------------------------------------------------------
+
+int pop_True(){
+	int data = trueList[true_top];
+	true_top -= 1;
+
+	return data;
+}
+//gia to stack return
+
+int push_True(int num){
+	printf("%d\n",num );
+	true_top++;
+    trueList[true_top] = num;
+	return 0;
+}
+
+int isEmptyTrue(){
+	if (true_top<0) return 1;
+	else return 0;
+}
+
+
+//------------------------------------------------------
+
+int pop_False(){
+	int data = falseList[false_top];
+	false_top -= 1;
+
+	return data;
+}
+//gia to stack return
+
+int push_False(int num){
+	printf("%d\n",num );
+	false_top++;
+    falseList[false_top] = num;
+	return 0;
+}
+
+int isEmptyFalse(){
+	if (false_top<0) return 1;
 	else return 0;
 }
