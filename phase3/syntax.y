@@ -146,7 +146,7 @@ multi_stmts : {current_rvals = 0;
             ;
 
 stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
-            if(flag_fortable == 1) {
+            /*if(flag_fortable == 1) {
                   //ignore
             } else {
             // kaluvei thn periptwsh tou  a().b.j.k.l; kai thn a()[b][r][u][w]; epeidh den grafetai to teleutaio stoixeio
@@ -157,16 +157,16 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 
                   if($1 != NULL && $1->type == tableitem_e && $1->index !=NULL){
 
-                  /*printf("EDW MESA THA PREPEI NA MPAINEI MONO STHN PERIPTWSH TYPOU: a().b.j.k.l; h a()[b][r][u]; otidhpote allo mporei na einai lathos!\n");
+                  printf("EDW MESA THA PREPEI NA MPAINEI MONO STHN PERIPTWSH TYPOU: a().b.j.k.l; h a()[b][r][u]; otidhpote allo mporei na einai lathos!\n");
                       result =malloc(5*sizeof(char));
                       sprintf(result,"_%d",rvalues++);
                       struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                       struct expr* tmp_expr = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
                       emit(tablegetelem,$1,$1->index,tmp_expr,yylineno,0);
-                    */
+
                       flag_fortable = 0;
                   }
-            }
+            }*/
       }
       | ifstmt 	{ printf(RED "if stmt \n" RESET); }
       | whilestmt 	{ printf(RED "while stmt \n" RESET); }
@@ -670,6 +670,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
                    ref = 1;
 
                 //   printf("eeeeeem egww (%s)=(%s)\n\n", $1->sym->value.var->name ,$4->sym->value.var->name);
+
                 /*   if($1->type != tableitem_e && $4->type == tableitem_e){
                              //gia na grafetai to d apo to x=t.a.b.c.d;
                             // printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
@@ -687,7 +688,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
                    if($1->type == tableitem_e){
                           // printf("else if:: lvalue(%s with type %d) = eq(%s with index %s and index type %d ) \n",$1->sym->value.var->name,$1->type, $4->sym->value.var->name, $4->index->sym->value.var->name,$4->index->type);
 
-                         if($4->index!= NULL && $4->index->type == conststring_e){
+                        /* if($4->index!= NULL && $4->index->type == conststring_e){
                                 //gia na grafetai to v apo to t.a.b.c.d = x.k.v;
                                   //   printf("ektos:: lvalue(%s with type %d) = eq(%s with index %s and index type %d ) \n",$1->sym->value.var->name,$1->type, $4->sym->value.var->name, $4->index->sym->value.var->name,$4->index->type);
                                      result =malloc(5*sizeof(char));
@@ -699,7 +700,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 
                                      //tablegetelem ^3        "v"      ^4
                            }
-
+*/
                         emit(table_setelem,$1->index,$4,$1,yylineno,0);
 //                                          e         x 2
                         struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
