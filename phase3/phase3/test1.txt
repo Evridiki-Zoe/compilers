@@ -1,0 +1,3 @@
+x = (x=4) and (function (){ return false;})(2) or (function(){
+x= a and b;
+return true;});
