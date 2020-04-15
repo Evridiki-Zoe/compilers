@@ -1,7 +1,7 @@
 %{
-#include "y.tab.h"
 #include "lex.h"
 #include "parsing.h"
+#include "y.tab.h"
 
 int token_count = 0;
 

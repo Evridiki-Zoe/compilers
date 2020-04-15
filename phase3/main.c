@@ -2,7 +2,7 @@
 #include "parsing.h"
 #include "quads.h"
 
-
+int yyparse();
 struct SymTable_struct *table = NULL;
 struct alpha_token_t *head = NULL;
 struct rvalue_node* r_value_head = NULL;

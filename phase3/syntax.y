@@ -13,7 +13,7 @@
 #define RESET "\x1B[0m"
 
 extern int yyerror(const char* s);
-
+int yylex();
 extern int yylineno;
 extern char * yytext;
 extern int scope;
