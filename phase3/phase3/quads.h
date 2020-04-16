@@ -168,3 +168,5 @@ int isEmptyFalse();
 void addTruelist(struct expr *expression , int quadno);
 void addFalselist(struct expr *expression , int quadno);
 void andLists(struct expr* res,struct expr *expr1,struct expr *expr2);
+void orLists(struct expr* res,struct expr *expr1,struct expr *expr2);
+void backpatchList(int list[],int label);

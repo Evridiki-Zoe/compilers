@@ -649,23 +649,53 @@ void addTruelist(struct expr* expression , int quadno){
 	int i=0;
 	while (expression->truelist[i]!=-1) i++;
 	expression->truelist[i]=quadno;
+
 }
 
 void addFalselist(struct expr* expression , int quadno){
 	int i=0;
 	while (expression->falselist[i]!=-1) i++;
 	expression->falselist[i]=quadno;
+
 }
 
 void andLists(struct expr *res ,struct expr *expr1,struct expr *expr2){
 	int i=0;
 	int reslist=0;
 
-	while ((res->truelist[i]=expr2->truelist[i])!=-1){
-		 printf("geia %d\n",expr2->truelist[i] );
-		 i++;
-	 }
+	printf("expr1 truelist\n" );
+	while (expr1->truelist[i]!=-1) {
+		printf("%d : %d\n",i,expr1->truelist[i++] );
+	}
 	 i=0;
+	printf("expr1 falselist\n" );
+	while (expr1->falselist[i]!=-1) {
+		printf("%d : %d\n",i,expr1->falselist[i++] );
+	}
+ i=0;
+	printf("expr2 truelist\n" );
+	while (expr2->truelist[i]!=-1) {
+		printf("%d : %d\n",i,expr2->truelist[i++] );
+	}
+	 i=0;
+	printf("expr1 falselist\n" );
+	while (expr1->falselist[i]!=-1) {
+		printf("%d : %d\n",i,expr2->falselist[i++] );
+	}
+
+
+	while (res->truelist[reslist]!=-1) reslist++;
+ i=0;
+	while (expr2->truelist[i]!=-1) {
+	   res->truelist[reslist++]=expr2->truelist[i++];
+	}
+
+
+	 i=0;
+
+//merge falselist
+	reslist=0;
+	while (res->falselist[reslist]!=-1) reslist++;
 
 	 while (expr2->falselist[i]!=-1) {
 	 	res->falselist[reslist++]=expr2->falselist[i++];
@@ -675,6 +705,57 @@ void andLists(struct expr *res ,struct expr *expr1,struct expr *expr2){
 	 	res->falselist[reslist++]=expr1->falselist[i++];
 	 }
 
+ i=0;
+	 printf("res truelist\n" );
+ 	while (res->truelist[i]!=-1) {
+ 		printf("%d : %d\n",i,res->truelist[i++] );
+ 	}
+	 i=0;
+ 	printf("res falselist\n" );
+ 	while (res->falselist[i]!=-1) {
+ 		printf("%d : %d\n",i,res->falselist[i++] );
+ 	}
+
+
+
+
+}
+
+void orLists(struct expr *res ,struct expr *expr1,struct expr *expr2){
+
+	int i=0;
+	int reslist=0;
+
+
+	while (res->falselist[reslist]!=-1) reslist++;
+
+	while (expr2->falselist[i]!=-1) {
+	   res->falselist[reslist++]=expr2->falselist[i++];
+	}
+	 i=0;
+//merge trulist
+
+	reslist=0;
+	while (res->truelist[reslist]!=-1) reslist++;
+
+	 while (expr2->truelist[i]!=-1) {
+
+		res->truelist[reslist++]=expr2->truelist[i++];
+	 }
+	 i=0;
+	 while (expr1->truelist[i]!=-1) {
+
+		res->truelist[reslist++]=expr1->truelist[i++];
+	 }
+
+
+}
+
+void backpatchList(int list[],int label){
+	int i=0;
+
+	while (list[i]!=-1) quads[list[i++]].label=label;
+
 
 }
 
@@ -683,24 +764,27 @@ int patchLists(struct expr* expression,int truelabel , int falselabel){
 	// while (!isEmptyTrue()) quads[pop_True()].label=truelabel;
 	//
 	// while(!isEmptyFalse()) quads[pop_False()].label=falselabel;
-int i=0;
-int tmp;
-printf("geiia\n" );
-
-while ((tmp=expression->truelist[i++])!=-1) {
-	printf(" quad %d with label %d\n",tmp ,quads[tmp].label  );
-	if (quads[tmp].label==999) quads[tmp].label=truelabel;
-
-}
-i=0;
-while ((tmp=expression->falselist[i++])!=-1) {
-	printf(" quad %d with label %d\n",tmp ,quads[tmp].label  );
-	if (quads[tmp].label==555) quads[tmp].label=falselabel;
-
-}
+	int i=0;
+	int tmp;
 
 
-printf("%d\n",tmp );
+
+
+	while ((tmp=expression->truelist[i++])!=-1) {
+		printf("True: quad %d with label %d\n",tmp ,quads[tmp].label  );
+		if (quads[tmp].label==999) quads[tmp].label=truelabel;
+
+	}
+	i=0;
+
+	while ((tmp=expression->falselist[i++])!=-1) {
+		printf("False : quad %d with label %d\n",tmp ,quads[tmp].label  );
+		if (quads[tmp].label==999) quads[tmp].label=falselabel;
+
+	}
+
+
+//	printf("teliko tmp %d\n",tmp );
 
 return 0;
 

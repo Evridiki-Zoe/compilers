@@ -149,7 +149,7 @@ multi_stmts : {current_rvals = 0;
 
 stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 					if (exprflag) {
-						printf("edooooo\n" );
+
 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 						struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
@@ -255,83 +255,85 @@ expr :
 
  }
  	| 	boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1; $$->apotimimeno=1;
-		//push_True((int)QuadNo-2);
-		//push_False((int)QuadNo-1);
-
 		addTruelist(($$),(int)QuadNo-2);
 		addFalselist(($$),(int)QuadNo-1);
 	}
 	| 	arexpr { printf("arexpr\n" ); $$=$1; }
 	|  	expr AND epsilon {
 
-		struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+		 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 		 printf("%d\n",(int)QuadNo );
 
 
 		if (!$1->apotimimeno) {
 			emit(if_eq,$1,true_expr,NULL,yylineno,999);//QuadNo +4 mallon
-			emit(jump,NULL,NULL,NULL,yylineno,555); // jump assign false
-			// push_True((int)QuadNo-2);
-			// push_False((int)QuadNo-1);
+			emit(jump,NULL,NULL,NULL,yylineno,999); // jump assign false
 			addTruelist(($1),(int)QuadNo-2);
 			addFalselist(($1),(int)QuadNo-1);
 
 		}
-		//to backpatch apo to and
-		 quads[(int)QuadNo-2].label=QuadNo+1;
+		// //to backpatch apo to and
+		//  quads[(int)QuadNo-2].label=QuadNo+1;
+
 	 } expr	{
-
-
 
 		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 		  if (!$5->apotimimeno) {
 			 emit(if_eq,$5,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
- 			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
-			 // push_True((int)QuadNo-2);
-			 // push_False((int)QuadNo-1);
+ 			 emit(jump,NULL,NULL,NULL,yylineno,999); // jump assing false
+
 			 addTruelist(($5),(int)QuadNo-2);
 	 		 addFalselist(($5),(int)QuadNo-1);
 		  }
 		  $$ = smallFunc(boolexp_e);
 		  //e.truelist=e2.truelist kai mergelist gia false
+		   backpatchList($1->truelist,$3+1);
 		 andLists($$,$1,$5);
 		 $$->apotimimeno=1;
 
 
 
-			 // emit(assign,true_expr,NULL,$$,yylineno,0); //  =true
-			 // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3); // jump under ass false
-			 // emit(assign,false_expr,NULL,$$,yylineno,0); // =false
-	//  emit(and,$1,$3,$$,yylineno,0);
-		exprflag=1;
+			exprflag=1;
 	}
-	|	expr OR		{
+	|	expr OR	epsilon	{
 
 			struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		 	struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			if (!$1->apotimimeno) {
+
 				emit(if_eq,$1,true_expr,NULL,yylineno,999);//epomeno expr an true
-				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2); // jump assign false
-				push_True((int)QuadNo-2);
-				push_False((int)QuadNo-1);	} } expr	{
+				emit(jump,NULL,NULL,NULL,yylineno,999); // jump assign false
+				addTruelist(($1),(int)QuadNo-2);
+				addFalselist(($1),(int)QuadNo-1);
+
+			}
+
+			// quads[(int)QuadNo-1].label=QuadNo+1;
+
+			} expr	{
 
 
-		  $$ = smallFunc(boolexp_e);
+
 		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-		   $$->apotimimeno=1;
 
-		  if (!$4->apotimimeno) {
-			  emit(if_eq,$4,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
- 			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
-			 push_True((int)QuadNo-2);
-			 push_False((int)QuadNo-1);
+
+		  if (!$5->apotimimeno) {
+				 emit(if_eq,$5,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
+	 			 emit(jump,NULL,NULL,NULL,yylineno,999); // jump assing false
+				 addTruelist(($5),(int)QuadNo-2);
+	 			 addFalselist(($5),(int)QuadNo-1);
 		  }
+
+			    $$ = smallFunc(boolexp_e);
+				$$->apotimimeno=1;
+				backpatchList($1->falselist,$3+1);
+				orLists($$,$1,$5);
 
 
 	 exprflag=1;
@@ -351,13 +353,13 @@ expr :
 
 			if (!$2->apotimimeno) {
   			  emit(if_eq,$2,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
-   			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
+   			 emit(jump,NULL,NULL,NULL,yylineno,999); // jump assing false
   			 push_True((int)QuadNo-2);
   			 push_False((int)QuadNo-1);
   		  }
 
 			// emit(if_eq,$2,true_expr,NULL,yylineno,999);
-			// emit(jump,NULL,NULL,NULL,yylineno,555);
+			// emit(jump,NULL,NULL,NULL,yylineno,999);
 			// emit(assign,true_expr,NULL,$$,yylineno,0);
 			// emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			// emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -443,7 +445,7 @@ boolResexpr :  expr GREATER expr {
 	  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 	  emit(if_greater,$1,$3,NULL,yylineno,999);
-	  emit(jump,NULL,NULL,NULL,yylineno,555);
+	  emit(jump,NULL,NULL,NULL,yylineno,999);
 	//  emit(assign,true_expr,NULL,$$,yylineno,0);
 	//  emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 	//  emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -463,7 +465,7 @@ boolResexpr :  expr GREATER expr {
 			  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			  emit(if_greatereq,$1,$3,NULL,yylineno,999);//THELEI SWSTO LABEL
-			  emit(jump,NULL,NULL,NULL,yylineno,555);
+			  emit(jump,NULL,NULL,NULL,yylineno,999);
 			 // emit(assign,true_expr,NULL,$$,yylineno,0);
 			  // // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -482,7 +484,7 @@ boolResexpr :  expr GREATER expr {
 			  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			  emit(if_less,$1,$3,NULL,yylineno,999);//THELEI SWSTO LABEL
-			  emit(jump,NULL,NULL,NULL,yylineno,555);
+			  emit(jump,NULL,NULL,NULL,yylineno,999);
 			  // emit(assign,true_expr,NULL,$$,yylineno,0);
 			  // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -500,7 +502,7 @@ boolResexpr :  expr GREATER expr {
 			  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			  emit(if_lesseq,$1,$3,NULL,yylineno,999);//THELEI SWSTO LABEL
-			  emit(jump,NULL,NULL,NULL,yylineno,555);
+			  emit(jump,NULL,NULL,NULL,yylineno,999);
 			  // emit(assign,true_expr,NULL,$$,yylineno,0);
 			  // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -531,7 +533,7 @@ boolResexpr :  expr GREATER expr {
 			  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			  emit(if_eq,$1,$3,NULL,yylineno,999);
-			  emit(jump,NULL,NULL,NULL,yylineno,555);
+			  emit(jump,NULL,NULL,NULL,yylineno,999);
 			  // emit(assign,true_expr,NULL,$$,yylineno,0);
 			  // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -556,7 +558,7 @@ boolResexpr :  expr GREATER expr {
 			  struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			  emit(if_not_eq,$1,$3,NULL,yylineno,999);//THELEI SWSTO LABEL
-			  emit(jump,NULL,NULL,NULL,yylineno,555);
+			  emit(jump,NULL,NULL,NULL,yylineno,999);
 			  // emit(assign,true_expr,NULL,$$,yylineno,0);
 			  // emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
@@ -731,7 +733,7 @@ term  : L_PARENTHES {push_E(exprflag); exprflag=0;} expr R_PARENTHES { printf(RE
           } else{
       				result =malloc(5*sizeof(char));
       			  sprintf(result,"_%d",rvalues++);
-      				printf("geia\n" );
+
     			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
     			   	tmpnode =insertVar(result,yylineno,scope);
     			   	tmpexpr=malloc(sizeof(struct expr));
