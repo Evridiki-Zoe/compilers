@@ -1106,6 +1106,17 @@ elist : expr multi_exprs {
 
           struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$2);
           $$ = temp_elem;
+
+		  if (exprflag) {
+			 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+			 emit(assign,true_expr,NULL,$1,yylineno,0);
+			 emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+			 emit(assign,false_expr,NULL,$1,yylineno,0);
+			 exprflag=0;
+			patchLists(($1),(int)QuadNo-2,(int)QuadNo);
+		 }
 	}
       | /*emty*/ { printf(RED "elist:: empty\n" RESET);
                 args = 0;

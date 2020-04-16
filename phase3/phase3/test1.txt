@@ -1,2 +1,5 @@
-
-not a;
+for (local i = 0; i < 5 and a; ++i) {
+		print(i);
+		continue;	
+		++i;
+	}
