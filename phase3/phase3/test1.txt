@@ -1,1 +1,2 @@
-y = not x and x or a;
+
+not a;

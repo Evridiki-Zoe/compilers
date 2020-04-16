@@ -346,7 +346,7 @@ expr :
 			// struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 			// $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-		//  $$ = smallFunc(boolexp_e);
+
 
 			struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
@@ -357,8 +357,13 @@ expr :
 			 addTruelist(($2),(int)QuadNo-2);
 			 addFalselist(($2),(int)QuadNo-1);
   		  }
-		  notLists($2);
-		  $$=$2;
+
+		  //$$=$2;
+		   $$ = smallFunc(boolexp_e);
+		   notLists($2,$$);
+
+
+
 		  $$->apotimimeno=1;
 		 exprflag=1;
 			// emit(if_eq,$2,true_expr,NULL,yylineno,999);
@@ -993,6 +998,10 @@ member : lvalue DOT IDENTIFIER {
             struct expr* tmp_exression = member_item($1, $3->sym->value.var->name); //prepei to $1 na einai table item
             //printf("MEMBER SAYS type returned is %d\n", tmp_exression->type);
             $$ = tmp_exression;
+
+
+
+
          }
          ;
 

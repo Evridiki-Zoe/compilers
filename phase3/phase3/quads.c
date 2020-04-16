@@ -732,13 +732,11 @@ void backpatchList(int list[],int label){
 
 }
 
-void notLists(struct expr* expr){
-	int tmp[20];
+void notLists(struct expr* expr,struct expr*res){
 	int i;
 	for ( i = 0; i < 20; i++) {
-		tmp[i]=expr->truelist[i];
-		expr->truelist[i]=expr->falselist[i];
-		expr->falselist[i]=tmp[i];
+		res->truelist[i]=expr->falselist[i];
+		res->falselist[i]=expr->truelist[i];
 	}
 
 
