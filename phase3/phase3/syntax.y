@@ -260,7 +260,7 @@ expr :
 		addFalselist(($$),(int)QuadNo-1);
 	}
 	| 	arexpr { printf("arexpr\n" ); $$=$1; }
-	|  	expr AND epsilon {
+	|  	expr AND  {
 
 		 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -277,7 +277,7 @@ expr :
 		// //to backpatch apo to and
 		//  quads[(int)QuadNo-2].label=QuadNo+1;
 
-	 } expr	{
+	 } epsilon expr	{
 
 		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -291,7 +291,7 @@ expr :
 		  }
 		  $$ = smallFunc(boolexp_e);
 		  //e.truelist=e2.truelist kai mergelist gia false
-		   backpatchList($1->truelist,$3+1);
+		   backpatchList($1->truelist,$4+1);
 		 andLists($$,$1,$5);
 		 $$->apotimimeno=1;
 
@@ -299,7 +299,7 @@ expr :
 
 			exprflag=1;
 	}
-	|	expr OR	epsilon	{
+	|	expr OR		{
 
 			struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		 	struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -315,7 +315,7 @@ expr :
 
 			// quads[(int)QuadNo-1].label=QuadNo+1;
 
-			} expr	{
+			} epsilon expr	{
 
 
 
@@ -333,7 +333,7 @@ expr :
 
 			    $$ = smallFunc(boolexp_e);
 				$$->apotimimeno=1;
-				backpatchList($1->falselist,$3+1);
+				backpatchList($1->falselist,$4+1);
 				orLists($$,$1,$5);
 
 
@@ -346,9 +346,8 @@ expr :
 			// struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 			// $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
 
-		  $$ = smallFunc(boolexp_e);
-		  $$->apotimimeno=1;
-		  exprflag=1;
+		//  $$ = smallFunc(boolexp_e);
+
 			struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
 
@@ -358,7 +357,10 @@ expr :
   			 push_True((int)QuadNo-2);
   			 push_False((int)QuadNo-1);
   		  }
-
+		  notLists($2);
+		  $$=$2;
+		  $$->apotimimeno=1;
+		 exprflag=1;
 			// emit(if_eq,$2,true_expr,NULL,yylineno,999);
 			// emit(jump,NULL,NULL,NULL,yylineno,999);
 			// emit(assign,true_expr,NULL,$$,yylineno,0);
@@ -585,7 +587,9 @@ boolResexpr :  expr GREATER expr {
 
 
 
-term  : L_PARENTHES {push_E(exprflag); exprflag=0;} expr R_PARENTHES { printf(RED " (expression) \n" RESET);
+term  : L_PARENTHES {
+	//push_E(exprflag); exprflag=0;
+} expr R_PARENTHES { printf(RED " (expression) \n" RESET);
       /*    result =malloc(5*sizeof(char));
           sprintf(result,"_%d",rvalues++);
           tmpnode = malloc(sizeof(struct symbol_table_binding));
@@ -594,7 +598,14 @@ term  : L_PARENTHES {push_E(exprflag); exprflag=0;} expr R_PARENTHES { printf(RE
           tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
       */
           $$ = $3;
-		  exprflag=pop_E();
+
+
+
+		// exprflag=pop_E();
+
+
+
+
       }
       | MINUS expr %prec UMINUS  {
 
@@ -805,7 +816,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 					 				emit(assign,false_expr,NULL,$4,yylineno,0);
 									exprflag=0;
 
-									patchLists(($3),(int)QuadNo-2,(int)QuadNo);
+									patchLists(($4),(int)QuadNo-2,(int)QuadNo);
 
 					 			}
 
@@ -1426,7 +1437,7 @@ if_start: IF L_PARENTHES expr {
 				   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 				   emit(assign,false_expr,NULL,$3,yylineno,0);
 				   exprflag=0;
-				  patchLists(($1),(int)QuadNo-2,(int)QuadNo);
+				  patchLists(($3),(int)QuadNo-2,(int)QuadNo);
 			   }
 				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tou if
@@ -1460,7 +1471,7 @@ whilecond : L_PARENTHES{ insideLoop++; } expr {
 						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 						   emit(assign,false_expr,NULL,$3,yylineno,0);
 						   exprflag=0;
-						   patchLists(($1),(int)QuadNo-2,(int)QuadNo);
+						   patchLists(($3),(int)QuadNo-2,(int)QuadNo);
 					   }
 
 

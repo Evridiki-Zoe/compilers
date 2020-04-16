@@ -1,4 +1,1 @@
-
-
-
-a < b or c < d or k < v and o ;
+not  (  a and b);
