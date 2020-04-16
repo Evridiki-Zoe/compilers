@@ -8,8 +8,8 @@ lamda = table[3][9]--;
 kappa = ++table[3][9];
 
 --table[3][9];
-lamda = --table[3][9];
-*/
+lamda = --table[3][9];*/
+
 
 //a()[b][r][u][2]++;
 
@@ -42,7 +42,7 @@ table[a][w][3] != 1;
 table[a] != table2[k];
 
 table[a][4] == table2[k];
-table[a] == table2[p][k]; //ayto ginetai me allh seira ston online alla einai swsto
+table[a] == table2[p][k];
 */
 
 
@@ -69,3 +69,12 @@ table[a] == table2[p][k]; //ayto ginetai me allh seira ston online alla einai sw
 //c[4] or table2[7];
 
 //-table[2];
+
+
+//f(a1.a2.a3.a4[9]);
+//s=f(a1.a2.a3.a4[9]);
+//f(a1.a2.a3.a4);
+//p=f(a1.a2.a3.a4);
+//k[a1.a2.a3.a4]=e;
+
+//e=k[a1.a2.a3.a4];
