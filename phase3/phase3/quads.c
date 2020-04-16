@@ -208,6 +208,11 @@ struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struc
 	expr_node->next = next;
 	expr_node->apotimimeno=0;
 
+for (size_t i = 0; i < 20; i++) {
+		expr_node->truelist[i]=-1;
+		expr_node->falselist[i]=-1;
+}
+
 	return expr_node;
 
 }
@@ -427,17 +432,7 @@ int patchReturn(int from , int to){
 	return 0;
 
 }
-int patchLists(int truelabel , int falselabel){
 
-	while (!isEmptyTrue()) quads[pop_True()].label=truelabel;
-
-	while(!isEmptyFalse()) quads[pop_False()].label=falselabel;
-
-return 0;
-
-
-
-}
 
 void print_quads(){
 	int i;
@@ -647,4 +642,66 @@ int push_False(int num){
 int isEmptyFalse(){
 	if (false_top<0) return 1;
 	else return 0;
+}
+
+
+void addTruelist(struct expr* expression , int quadno){
+	int i=0;
+	while (expression->truelist[i]!=-1) i++;
+	expression->truelist[i]=quadno;
+}
+
+void addFalselist(struct expr* expression , int quadno){
+	int i=0;
+	while (expression->falselist[i]!=-1) i++;
+	expression->falselist[i]=quadno;
+}
+
+void andLists(struct expr *res ,struct expr *expr1,struct expr *expr2){
+	int i=0;
+	int reslist=0;
+
+	while ((res->truelist[i]=expr2->truelist[i])!=-1){
+		 printf("geia %d\n",expr2->truelist[i] );
+		 i++;
+	 }
+	 i=0;
+
+	 while (expr2->falselist[i]!=-1) {
+	 	res->falselist[reslist++]=expr2->falselist[i++];
+	 }
+	 i=0;
+	 while (expr1->falselist[i]!=-1) {
+	 	res->falselist[reslist++]=expr1->falselist[i++];
+	 }
+
+
+}
+
+int patchLists(struct expr* expression,int truelabel , int falselabel){
+
+	// while (!isEmptyTrue()) quads[pop_True()].label=truelabel;
+	//
+	// while(!isEmptyFalse()) quads[pop_False()].label=falselabel;
+int i=0;
+int tmp;
+printf("geiia\n" );
+
+while ((tmp=expression->truelist[i++])!=-1) {
+	printf(" quad %d with label %d\n",tmp ,quads[tmp].label  );
+	if (quads[tmp].label==999) quads[tmp].label=truelabel;
+
+}
+i=0;
+while ((tmp=expression->falselist[i++])!=-1) {
+	printf(" quad %d with label %d\n",tmp ,quads[tmp].label  );
+	if (quads[tmp].label==555) quads[tmp].label=falselabel;
+
+}
+
+
+printf("%d\n",tmp );
+
+return 0;
+
 }

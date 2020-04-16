@@ -81,6 +81,8 @@ struct expr{
 	unsigned char boolconst;
 	struct expr* next;
 	int apotimimeno;
+	int truelist[20];
+	int falselist[20];
 };
 
 struct quad{
@@ -129,7 +131,7 @@ struct expr* apotimhsh_seboolean(struct expr* expr);
 
 int  patchFlow(double  con , double bre);
 int patchReturn(int from , int to);
-int patchLists(int truelabel , int falselabel);
+int patchLists(struct expr* expression,int truelabel , int falselabel);
 char* enum_toString_opCodes(iopcode sym);
 
 //Stack functions
@@ -160,3 +162,9 @@ int isEmptyTrue();
 int pop_False();
 int push_False(int num);
 int isEmptyFalse();
+
+
+
+void addTruelist(struct expr *expression , int quadno);
+void addFalselist(struct expr *expression , int quadno);
+void andLists(struct expr* res,struct expr *expr1,struct expr *expr2);

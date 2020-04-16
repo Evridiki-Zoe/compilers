@@ -115,7 +115,7 @@ int current_rvals = 0;
 	struct expr* expression;
     struct call* callexpr;
 }
-%type<intValue>         INTEGER if_start whilestart whilecond funcstart for_cond for_end for_elist
+%type<intValue>         INTEGER if_start whilestart whilecond funcstart for_cond for_end for_elist epsilon
 %type<floatValue>       FLOAT
 %type<stringValue>      IDENTIFIER STRING
 //%type<stringValue>    //  lvalue
@@ -149,6 +149,7 @@ multi_stmts : {current_rvals = 0;
 
 stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 					if (exprflag) {
+						printf("edooooo\n" );
 						struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 						struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
@@ -156,7 +157,8 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 						emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 						emit(assign,false_expr,NULL,$1,yylineno,0);
 						exprflag=0;
-						patchLists((int)QuadNo-2,(int)QuadNo);
+
+						patchLists(($1),(int)QuadNo-2,(int)QuadNo);
 					}
 
           /*  if(flag_fortable == 1) {
@@ -252,34 +254,51 @@ expr :
 	 }
 
  }
- 	| 	boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1; $$->apotimimeno=1; 	push_True((int)QuadNo-2); push_False((int)QuadNo-1);}
+ 	| 	boolResexpr {printf("boolResexpr\n" );$$=$1; exprflag=1; $$->apotimimeno=1;
+		//push_True((int)QuadNo-2);
+		//push_False((int)QuadNo-1);
+
+		addTruelist(($$),(int)QuadNo-2);
+		addFalselist(($$),(int)QuadNo-1);
+	}
 	| 	arexpr { printf("arexpr\n" ); $$=$1; }
-	|  	expr AND	{
+	|  	expr AND epsilon {
 
 		struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+		 printf("%d\n",(int)QuadNo );
 
 
 		if (!$1->apotimimeno) {
 			emit(if_eq,$1,true_expr,NULL,yylineno,999);//QuadNo +4 mallon
 			emit(jump,NULL,NULL,NULL,yylineno,555); // jump assign false
-			push_True((int)QuadNo-2);
-			push_False((int)QuadNo-1);
+			// push_True((int)QuadNo-2);
+			// push_False((int)QuadNo-1);
+			addTruelist(($1),(int)QuadNo-2);
+			addFalselist(($1),(int)QuadNo-1);
 
-		} } expr	{
+		}
+		//to backpatch apo to and
+		 quads[(int)QuadNo-2].label=QuadNo+1;
+	 } expr	{
 
-		  $$ = smallFunc(boolexp_e);
-		  $$->apotimimeno=1;
+
 
 		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 		   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
-		  if (!$4->apotimimeno) {
-			 emit(if_eq,$4,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
+		  if (!$5->apotimimeno) {
+			 emit(if_eq,$5,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
  			 emit(jump,NULL,NULL,NULL,yylineno,555); // jump assing false
-			 push_True((int)QuadNo-2);
-			 push_False((int)QuadNo-1);
+			 // push_True((int)QuadNo-2);
+			 // push_False((int)QuadNo-1);
+			 addTruelist(($5),(int)QuadNo-2);
+	 		 addFalselist(($5),(int)QuadNo-1);
 		  }
+		  $$ = smallFunc(boolexp_e);
+		  //e.truelist=e2.truelist kai mergelist gia false
+		 andLists($$,$1,$5);
+		 $$->apotimimeno=1;
 
 
 
@@ -348,7 +367,7 @@ expr :
 	|	term { $$=$1; printf(RED"term(%s)\n"RESET, $1->sym->value.var->name); }
 	;
 
-
+epsilon : /*empty*/ {$$=QuadNo;}
 
 arexpr :
  		   expr PLUS expr {
@@ -782,7 +801,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 					 				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 					 				emit(assign,false_expr,NULL,$4,yylineno,0);
 									exprflag=0;
-									patchLists((int)QuadNo-2,(int)QuadNo);
+									//patchLists((int)QuadNo-2,(int)QuadNo);
 
 					 			}
 
@@ -1403,7 +1422,7 @@ if_start: IF L_PARENTHES expr {
 				   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 				   emit(assign,false_expr,NULL,$3,yylineno,0);
 				   exprflag=0;
-				   patchLists((int)QuadNo-2,(int)QuadNo);
+				   //patchLists((int)QuadNo-2,(int)QuadNo);
 			   }
 				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tou if
@@ -1437,7 +1456,7 @@ whilecond : L_PARENTHES{ insideLoop++; } expr {
 						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 						   emit(assign,false_expr,NULL,$3,yylineno,0);
 						   exprflag=0;
-						   patchLists((int)QuadNo-2,(int)QuadNo);
+						   //patchLists((int)QuadNo-2,(int)QuadNo);
 					   }
 
 
@@ -1494,7 +1513,7 @@ for_cond : expr  {
 						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 						   emit(assign,false_expr,NULL,$1,yylineno,0);
 						   exprflag=0;
-						   patchLists((int)QuadNo-2,(int)QuadNo);
+						   //patchLists((int)QuadNo-2,(int)QuadNo);
 					   }
 
 
