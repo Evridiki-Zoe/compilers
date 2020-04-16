@@ -520,10 +520,10 @@ boolResexpr :  expr GREATER expr {
 			  else if(oneIsVar($1, $3)) {
 					//ok
 			  }
-			  else if( ($1)->type != ($3)->type){
+			/*  else if( ($1)->type != ($3)->type){
 				  printf("Compile time error: cannot compare 2 different types! expr1 is %d and expr2 is %d, line: %d\n",($1)->type, ($3)->type, yylineno );
 				  exit(EXIT_FAILURE);
-			  }
+			  }*/
 
 			  $$ = smallFunc(boolexp_e);
 
@@ -545,10 +545,10 @@ boolResexpr :  expr GREATER expr {
 			  else if(oneIsVar($1, $3)) {
 					//ok
 			  }
-			  else if( ($1)->type != ($3)->type){
+			 /* else if( ($1)->type != ($3)->type){
 				  printf("Compile time error: cannot COMPARE 2 different types! expr1 is %d and expr2 is %d, line %d\n",($1)->type, ($3)->type, yylineno );
 				  exit(EXIT_FAILURE);
-			  }
+			  }*/
 
 			  $$ = smallFunc(boolexp_e);
 
