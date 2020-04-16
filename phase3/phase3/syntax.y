@@ -124,7 +124,8 @@ int current_rvals = 0;
 
 /*MHN ALLAKSETE SEIRA SE AYTA GIATI EXOUN PROTERAIOTHTA*/
 %right	EQ
-%left	      AND OR
+%left	      OR
+%left		  AND
 %nonassoc	EQUAL NEQUAL
 %nonassoc	GREATER GREATER_EQUAL LESS LESS_EQUAL
 %left	      PLUS MINUS
@@ -803,7 +804,8 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 					 				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 					 				emit(assign,false_expr,NULL,$4,yylineno,0);
 									exprflag=0;
-									//patchLists((int)QuadNo-2,(int)QuadNo);
+
+									patchLists(($3),(int)QuadNo-2,(int)QuadNo);
 
 					 			}
 
@@ -1424,7 +1426,7 @@ if_start: IF L_PARENTHES expr {
 				   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 				   emit(assign,false_expr,NULL,$3,yylineno,0);
 				   exprflag=0;
-				   //patchLists((int)QuadNo-2,(int)QuadNo);
+				  patchLists(($1),(int)QuadNo-2,(int)QuadNo);
 			   }
 				struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				emit(if_eq,$3,true_expr,NULL,yylineno,QuadNo+3); // jump stin arxi tou if
@@ -1458,7 +1460,7 @@ whilecond : L_PARENTHES{ insideLoop++; } expr {
 						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 						   emit(assign,false_expr,NULL,$3,yylineno,0);
 						   exprflag=0;
-						   //patchLists((int)QuadNo-2,(int)QuadNo);
+						   patchLists(($1),(int)QuadNo-2,(int)QuadNo);
 					   }
 
 
@@ -1515,7 +1517,7 @@ for_cond : expr  {
 						   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 						   emit(assign,false_expr,NULL,$1,yylineno,0);
 						   exprflag=0;
-						   //patchLists((int)QuadNo-2,(int)QuadNo);
+						  patchLists(($1),(int)QuadNo-2,(int)QuadNo);
 					   }
 
 
