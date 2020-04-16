@@ -354,8 +354,8 @@ expr :
 			if (!$2->apotimimeno) {
   			  emit(if_eq,$2,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
    			 emit(jump,NULL,NULL,NULL,yylineno,999); // jump assing false
-  			 push_True((int)QuadNo-2);
-  			 push_False((int)QuadNo-1);
+			 addTruelist(($2),(int)QuadNo-2);
+			 addFalselist(($2),(int)QuadNo-1);
   		  }
 		  notLists($2);
 		  $$=$2;
