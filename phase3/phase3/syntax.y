@@ -159,7 +159,7 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
 						patchLists((int)QuadNo-2,(int)QuadNo);
 					}
 
-            if(flag_fortable == 1) {
+          /*  if(flag_fortable == 1) {
                   //ignore
             } else {
             // kaluvei thn periptwsh tou  a().b.j.k.l; kai thn a()[b][r][u][w]; epeidh den grafetai to teleutaio stoixeio
@@ -176,9 +176,11 @@ stmt	: expr SEMICOLON  { printf(RED "expression \n" RESET);
                       struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
                       struct expr* tmp_expr = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
                       emit(tablegetelem,$1,$1->index,tmp_expr,yylineno,0);
+
                       flag_fortable = 0;
+
                   }
-            }
+            }*/
 
 
       }
@@ -265,12 +267,6 @@ expr :
 			push_False((int)QuadNo-1);
 
 		} } expr	{
-		if($1->type == 1){
-			  $1=member_item($1, $1->sym->value.var->name);
-		}
-		  if($4->type == 1){
-				$4=member_item($4, $4->sym->value.var->name);
-		  }
 
 		  $$ = smallFunc(boolexp_e);
 		  $$->apotimimeno=1;
@@ -303,12 +299,7 @@ expr :
 				emit(jump,NULL,NULL,NULL,yylineno,QuadNo+2); // jump assign false
 				push_True((int)QuadNo-2);
 				push_False((int)QuadNo-1);	} } expr	{
-		  if($1->type == 1){
-				$1=member_item($1, $1->sym->value.var->name);
-		  }
-		  if($4->type == 1){
-				$4=member_item($4, $4->sym->value.var->name);
-		  }
+
 
 		  $$ = smallFunc(boolexp_e);
 		  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
@@ -332,10 +323,6 @@ expr :
 			// sprintf(result,"_%d",rvalues++);
 			// struct symbol_table_binding* newnode =insertVar(result,yylineno,scope);
 			// $$ = new_expr(boolexp_e,newnode,NULL,0,"",'\0',NULL);
-
-			if($2->type == 1){
-				  $2=member_item($2, $2->sym->value.var->name);
-			}
 
 		  $$ = smallFunc(boolexp_e);
 		  $$->apotimimeno=1;
@@ -366,13 +353,6 @@ expr :
 arexpr :
  		   expr PLUS expr {
 
-            if($1->type == 1){
-                  $1=member_item($1, $1->sym->value.var->name);
-            }
-            if($3->type == 1){
-                  $3=member_item($3, $3->sym->value.var->name);
-            }
-
             if(checkTypes($1, $3) == 1) {
 //todo? edw o online den kanei to rvalues++
                   $$ = smallFunc(arithmeticexp_e);
@@ -385,13 +365,6 @@ arexpr :
 
       }
 		|  expr MINUS expr {
-		    if($1->type == 1){
-		          $1=member_item($1, $1->sym->value.var->name);
-		    }
-		    if($3->type == 1){
-		          $3=member_item($3, $3->sym->value.var->name);
-		    }
-
 		    /*compile time type check*/
 		    if(checkTypes($1, $3) == 1) {
 		          $$ = smallFunc(arithmeticexp_e);
@@ -403,13 +376,6 @@ arexpr :
 		    }
 		}
 		|  expr MULT expr {
-		    if($1->type == 1){
-		          $1=member_item($1, $1->sym->value.var->name);
-		    }
-		    if($3->type == 1){
-		          $3=member_item($3, $3->sym->value.var->name);
-		    }
-
 		    /*compile time type check*/
 		    if(checkTypes($1, $3) == 1) {
 		          $$ = smallFunc(arithmeticexp_e);
@@ -421,13 +387,6 @@ arexpr :
 		    }
 		}
 		|  expr DIV expr {
-		    if($1->type == 1){
-		          $1=member_item($1, $1->sym->value.var->name);
-		    }
-		    if($3->type == 1){
-		          $3=member_item($3, $3->sym->value.var->name);
-		    }
-
 		    /*compile time type check*/
 		    if(checkTypes($1, $3) == 1) {
 		          $$ = smallFunc(const_num_e);
@@ -439,13 +398,6 @@ arexpr :
 		    }
 		}
 		|  expr MOD expr {
-		    if($1->type == 1){
-		          $1=member_item($1, $1->sym->value.var->name);
-		    }
-		    if($3->type == 1){
-		          $3=member_item($3, $3->sym->value.var->name);
-		    }
-
 		    /*compile time type check*/
 		    if(checkTypes($1, $3) == 1) {
 		          $$ = smallFunc(const_num_e);
@@ -460,12 +412,6 @@ arexpr :
 
 
 boolResexpr :  expr GREATER expr {
-	  if($1->type == 1){
-			$1=member_item($1, $1->sym->value.var->name);
-	  }
-	  if($3->type == 1){
-			$3=member_item($3, $3->sym->value.var->name);
-	  }
 
 	  if(checkTypes($1, $3) == 1) {
 			$$ = smallFunc(boolexp_e);
@@ -486,12 +432,6 @@ boolResexpr :  expr GREATER expr {
 
 }
 		|  expr GREATER_EQUAL expr {
-			  if($1->type == 1){
-					$1=member_item($1, $1->sym->value.var->name);
-			  }
-			  if($3->type == 1){
-					$3=member_item($3, $3->sym->value.var->name);
-			  }
 
 			  if(checkTypes($1, $3) == 1) {
 					$$ = smallFunc(boolexp_e);
@@ -510,12 +450,7 @@ boolResexpr :  expr GREATER expr {
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
 		}
 		|  expr LESS expr {
-			  if($1->type == 1){
-					$1=member_item($1, $1->sym->value.var->name);
-			  }
-			  if($3->type == 1){
-					$3=member_item($3, $3->sym->value.var->name);
-			  }
+
 
 			  if(checkTypes($1, $3) == 1) {
 					$$ = smallFunc(boolexp_e);
@@ -535,13 +470,6 @@ boolResexpr :  expr GREATER expr {
 
 		}
 		|  expr LESS_EQUAL expr {
-			  if($1->type == 1){
-					$1=member_item($1, $1->sym->value.var->name);
-			  }
-			  if($3->type == 1){
-					$3=member_item($3, $3->sym->value.var->name);
-			  }
-
 			  if(checkTypes($1, $3) == 1) {
 					$$ = smallFunc(boolexp_e);
 			  } else {
@@ -567,13 +495,6 @@ boolResexpr :  expr GREATER expr {
 		// printf("to expr1 apotimatai se: %s, typou %d\n", expr1_apotimhsh_seboolean->sym->value.var->name, expr1_apotimhsh_seboolean->type);
 		// printf("to expr2 apotimatai se: %s, typou %d\n", expr2_apotimhsh_seboolean->sym->value.var->name, expr2_apotimhsh_seboolean->type);
 
-		if($1->type == 1){
-			  $1=member_item($1, $1->sym->value.var->name);
-		}
-		if($3->type == 1){
-			  $3=member_item($3, $3->sym->value.var->name);
-		}
-
 			  //compile time type check
 			  if( ($1)->type == 1 && ($3)->type == 11 ){ //table and nil ok
 			  }
@@ -597,12 +518,6 @@ boolResexpr :  expr GREATER expr {
 			  // emit(assign,false_expr,NULL,$$,yylineno,0);
 		}
 		|  expr NEQUAL expr {
-			  if($1->type == 1){
-					$1=member_item($1, $1->sym->value.var->name);
-			  }
-			  if($3->type == 1){
-					$3=member_item($3, $3->sym->value.var->name);
-			  }
 
 			  //compile time type check- MPOREI NA EINAI LATHOS
 			  if( ($1)->type ==1 && ($3)->type ==11 ){
@@ -660,13 +575,10 @@ term  : L_PARENTHES {push_E(exprflag); exprflag=0;} expr R_PARENTHES { printf(RE
 		  exprflag=pop_E();
       }
       | MINUS expr %prec UMINUS  {
-            if($2->type == 1){
-                  $2=member_item($2, $2->sym->value.var->name);
-            }
 
             printf(RED " - expression \n" RESET);
             result =malloc(5*sizeof(char));
-            sprintf(result,"_%d",rvalues++);
+            sprintf(result,"_%d",rvalues);
             tmpnode = malloc(sizeof(struct symbol_table_binding));
             tmpnode =insertVar(result,yylineno,scope);
             tmpexpr=malloc(sizeof(struct expr));
@@ -875,7 +787,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 					 			}
 
                 //   printf("eeeeeem egww (%s)=(%s)\n\n", $1->sym->value.var->name ,$4->sym->value.var->name);
-                   if($1->type != tableitem_e && $4->type == tableitem_e){
+                /*   if($1->type != tableitem_e && $4->type == tableitem_e){
                              //gia na grafetai to d apo to x=t.a.b.c.d;
                             // printf("ASSXP:: lvalue(%s) = eq(%s with index %s) \n",$1->sym->value.var->name, $4->sym->value.var->name, $4->index->sym->value.var->name);
 
@@ -885,13 +797,14 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
                              struct expr* tmp_table = new_expr(var_e,newnode,NULL,0,"",'\0',NULL);
 
                              emit(tablegetelem,$4,$4->index,tmp_table,yylineno,0);
-                             emit(assign,tmp_table,NULL,$1,yylineno,0);
+                             emit(assign,$4,NULL,$1,yylineno,0);
 
                    }
-                   else if($1->type == tableitem_e){
+                   else */
+                   if($1->type == tableitem_e){
                           // printf("else if:: lvalue(%s with type %d) = eq(%s with index %s and index type %d ) \n",$1->sym->value.var->name,$1->type, $4->sym->value.var->name, $4->index->sym->value.var->name,$4->index->type);
 
-                         if($4->index!= NULL && $4->index->type == conststring_e){
+                        /* if($4->index!= NULL && $4->index->type == conststring_e){
                                 //gia na grafetai to v apo to t.a.b.c.d = x.k.v;
                                   //   printf("ektos:: lvalue(%s with type %d) = eq(%s with index %s and index type %d ) \n",$1->sym->value.var->name,$1->type, $4->sym->value.var->name, $4->index->sym->value.var->name,$4->index->type);
                                      result =malloc(5*sizeof(char));
@@ -903,9 +816,9 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 
                                      //tablegetelem ^3        "v"      ^4
                            }
-
+*/
                         emit(table_setelem,$1->index,$4,$1,yylineno,0);
-//                                          e         x 2
+
                         struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
                         tmp_index->value.var = malloc(sizeof(struct variable));
                         tmp_index->value.var->name = malloc((strlen($1->index->sym->value.var->name) + 1) * sizeof(char));
@@ -922,13 +835,14 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 						  }
               ;
 
-primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;  }
+primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;
+            if($1->type == 1 ){
+                  $1 = member_item($1, $1->sym->value.var->name);
+            }
+            $$=$1;
+         }
          | call {printf(RED "primary:: call %s \n" RESET,$1->sym->value.var->name);
-                //if($1->type == 1 ){
-                printf("sheldonnn %d\n",$1->type);
-                        member_item($1, $1->sym->value.var->name);
-                  //}
-//$$ = $1;
+
          }
          | objectdef { printf(RED "primary:: objectdef\n" RESET);
 /*              result =malloc(5*sizeof(char));
