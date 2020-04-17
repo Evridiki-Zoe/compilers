@@ -635,7 +635,8 @@ term  : L_PARENTHES {
               strcpy(name,$2->index->sym->value.var->name);
 
               $2 = member_item($2, $2->sym->value.var->name);
-
+			  result =malloc(5*sizeof(char));
+              sprintf(result,"_%d",rvalues++);
               tmpnode = malloc(sizeof(struct symbol_table_binding));
               tmpnode =insertVar(result,yylineno,scope);
               tmpexpr=malloc(sizeof(struct expr));
