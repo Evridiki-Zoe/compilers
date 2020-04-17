@@ -593,7 +593,7 @@ boolResexpr :  expr GREATER expr {
 
 
 term  : L_PARENTHES {
-	//push_E(exprflag); exprflag=0;
+	push_E(exprflag); exprflag=0;
 } expr R_PARENTHES { printf(RED " (expression) \n" RESET);
       /*    result =malloc(5*sizeof(char));
           sprintf(result,"_%d",rvalues++);
@@ -606,7 +606,7 @@ term  : L_PARENTHES {
 
 
 
-		// exprflag=pop_E();
+		 exprflag=pop_E();
 
 
 
@@ -1108,6 +1108,7 @@ elist : expr multi_exprs {
           $$ = temp_elem;
 
 		  if (exprflag) {
+			  printf("exooo\n" );
 			 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
@@ -1518,17 +1519,17 @@ whilecond : L_PARENTHES{ insideLoop++; } expr {
 // 					 R_PARENTHES stmt { emit(jump,NULL,NULL,NULL,yylineno,999); /*jump stin arxi tou 2ou elist*/ printf(RED "for(elist; expr;elist) stmt\n" RESET); insideLoop--; }
 //     		;
 									//			--arxi cond $4			--arxi extra ent$6	--arxi somatos for	$8
-forstmt : FOR  L_PARENTHES { insideLoop++; } for_elist SEMICOLON  for_cond  SEMICOLON for_end R_PARENTHES stmt {
+forstmt : FOR  L_PARENTHES { insideLoop++; push_E(exprflag); exprflag=0; } for_elist {exprflag=pop_E();} SEMICOLON  for_cond  SEMICOLON for_end R_PARENTHES stmt {
 
 				printf(RED "for(elist; expr;elist) stmt\n" RESET);
 				insideLoop--;
-				printf("for elist %d for cond %d for end%d\n",(int)$4,(int)$6 , (int)$8 );
-				emit(jump,NULL,NULL,NULL,yylineno,$6+1); /*jump stin arxi tou 2ou elist*/
-				quads[(int)$6-1].label=QuadNo+1; /*gia to jump sto telos tou for */
-				quads[(int)$6-2].label=$8+1; /*if_eq jump arxi for*/
-				quads[(int)$8-1].label=$4+1; /*gia jump sto cond tis for*/
+				printf("for elist %d for cond %d for end%d\n",(int)$4,(int)$7 , (int)$9 );
+				emit(jump,NULL,NULL,NULL,yylineno,$7+1); /*jump stin arxi tou 2ou elist*/
+				quads[(int)$7-1].label=QuadNo+1; /*gia to jump sto telos tou for */
+				quads[(int)$7-2].label=$9+1; /*if_eq jump arxi for*/
+				quads[(int)$9-1].label=$4+1; /*gia jump sto cond tis for*/
 
-				patchFlow((int)$6+1,(int)QuadNo+1);
+				patchFlow((int)$7+1,(int)QuadNo+1);
 
 			}
 
@@ -1565,6 +1566,20 @@ for_end : for_elist {
 	      };
 
 returnstmt	: RETURN expr  SEMICOLON {
+				if (exprflag) {
+
+					struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+					struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+					emit(assign,true_expr,NULL,$2,yylineno,0);
+					emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+					emit(assign,false_expr,NULL,$2,yylineno,0);
+					exprflag=0;
+
+					patchLists(($2),(int)QuadNo-2,(int)QuadNo);
+				}
+
+
 					printf(RED "return expression; \n" RESET);
 					emit(ret,NULL,NULL,$2,yylineno,0);
 					emit(jump,NULL,NULL,NULL,yylineno,999);//end of func
