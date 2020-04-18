@@ -121,8 +121,6 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 void initialize_quad_table();
 void print_quads();
 
-struct symbol_table_binding* SearchFunction(char* name);
-
 struct expr* emit_iftable_item(struct expr* exp);
 struct expr* member_item(struct expr* lvalue ,char* name);
 struct expr* make_call (struct expr* lv, struct expr* elist);
@@ -154,14 +152,6 @@ int isEmptyR();
 int pop_E();
 int push_E(int num);
 int isEmptyE();
-
-int pop_True();
-int push_True(int num);
-int isEmptyTrue();
-
-int pop_False();
-int push_False(int num);
-int isEmptyFalse();
 
 
 

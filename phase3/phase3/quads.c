@@ -23,8 +23,6 @@ extern int 	flow_Break[50];
 extern int flow_Continue[50];
 extern int flow_Return[50];
 extern int exprflag_stack[50];
-extern int trueList[100];
-extern int falseList[100];
 
 int true_top=-1;
 int false_top=-1;
@@ -238,22 +236,6 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 }
 
 
-
-struct symbol_table_binding* SearchFunction(char* name){
-		int hash = 0;
-		struct symbol_table_binding *curr;
-		hash = hash_function(name);//briskw pou kanei hash to stoixeio
-		curr = table->pinakas[hash];
-
-		while (curr) {
-			if(strcmp(name, curr->value.var->name) == 0 && curr->active == true) {
-				return curr;
-			}
-			curr = curr->next;
-		}
-		curr = NULL;
-		return curr;
-}
 
 
 struct expr* emit_iftable_item(struct expr* exp){
@@ -584,7 +566,6 @@ int pop_E(){
 
 	return data;
 }
-//gia to stack return
 
 int push_E(int num){
 	printf("%d\n",num );
@@ -599,50 +580,6 @@ int isEmptyE(){
 }
 
 
-//------------------------------------------------------
-
-int pop_True(){
-	int data = trueList[true_top];
-	true_top -= 1;
-
-	return data;
-}
-//gia to stack return
-
-int push_True(int num){
-	printf("%d\n",num );
-	true_top++;
-    trueList[true_top] = num;
-	return 0;
-}
-
-int isEmptyTrue(){
-	if (true_top<0) return 1;
-	else return 0;
-}
-
-
-//------------------------------------------------------
-
-int pop_False(){
-	int data = falseList[false_top];
-	false_top -= 1;
-
-	return data;
-}
-//gia to stack return
-
-int push_False(int num){
-	printf("%d\n",num );
-	false_top++;
-    falseList[false_top] = num;
-	return 0;
-}
-
-int isEmptyFalse(){
-	if (false_top<0) return 1;
-	else return 0;
-}
 
 
 void addTruelist(struct expr* expression , int quadno){

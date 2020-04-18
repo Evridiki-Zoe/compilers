@@ -297,7 +297,8 @@ struct symbol_table_binding* global_exists(const char *name) {
 		}
 		curr = curr->next;
 	}
-	curr=NULL;
+	printf("\"%s\" undeclared, (first use here), line: %d\n", name, yylineno);
+	exit(EXIT_FAILURE);
 	return curr;
 }
 
@@ -343,7 +344,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	assert(table && name);
 
 	if (scope == 0) flag = 0;
-	
+
 	/*
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR

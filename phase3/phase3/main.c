@@ -14,6 +14,7 @@ struct symbol_table_binding* nil_expr_sym;
 struct symbol_table_binding* number_one;
 
 struct quad *quads=NULL;
+
 int scope_spaces[50];
 int flow_Break[50];
 int flow_Continue[50];
@@ -21,8 +22,6 @@ int flow_Return[50];
 int tmpoffset=0;
 int exprflag_stack[50];
 
-int trueList[100];
-int falseList[100];
 
 
 
