@@ -206,7 +206,8 @@ struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struc
 	expr_node->next = next;
 	expr_node->apotimimeno=0;
 
-for (size_t i = 0; i < 20; i++) {
+	size_t i;
+for (i = 0; i < 20; i++) {
 		expr_node->truelist[i]=-1;
 		expr_node->falselist[i]=-1;
 }
@@ -219,8 +220,12 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	QuadNo++;
 	if (QuadNo == QuadsSize) {
 		QuadsSize *= 2;
-		printf("realloc in emit\n" );
+		printf("realloc in emit...." );
 		quads = (struct quad*)realloc(quads, QuadsSize * sizeof(struct quad) );
+		if(quads==NULL) {
+			printf("realloc was not correct!\n" );
+			exit(EXIT_FAILURE);
+		}
 	}
 	struct quad* new_quad = malloc(sizeof(struct quad));
 	new_quad->arg1 = malloc(sizeof(struct expr ));
