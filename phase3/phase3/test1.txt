@@ -1,149 +1,29 @@
-/*
-//proper	output
-parent
-childL
-grandChildLL
-grandChildLR
-childR
-grandChildRL
-grandChildRR
-
-
-
-
-parent
-childR
-grandChildRR
-grandChildRL
-childL
-grandChildLR
-grandChildLL
-*/
-nl = "\n";
-
-function TreeNode (p, l, r) {
-	parent  = 0;
-	left	= 0;
-	right	= 0; 
-	if (argument(0)) parent = p;
-	if (argument(1)) left = l;
-	if (argument(totalarguments()-1)) right = r; //or if (argument[2]) right = r;
-
-	return  [
-		{"class" : "TreeNode"},
-		{"parent": parent},	
-		{"left"	 : left},
-		{"right" : right},
-		{"info"	 : 0},
-		{"marked": false}
-	];
-}
-
-function Stack () {
-
-	return [
-		{"class" : "Stack"},
-		{"next"  : 0},
-		{"data"  : []},
-		{"empty" : (function (self){
-			return self.next == 0;
-		})},
+//insert in ST anonymous function with 
+//two formal arguments (x, AnonymousOne). scope: 0, line: 5
+//insert in ST formal argument x. scope: 1, line: 5
+//insert in ST formal argument AnonymousOne. scope: 1, line: 5
+function (x, AnonymousOne){
+	
+	//insert in ST anonymous function with 
+	//one formal argument (AnonymousTwo). scope: 1, line: 10
+	//insert in ST formal argument AnonymousTwo. scope: 2, line: 10
+	function (AnonymousTwo){
 		
-		{"push"	 : (function (self, data){
-			self.data[self.next++] = data;
-		})},
+		//insert in ST anonymous function with 
+		//one formal argument (AnonymousThree). scope: 2, line: 15
+		//insert in ST formal argument AnonymousThree. scope: 3, line: 15
+		function (AnonymousThree){}
 		
-		{"pop"	 : (function (self){
-			if (self.next > 0)
-				self.data[--self.next] = nil;
-		})},
-		
-		{"top" 	 : (function (self){
-			return self.data[self.next-1];
-		})}
-	];
-}
-
-function PrintTree (root) {
-	if (root)
-		print(root.info, ::nl);
-
-	if (root.left)
-		PrintTree(root.left);
-
-	if (root.right)
-		PrintTree(root.right);
-}
-
-function PostOrder(root) {
-	k = Stack();
-	k..push(root);
-
-	while(not k.empty()){
-		tmp = k..top();
-		k..pop();
-		
-		if (tmp.marked)
-			print(tmp.info, nl);
-		else {
-			if (tmp.left)   k..push(tmp.left);
-			if (tmp.right)	k..push(tmp.right);
-			tmp.marked = true;
-			k..push(tmp);
-		}
+		//insert in ST anonymous function with 
+		//one formal argument (AnonymousFour). scope: 2, line: 20
+		//insert in ST formal argument AnonymousFour. scope: 3, line: 20
+		function (AnonymousFour){}
 	}
 }
-/*
-							  root
-							 /    \   
-						    /      \
-						   /  	    \
-						  /    	     \
-					  childL	     childR
-					  /     \        /     \
-					 /       \  grandChildRR\
-				    /         \			     \
-			grandChildLL  grandChildLR      grandChildRR
-*/
 
-root 			= TreeNode(0,0,0);
-childL 			= TreeNode(0,0,0);
-childR 			= TreeNode(0,0,0);
-grandChildLL 	= TreeNode(0,0,0);
-grandChildLR 	= TreeNode(0,0,0);
-grandChildRL 	= TreeNode(0,0,0);
-grandChildRR 	= TreeNode(0,0,0);
-
-root.info 	  		= "parent";
-childL.info 	  	= "childL";
-childR.info 	  	= "childR";
-grandChildLL.info 	= "grandChildLL";
-grandChildLR.info 	= "grandChildLR";
-grandChildRL.info 	= "grandChildRL";
-grandChildRR.info 	= "grandChildRR";
-
-root.left  = childL;
-root.right = childR;
-
-childL.parent	= root;
-childL.left		= grandChildLL;
-childL.right	= grandChildLR;
-
-childR.parent 	= root;
-childR.left		= grandChildRL;
-childR.right	= grandChildRR;
-
-
-grandChildLL.parent = childL;
-grandChildLR.parent = childL;
-
-grandChildRL.parent = childR;
-grandChildRL.parnet = childR;
-
-
-PrintTree(root);
-print("\n", ::nl, "\n", nl);
-PostOrder(root);
-
-
+//insert in ST anonymous function with 
+//two formal arguments (x, AnonymousFive). scope: 0, line: 28
+//insert in ST formal argument x. scope: 1, line: 28
+//insert in ST formal argument AnonymousFive. scope: 1, line: 28
+function (x, AnonymousFive){}
 
