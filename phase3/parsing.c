@@ -343,7 +343,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	assert(table && name);
 
 	if (scope == 0) flag = 0;
-	
+
 	/*
 	 * check locally gia reference, ok
 	 * meta an yparxei synartisi anamesa, ERROR
@@ -592,7 +592,7 @@ int print_table(){
       				printf("\n \"%s\" [%s variable] (line %d) (scope %d) (offset %d on %s) ", curr->value.var->name, enum_toString(curr->symbol_type), curr->value.var->line, curr->value.var->scope,curr->value.var->offset,enum_toString_symbolSpace(curr->scope_space));
 
 				if((curr->symbol_type == 3 || curr->symbol_type == 4) && curr->value.func->scope == scope ) {
-			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) (total vars %d)", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope, curr->value.func->totalVars);
+			 		printf("\n \"%s\" [%s function] (line %d) (scope %d) (total vars %d) (address %d)", curr->value.func->name, enum_toString(curr->symbol_type), curr->value.func->line, curr->value.func->scope, curr->value.func->totalVars,curr->value.func->funcAddress);
 					//printf gia oti mpikan swsta <3
 					// struct arguments *tmp = curr->value.func->args_list;
 					// //printf("arg1 %s arg2 %s",tmp->name, tmp->next->name);

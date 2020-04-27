@@ -1,22 +1,19 @@
-/*test1().test2(a,b,c,v,e);
+a=0;
+b=5;
 
-test1.test2(a,b,l);
 
-(function a(){})(k,l);
+function kati(b,c){
 
-sprite..move(dx,dy);
-*/
+ffisd;
+while(true){
+        function edo(k,z){
+        geia=e and 3;
 
-//f(a1.a2.a3.a4[9]);
-//s=f(a1.a2.a3.a4[9]);
-//f(a1.a2.a3.a4);
-//p=f(a1.a2.a3.a4);
-//k[a1.a2.a3.a4]=e;
+        newf=(function(n,m){});
+}
 
-//e=k[a1.a2.a3.a4];
+}
 
-//(function(a,b,c){::print(a);})(a(), b()(), (function(x){return x;})(c()));
 
-//a[7].b[9].l();
-//a[7].b[9]();
-//a[7].b[8];
+
+}

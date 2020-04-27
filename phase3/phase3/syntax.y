@@ -1346,6 +1346,8 @@ funcdef  :  funcstart funcname  L_PARENTHES {push_SP(tmpoffset); tmpoffset=0; in
 			  insideFunc--;
 			  emit(funcend,$2,NULL,NULL,yylineno,0);
 			  $2->sym->value.func->totalVars=tmpoffset;
+			  $2->sym->value.func->funcAddress=$1+2;//+1 gia indexing apo to 0 +1 giati to $1 einai to jump
+
 			  $$=$2;
 			  printf("funcstart %d\n",(int)$1 );
 			  quads[(int)$1].label=QuadNo+1;

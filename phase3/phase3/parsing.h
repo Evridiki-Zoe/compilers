@@ -41,6 +41,7 @@ typedef struct function {
 	unsigned int 		line;
 	unsigned int 		scope;
 	int 				totalVars;
+	int					funcAddress;
  	struct arguments 	*args_list;
 } function;
 
