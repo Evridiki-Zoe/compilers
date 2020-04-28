@@ -1,14 +1,14 @@
-/*table[3][9]++;
+table[3][9]++;
 kappa = table[3][9]++;
-
-table[3][9]--;
-lamda = table[3][9]--;
 
 ++table[3][9][x];
 kappa = ++table[3][9];
 
+table[3][9]--;
+lamda = table[3][9]--;
+
 --table[3][9];
-lamda = --table[3][9];*/
+lamda = --table[3][9];
 
 
 //a()[b][r][u][2]++;
