@@ -624,42 +624,12 @@ term  : L_PARENTHES {
 	      printf(RED "++lvalue dassa\n" RESET);
             check_for_funcname($2->sym->value.var->name);
 
-            char * name = NULL;
             if($2->type == 1){
 
-
-              // name = malloc(sizeof(char)* strlen($2->index->sym->value.var->name));
-              // strcpy(name,$2->index->sym->value.var->name);
-			  //
-              // $2 = member_item($2, $2->sym->value.var->name); /// to apanografeis xoris logo
-			  // result =malloc(5*sizeof(char));
-              // sprintf(result,"_%d",rvalues++);
-              // tmpnode =insertVar(result,yylineno,scope);
-              // tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-              // //new expr for number 1
-              // struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-              // // first add
-              // emit(add,$2,tmp_one,$2,yylineno,0);
-			  //
-			  //
-              // struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
-              // tmpnode->value.var = malloc(sizeof(struct variable));
-              // tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
-              // strcpy(tmpnode->value.var->name, name);
-              // tmpnode->next = NULL;
-              // struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
-              // emit(table_setelem,tmp_expr,$2,$2->index,yylineno,0);
-			  //
-              // $$ = $2;
-              // $$->type = 0;
-
 			   struct expr* tmp_expr = new_expr(tableitem_e,$2->index->sym,NULL,0,"",'\0',NULL);
-			 //  printf("edo $2 %s\n",$2->sym->value.var->name );
 
 			  $$= member_item($2, $2->sym->value.var->name);
 
-			  printf("edo $$ %s \n",$$->sym->value.var->name );
-			  printf("edo $$ index %s \n",$$->index->sym->value.var->name );
 			  result =malloc(5*sizeof(char));
 			  sprintf(result,"_%d",rvalues++);
 			  tmpnode =insertVar(result,yylineno,scope);
@@ -669,18 +639,8 @@ term  : L_PARENTHES {
 			  // first add
 			  emit(add,$$,tmp_one,$$,yylineno,0);
 
-
-
-              emit(table_setelem,tmp_expr,$$,$$->index,yylineno,0);
-
-			  $$->type = 0;
-
-
-
-
-
-
-            } else{
+        emit(table_setelem,tmp_expr,$$,$$->index,yylineno,0);
+        } else{
                   result =malloc(5*sizeof(char));
                   sprintf(result,"_%d",rvalues++);
     			   	tmpnode = malloc(sizeof(struct symbol_table_binding));
@@ -735,35 +695,21 @@ term  : L_PARENTHES {
           check_for_funcname($2->sym->value.var->name);
   				printf(RED "--lvalue\n" RESET);
 
-
-          char * name = NULL;
           if($2->type == 1){
-              name = malloc(sizeof(char)* strlen($2->index->sym->value.var->name));
-              strcpy(name,$2->index->sym->value.var->name);
 
-              $2 = member_item($2, $2->sym->value.var->name);
+              struct expr* tmp_expr = new_expr(tableitem_e,$2->index->sym,NULL,0,"",'\0',NULL);
+              $$= member_item($2, $2->sym->value.var->name);
 
-			  result =malloc(5*sizeof(char));
-    		  sprintf(result,"_%d",rvalues++);
+              result =malloc(5*sizeof(char));
+              sprintf(result,"_%d",rvalues++);
               tmpnode =insertVar(result,yylineno,scope);
               tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
               //new expr for number 1
               struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-              // first add
-              emit(sub,$2,tmp_one,$2,yylineno,0);
 
+              emit(sub,$$,tmp_one,$$,yylineno,0);
 
-              struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
-              tmpnode->value.var = malloc(sizeof(struct variable));
-              tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
-              strcpy(tmpnode->value.var->name, name);
-              tmpnode->next = NULL;
-              struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
-              emit(table_setelem,tmp_expr,$2,$2->index,yylineno,0);
-
-              $$ = $2;
-              $$->type = 0;
-
+              emit(table_setelem,tmp_expr,$$,$$->index,yylineno,0);
           } else{
       				result =malloc(5*sizeof(char));
       			  sprintf(result,"_%d",rvalues++);
@@ -807,8 +753,8 @@ term  : L_PARENTHES {
     				emit(sub,$1,tmp_one,$1,yylineno,0);
             $$ = tmpexpr;
 
-            if(name!= NULL){
-                 //$$ =???;
+            if(name!= NULL){  // ayto den mporei na allaksei giati prepei na ginetai mono an einai table
+                 
                  struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
                  tmpnode->value.var = malloc(sizeof(struct variable));
                  tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
