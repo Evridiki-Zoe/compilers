@@ -661,34 +661,64 @@ term  : L_PARENTHES {
             result =malloc(5*sizeof(char));
   			sprintf(result,"_%d",rvalues++);
 
-            char * name = NULL;
-            if($1->type == 1){
-                  name = malloc(sizeof(char)* strlen($1->index->sym->value.var->name));
-                  strcpy(name,$1->index->sym->value.var->name);
+          //   char * name = NULL;
+          //   if($1->type == 1){
+          //         name = malloc(sizeof(char)* strlen($1->index->sym->value.var->name));
+          //         strcpy(name,$1->index->sym->value.var->name);
+		  //
+          //         $1 = member_item($1, $1->sym->value.var->name);
+          //   }
+		  //
+		  //
+			//    	tmpnode =insertVar(result,yylineno,scope);
+			//    	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+			// 	  //new expr for number 1
+          // 		struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+			// 	  // first assing
+			// 	  emit(assign,$1,NULL,tmpexpr,yylineno,0);
+			// 	  //then add
+			// 	  emit(add,$1,tmp_one,$1,yylineno,0);
+          // $$ = tmpexpr;
+		  //
+          // if(name!= NULL){
+          //     //$$ =???;
+          //     struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
+          //     tmpnode->value.var = malloc(sizeof(struct variable));
+          //     tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
+          //     strcpy(tmpnode->value.var->name, name);
+          //     tmpnode->next = NULL;
+          //     struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
+          //     emit(table_setelem,tmp_expr,$1,$1->index,yylineno,0);
+          // }
 
-                  $1 = member_item($1, $1->sym->value.var->name);
-            }
 
-			   	tmpnode =insertVar(result,yylineno,scope);
-			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-				  //new expr for number 1
-          struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-				  // first assing
-				  emit(assign,$1,NULL,tmpexpr,yylineno,0);
-				  //then add
-				  emit(add,$1,tmp_one,$1,yylineno,0);
-          $$ = tmpexpr;
+		  if($1->type == 1){
+			  	$$= member_item($1, $1->sym->value.var->name);
 
-          if(name!= NULL){
-              //$$ =???;
-              struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
-              tmpnode->value.var = malloc(sizeof(struct variable));
-              tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
-              strcpy(tmpnode->value.var->name, name);
-              tmpnode->next = NULL;
-              struct expr* tmp_expr = new_expr(tableitem_e,tmpnode,NULL,0,"",'\0',NULL);
-              emit(table_setelem,tmp_expr,$1,$1->index,yylineno,0);
-          }
+			    tmpnode =insertVar(result,yylineno,scope);
+   			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+   				//new expr for number 1
+             	struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+   				// first assing
+   				emit(assign,$$,NULL,tmpexpr,yylineno,0);
+
+				emit(add,$$,tmp_one,$$,yylineno,0);
+
+				 emit(table_setelem,$1->index,$$,$$->index,yylineno,0);
+
+		  }else{
+			  tmpnode =insertVar(result,yylineno,scope);
+			 tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
+			   //new expr for number 1
+			 struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
+			   // first assing
+			   emit(assign,$1,NULL,tmpexpr,yylineno,0);
+			   //then add
+			   emit(add,$1,tmp_one,$1,yylineno,0);
+	   			$$ = tmpexpr;
+		  }
+
+
 
 	}
       | MMINUS lvalue {
@@ -754,7 +784,7 @@ term  : L_PARENTHES {
             $$ = tmpexpr;
 
             if(name!= NULL){  // ayto den mporei na allaksei giati prepei na ginetai mono an einai table
-                 
+
                  struct symbol_table_binding *tmpnode = malloc(sizeof(struct symbol_table_binding));
                  tmpnode->value.var = malloc(sizeof(struct variable));
                  tmpnode->value.var->name = malloc(strlen(name+1) * sizeof(char));
