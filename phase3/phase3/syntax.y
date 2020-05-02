@@ -338,11 +338,13 @@ expr :
 
 		  $$->apotimimeno=1;
 		 exprflag=1;
-			// emit(if_eq,$2,true_expr,NULL,yylineno,999);
-			// emit(jump,NULL,NULL,NULL,yylineno,999);
-			// emit(assign,true_expr,NULL,$$,yylineno,0);
-			// emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
-			// emit(assign,false_expr,NULL,$$,yylineno,0);
+
+			emit(assign,true_expr,NULL,$$,yylineno,0);
+			emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+			emit(assign,false_expr,NULL,$$,yylineno,0);
+			exprflag=0;
+
+			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
 
 
 }
