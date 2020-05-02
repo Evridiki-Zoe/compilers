@@ -1211,12 +1211,36 @@ multi_indexedelem	: COMMA indexedelem multi_indexedelem {
                   }
                   ;
 
-indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr(%s) : expr(%s)}\n",$2->sym->value.var->name,$4->sym->value.var->name);
+indexedelem	  : L_CBRACKET expr  {
+	if (exprflag) {
+	   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+	   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+	   emit(assign,true_expr,NULL,$2,yylineno,0);
+	   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+	   emit(assign,false_expr,NULL,$2,yylineno,0);
+	   exprflag=0;
+	  patchLists(($2),(int)QuadNo-2,(int)QuadNo);
+   }
+}
+	COLON expr R_CBRACKET { //printf( "indelem {expr(%s) : expr(%s)}\n",$2->sym->value.var->name,$4->sym->value.var->name);
+					printf("edo %d\n",exprflag );
+					if (exprflag) {
+					   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+					   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+					   emit(assign,true_expr,NULL,$5,yylineno,0);
+					   emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+					   emit(assign,false_expr,NULL,$5,yylineno,0);
+					   exprflag=0;
+					  patchLists(($5),(int)QuadNo-2,(int)QuadNo);
+				   }
+
                   result = malloc(2 * sizeof(char));
                   sprintf(result, "_%d", rvalues);
                   struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
                   struct expr* temp_elem = new_expr(tableitem_e,tmp_symbol,NULL,0,"",'\0',NULL);
-                  emit(table_setelem,$2,$4,temp_elem,yylineno,0);
+                  emit(table_setelem,$2,$5,temp_elem,yylineno,0);
 
                   //adespoto symbol pou den prepei na mpei sto hash!
                   struct symbol_table_binding *newnode1 = malloc(sizeof(struct symbol_table_binding));
@@ -1230,8 +1254,8 @@ indexedelem	  : L_CBRACKET expr COLON expr R_CBRACKET { //printf( "indelem {expr
 
                   struct symbol_table_binding *newnode2 = malloc(sizeof(struct symbol_table_binding));
                   newnode2->value.var = malloc(sizeof(struct variable));
-                  newnode2->value.var->name = malloc((strlen($4->sym->value.var->name) + 1) * sizeof(char));
-                  strcpy(newnode2->value.var->name, $4->sym->value.var->name);
+                  newnode2->value.var->name = malloc((strlen($5->sym->value.var->name) + 1) * sizeof(char));
+                  strcpy(newnode2->value.var->name, $5->sym->value.var->name);
                   newnode2->value.var->line = yylineno;
                   newnode2->symbol_type = 1;
                   newnode2->value.var->scope = scope;
