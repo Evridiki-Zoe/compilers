@@ -1,2 +1,0 @@
-t.a.v.l.l = x;
-//x = table.a.b.c.d;
