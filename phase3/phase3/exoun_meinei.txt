@@ -1,7 +1,0 @@
-//swsto type checking
-//id twn functions
-// re alloc ston pinaka me ta quads (?) - apla terastio pinaka lol
-
-//na rwthsoume gia:
-// ignore quad (?)
-// rvalues ti paizei
