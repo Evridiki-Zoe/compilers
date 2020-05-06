@@ -326,7 +326,7 @@ expr :
 
 		exprflag = 1;
 
-			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
+//			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
 
 
 }
