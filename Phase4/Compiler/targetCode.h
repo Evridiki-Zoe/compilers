@@ -37,6 +37,9 @@ struct vmarg {
 	unsigned int	val;
 
 };
+//array of instruction , san to quads[]
+
+struct instruction *instructions;
 
 struct instruction {
 
@@ -44,7 +47,7 @@ struct instruction {
 	struct vmarg*			result;
 	struct vmarg*			arg1;
 	struct vmarg* 			arg2;
-	unsigned int 	srcLine;
+	unsigned  	srcLine;
 
 };
 
@@ -67,6 +70,8 @@ unsigned	totalNamedLibfuncs;
 struct userfunc*	userFuncs;
 unsigned	totalUserFuncs;
 
+void printInstructions();
+void emitIns(vmopcode opcode ,struct vmarg* result , struct vmarg* arg1, struct vmarg* arg2, unsigned  srcLine);
 
 void generate(void);
 

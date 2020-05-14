@@ -4,7 +4,7 @@
 #include "targetCode.h"
 
 extern double QuadNo;
-
+unsigned instrNo=0;
 
 void generate_ADD (struct quad *quad){printf("add\n" ); }
 void generate_SUB (struct quad *quad){printf("sub\n" );}
@@ -69,13 +69,37 @@ generator_func_t generators[] = {
 
 };
 
+void printInstructions(){
+	int i;
+	for (i = 0; i < instrNo; i++) {
+		printf("%d) code : %d , result :%d , arg1 : %d , arg2 : %d \n",i+1 ,instructions[i].opcode,instructions[i].result->type,instructions[i].arg1->val,instructions[i].arg2->val);
+	}
+}
+
 
 void generate(void){
+
 	int i;
+
+	// struct vmarg* tmpnode=malloc(sizeof(struct vmarg));
+	// tmpnode->type=label_a;
+	// tmpnode->val=10;
+
+	instructions= (struct instruction*)malloc(QuadNo * sizeof(struct instruction) );
 	for ( i = 0; i < QuadNo; i++) {
 	printf("%d)",i+1 );
+	//		emitIns((int)(quads[i].opcode),tmpnode,tmpnode,tmpnode,400);
 		(*generators[quads[i].opcode])(quads+1);
 	}
 
 
+}
+
+void emitIns(vmopcode opcode ,struct vmarg* result ,struct vmarg* arg1, struct vmarg* arg2, unsigned  srcLine){
+	instructions[instrNo].opcode=opcode;
+	instructions[instrNo].result=result;
+	instructions[instrNo].arg1=arg1;
+	instructions[instrNo].arg2=arg2;
+	instructions[instrNo].srcLine=srcLine;
+	instrNo++;
 }
