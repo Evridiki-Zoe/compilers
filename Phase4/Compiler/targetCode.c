@@ -11,7 +11,7 @@ void generate_SUB (struct quad *quad){printf("sub\n" );}
 void generate_MUL (struct quad *quad){printf("mul\n" );}
 void generate_DIV (struct quad *quad){printf("div\n" );}
 void generate_MOD (struct quad *quad){printf("mod\n" );}
-void generate_NEWTABLE (struct quad *quad){printf("generate_NEWTABLE\n" );}
+void generate_NEWTABLE (struct quad *quad){printf("generate_NEWTABLE\n" );generate(newtable_v,quad);}
 void generate_TABLEGETELM (struct quad *quad){printf("generate_TABLEGETELM\n" );}
 void generate_TABLESETELEM(struct quad *quad){printf("generate_TABLESETELEM\n" );}
 void generate_ASSIGN (struct quad *quad){printf("generate_ASSIGN\n" );}
@@ -72,7 +72,7 @@ generator_func_t generators[] = {
 void printInstructions(){
 	int i;
 	for (i = 0; i < instrNo; i++) {
-	//	printf("%d) code : %d nano , result :%d , arg1 : %d , arg2 : %d \n",i+1 ,instructions[i].opcode,instructions[i].result->type,instructions[i].arg1->val,instructions[i].arg2->val);
+		printf("%d) code : %d  , result :%d , arg1 : %d , arg2 : %d \n",i+1 ,instructions[i].opcode,instructions[i].result->val,instructions[i].arg1->val,instructions[i].arg2->val);
 	}
 }
 
@@ -99,7 +99,7 @@ void generateIns(void){
 
 void generate(vmopcode code , struct quad* quad){
 
-	struct instruction* tmpins;
+	struct instruction* tmpins=malloc(sizeof(struct instruction));
 	tmpins->opcode=code;
 	tmpins->arg1=make_operand(quad->arg1);
 
