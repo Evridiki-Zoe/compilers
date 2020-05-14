@@ -194,7 +194,7 @@ void print_list_rvalues(){
 
 struct expr* new_expr(expr_t expr_type, struct symbol_table_binding* sym , struct expr* index
 	,double numconst ,char* strconst , unsigned char boolconst , struct expr* next){
-	
+
 	size_t i;
 	struct expr* expr_node = malloc(sizeof(struct expr));
 
@@ -499,7 +499,7 @@ void print_quads(){
 	}
 	fprintf(fp,"------------------------------------------------\n" );
 
-	fclose (fp);
+	//fclose (fp);
 
 }
 

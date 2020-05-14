@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 
-
+struct quad *quads;
 /*enum for rvalue type*/
 typedef enum {
 	number = 0,

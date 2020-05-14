@@ -14,7 +14,7 @@ struct symbol_table_binding* false_expr_sym;
 struct symbol_table_binding* nil_expr_sym;
 struct symbol_table_binding* number_one;
 
-struct quad *quads=NULL;
+extern struct quad *quads;
 int scope_spaces[50];
 int flow_Break[50];
 int flow_Continue[50];
@@ -54,5 +54,6 @@ int main(void) {
 	print_table();
 //	print_list_rvalues();
 	print_quads();
+	generate();
 	return 0;
 }
