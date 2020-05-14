@@ -30,11 +30,22 @@ int falseList[100];
 int main(void) {
 
 	initialize_quad_table();
-
 	table = malloc(sizeof(struct SymTable_struct));
 
 	table->pinakas = malloc(SIZE* sizeof(struct symbol_table_binding *));//oxi calloc, tha to diorthwsw kapoia stigmh
 	table->total_size = 0;
+
+	stringConsts = (char**) malloc(50 * sizeof(char*)); //pianw 50 theseis gia ta strings
+	totalStringConsts=0;
+
+	numConsts = (double *) malloc(100 * sizeof(double)); //pianw 100 theseis gia numbers
+	totalNumConsts = 0 ;
+
+	namedLibfuncs = (char**) malloc(50 * sizeof(char*)); //pianw 50 theseis gia ta libfunc
+	totalNamedLibfuncs=0;
+
+	userFuncs = (struct userfunc**) malloc(50 * sizeof(struct userfunc*)); //pianw 50 theseis gia ta user's func
+	totalUserFuncs=0;
 
 	insert_hash_table("print", 4 , 0, true, 0);
 	insert_hash_table("input", 4 , 0, true, 0);
@@ -54,8 +65,29 @@ int main(void) {
 	print_table();
 //	print_list_rvalues();
 	print_quads();
-	generateIns();
+generateIns();
 	printInstructions();
 
+
+	/*add_rval_string("lalal");
+
+	add_rval_num(5);
+	add_rval_num(3.123456789);
+	add_rval_num(-9);
+
+	add_rval_libfuncs("libfunc");
+	add_rval_libfuncs("libfunc2");
+	add_rval_libfuncs("libfunc3");
+
+
+	add_rval_userfuncs("userfunc",4,3,2);
+	add_rval_userfuncs("userfunc2",1,3,3);
+	add_rval_userfuncs("userfunc3",2,3,7);
+
+	int j=0;
+	while (j< totalUserFuncs) {
+		printf("%s\n", userFuncs[j]->id );
+		j++;
+	}*/
 	return 0;
 }

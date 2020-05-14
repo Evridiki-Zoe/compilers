@@ -34,7 +34,7 @@ typedef enum  {
 struct vmarg {
 
 	vmarg_t 		type;
-	unsigned 		val;
+	unsigned 	val;
 
 };
 //array of instruction , san to quads[]
@@ -43,11 +43,11 @@ struct instruction *instructions;
 
 struct instruction {
 
-	vmopcode				opcode;
+	vmopcode		opcode;
 	struct vmarg*			result;
 	struct vmarg*			arg1;
 	struct vmarg* 			arg2;
-	unsigned  				srcLine;
+	unsigned  	srcLine;
 
 };
 
@@ -61,21 +61,23 @@ struct userfunc {
 };
 
 
-double* 	numConsts;
-unsigned	totalNumConsts;
-char**		stringConsts;
-unsigned	totalStringConsts;
+double* 	numConsts; //rvalue numbers
+unsigned	totalNumConsts; //total number of  numbers
+char**		stringConsts; //rvalue strings
+unsigned	totalStringConsts; //total number of strings
 char**		namedLibfuncs;
 unsigned	totalNamedLibfuncs;
-struct userfunc*	userFuncs;
+struct userfunc**	userFuncs;
 unsigned	totalUserFuncs;
 
+void add_rval_string(char * str);
+void add_rval_num(double number);
+void add_rval_libfuncs(char * libfunc);
+void add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs );
 
 struct vmarg* make_operand(struct expr* expr);
 void printInstructions();
 void emitIns(struct instruction* ins);
-
-
 
 void generateIns(void);
 void generate(vmopcode code , struct quad* quad);
@@ -110,8 +112,6 @@ void generate_AND(struct quad *quad);
 void generate_OR(struct quad *quad);
 void generate_NOT(struct quad *quad);
 void generate_RET(struct quad *quad);
-
-
 
 
 

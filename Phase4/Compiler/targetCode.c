@@ -38,6 +38,7 @@ void generate_NOT(struct quad *quad){}
 void generate_RET(struct quad *quad){}
 
 
+
 typedef void (*generator_func_t) (struct quad*);
 
 generator_func_t generators[] = {
@@ -87,9 +88,9 @@ void generateIns(void){
 	int i;
 
 	instructions= (struct instruction*)malloc(QuadNo * sizeof(struct instruction) );
-
 	for ( i = 0; i < QuadNo; i++) {
-		(*generators[quads[i].opcode])(quads + i);
+		(*generators[quads[i].opcode])(quads+i);
+
 	}
 
 
@@ -97,19 +98,18 @@ void generateIns(void){
 
 void generate(vmopcode code , struct quad* quad){
 
-	struct instruction* tmpins=malloc(sizeof(struct instruction));
+	struct instruction* tmpins=malloc(sizeof(struct instruction));;
 	tmpins->opcode=code;
 	tmpins->arg1=make_operand(quad->arg1);
+
 	tmpins->arg2=make_operand(quad->arg2);
 	tmpins->result=make_operand(quad->res);
 	tmpins->srcLine=quad->line;
 	// TODO den ksero ti thelei na pei o poiitis sot -> quad.taddress=nexcf/...
 
 	emitIns(tmpins);
-
-
-
 }
+
 
 void emitIns(struct instruction* ins){
 
@@ -119,24 +119,19 @@ void emitIns(struct instruction* ins){
 	instructions[instrNo].arg2=ins->arg2;
 	instructions[instrNo].srcLine=ins->srcLine;
 	instrNo++;
-
 }
-
 
 struct vmarg* make_operand(struct expr* expr){
 
- 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-	//printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
-
+	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
+//	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
 		case arithmeticexp_e:
 		case boolexp_e:
 		case newtable_e: {
-
 			arg->val=expr->sym->value.var->offset;
-
 			switch (expr->sym->scope_space) {
 				case program_var : 	arg->type=global_a;	break;
 				case function_loc : arg->type=local_a;	break;
@@ -144,6 +139,7 @@ struct vmarg* make_operand(struct expr* expr){
 				default :	assert(0);
 			}
 			break;
+
 		}
 		case constbool_e: {
 			arg->val= expr->boolconst;
@@ -175,4 +171,49 @@ struct vmarg* make_operand(struct expr* expr){
 	}
 
 	return arg;
+
+}
+
+void add_rval_string(char * str){
+			if(totalStringConsts == 50 );// TODO realloc pinaka, oxi 50 thelei global maxsize gia to kathena
+
+			stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
+			strcpy(stringConsts[totalStringConsts] , str);
+			printf("%s\n", stringConsts[totalStringConsts] );
+			totalStringConsts++;
+}
+
+void add_rval_num(double number){ // xanei pshfia meta to 6o
+	if(totalNumConsts == 100 );// TODO realloc pinaka
+
+	numConsts[totalNumConsts] = number;
+	printf("%f\n", numConsts[totalNumConsts] );
+	totalNumConsts++;
+
+}
+
+void add_rval_libfuncs(char * libfunc){
+	if(totalNamedLibfuncs == 50 );// TODO realloc pinaka
+
+	namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
+	strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
+	printf("%s\n", namedLibfuncs[totalNamedLibfuncs] );
+	totalNamedLibfuncs++;
+
+}
+
+void add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
+
+	if(totalUserFuncs == 50 );// TODO realloc pinaka
+
+	struct userfunc* newnode = malloc(sizeof(struct userfunc));
+	newnode->address = address;
+	newnode->localSize = localsize;
+	newnode->totalargs =  totalargs;
+	newnode->id = malloc(sizeof(char) * strlen(userfunc));
+	strcpy(newnode->id, userfunc);
+
+	userFuncs[totalUserFuncs]  = newnode;
+	printf("%s\n", userFuncs[totalUserFuncs] ->id );
+	totalUserFuncs++;
 }
