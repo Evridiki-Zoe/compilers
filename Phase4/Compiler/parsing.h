@@ -33,7 +33,7 @@ typedef struct variable{
     char			*name;
 	unsigned int 	line;
 	unsigned int 	scope;
-	int 			offset;
+	unsigned 			offset;
 } variable;
 
 typedef struct function {

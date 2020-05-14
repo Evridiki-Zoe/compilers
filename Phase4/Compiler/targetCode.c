@@ -6,34 +6,36 @@
 extern double QuadNo;
 unsigned instrNo=0;
 
-void generate_ADD (struct quad *quad){printf("add\n" ); generate(add_v,quad); printf("kai edo\n" );}
-void generate_SUB (struct quad *quad){printf("sub\n" );}
-void generate_MUL (struct quad *quad){printf("mul\n" );}
-void generate_DIV (struct quad *quad){printf("div\n" );}
-void generate_MOD (struct quad *quad){printf("mod\n" );}
-void generate_NEWTABLE (struct quad *quad){printf("generate_NEWTABLE\n" );generate(newtable_v,quad);}
-void generate_TABLEGETELM (struct quad *quad){printf("generate_TABLEGETELM\n" );}
-void generate_TABLESETELEM(struct quad *quad){printf("generate_TABLESETELEM\n" );}
-void generate_ASSIGN (struct quad *quad){printf("generate_ASSIGN\n" );}
-void generate_NOP (struct quad *quad){printf("generate_NOP\n" );}
-void generate_JUMP(struct quad *quad){printf("generate_JUMP\n" );}
-void generate_IF_EQ(struct quad *quad){printf("generate_IF_EQ\n" );}
-void generate_IF_NOTEQ(struct quad *quad){printf("generate_IF_NOTEQ\n" );}
-void generate_IF_GREATER(struct quad *quad){printf("generate_IF_GREATER\n" );}
-void generate_IF_GREATEREQ(struct quad *quad){printf("generate_IF_GREATEREQ\n" );}
-void generate_IF_LESS(struct quad *quad){printf("generate_IF_LESS\n" );}
-void generate_IF_LESSEQ(struct quad *quad){printf("generate_IF_LESSEQ\n" );}
-void generate_PARAM(struct quad *quad){printf("generate_PARAM\n" );}
-void generate_CALL(struct quad *quad){ printf("generate_CALL\n" );}
-void generate_GETRETVAL(struct quad *quad){printf("generate_GETRETVAL\n" );}
-void generate_FUNCSTART(struct quad *quad){printf("generate_FUNCSTART\n" );}
-void generate_RETURN(struct quad *quad){printf("generate_RETURN\n" );}
-void generate_FUNCEND(struct quad *quad){printf("generate_FUNCEND\n" );}
-void generate_UMINUS(struct quad *quad){printf("generate_UMINUS\n" );}
-void generate_AND(struct quad *quad){printf("generate_AND\n" );}
-void generate_OR(struct quad *quad){printf("generate_OR\n" );}
-void generate_NOT(struct quad *quad){printf("generate_NOT\n" );}
-void generate_RET(struct quad *quad){printf("generate_RET\n" );}
+void generate_ADD (struct quad *quad)			{generate(add_v,quad);}
+void generate_SUB (struct quad *quad)			{generate(sub_v,quad);}
+void generate_MUL (struct quad *quad)			{generate(mul_v,quad);}
+void generate_DIV (struct quad *quad)			{generate(div_v,quad);}
+void generate_MOD (struct quad *quad)			{generate(mod_v,quad);}
+void generate_NEWTABLE (struct quad *quad)		{generate(newtable_v,quad);}
+void generate_TABLEGETELM (struct quad *quad)	{generate(tablegetelem_v,quad);}
+void generate_TABLESETELEM(struct quad *quad)	{generate(tablesetelem_v,quad);}
+void generate_ASSIGN (struct quad *quad)		{generate(assign_v,quad);}
+void generate_NOP (struct quad *quad)			{struct instruction *t=malloc(sizeof(struct instruction)); t->opcode=nop_v;emitIns(t);}// dunno ti rolo varaei
+void generate_JUMP(struct quad *quad)			{}//TODO generate jump
+void generate_IF_EQ(struct quad *quad)			{generate(jeq_v,quad);}
+void generate_IF_NOTEQ(struct quad *quad)		{generate(jne_v,quad);}
+void generate_IF_GREATER(struct quad *quad)		{generate(jgt_v,quad);}
+void generate_IF_GREATEREQ(struct quad *quad)	{generate(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
+void generate_IF_LESS(struct quad *quad)		{generate(jlt_v,quad);}
+void generate_IF_LESSEQ(struct quad *quad)		{generate(jle_v,quad);}
+void generate_PARAM(struct quad *quad)			{}//TODO
+void generate_CALL(struct quad *quad)			{}//TODO
+void generate_GETRETVAL(struct quad *quad)		{}//TODO
+void generate_FUNCSTART(struct quad *quad)		{}//TODO
+void generate_RETURN(struct quad *quad)			{}//TODO
+void generate_FUNCEND(struct quad *quad)		{}//TODO
+void generate_UMINUS(struct quad *quad)			{}//TODO
+
+
+void generate_AND(struct quad *quad){} 		//Den tha ta xreiastoume afta
+void generate_OR(struct quad *quad){}
+void generate_NOT(struct quad *quad){}
+void generate_RET(struct quad *quad){}
 
 
 typedef void (*generator_func_t) (struct quad*);
@@ -72,7 +74,10 @@ generator_func_t generators[] = {
 void printInstructions(){
 	int i;
 	for (i = 0; i < instrNo; i++) {
-		printf("%d) code : %d  , result :%d , arg1 : %d , arg2 : %d \n",i+1 ,instructions[i].opcode,instructions[i].result->val,instructions[i].arg1->val,instructions[i].arg2->val);
+		printf("%d)",i+1 );
+		printf("result : (%d,%u)\t",instructions[i].result->type,instructions[i].result->val );
+		printf("arg1 : (%d,%u)\t",instructions[i].arg1->type,instructions[i].arg1->val );
+		printf("arg2 : (%d,%u)\n",instructions[i].arg2->type,instructions[i].arg2->val );
 	}
 }
 
@@ -81,17 +86,10 @@ void generateIns(void){
 
 	int i;
 
-	// struct vmarg* tmpnode=malloc(sizeof(struct vmarg));
-	// tmpnode->type=label_a;
-	// tmpnode->val=10;
-
 	instructions= (struct instruction*)malloc(QuadNo * sizeof(struct instruction) );
+
 	for ( i = 0; i < QuadNo; i++) {
-	//printf("%d)",i+1 );
-	//		emitIns((int)(quads[i].opcode),tmpnode,tmpnode,tmpnode,400);
-		printf("geiaa\n" );
 		(*generators[quads[i].opcode])(quads + i);
-		printf("geiaa\n" );
 	}
 
 
@@ -102,16 +100,13 @@ void generate(vmopcode code , struct quad* quad){
 	struct instruction* tmpins=malloc(sizeof(struct instruction));
 	tmpins->opcode=code;
 	tmpins->arg1=make_operand(quad->arg1);
-
 	tmpins->arg2=make_operand(quad->arg2);
-	printf("1\n" );
 	tmpins->result=make_operand(quad->res);
-	printf("1\n" );
 	tmpins->srcLine=quad->line;
 	// TODO den ksero ti thelei na pei o poiitis sot -> quad.taddress=nexcf/...
 
 	emitIns(tmpins);
-	printf("irtha\n" );
+
 
 
 }
@@ -124,27 +119,31 @@ void emitIns(struct instruction* ins){
 	instructions[instrNo].arg2=ins->arg2;
 	instructions[instrNo].srcLine=ins->srcLine;
 	instrNo++;
-	printf("emit okey\n" );
+
 }
 
 
 struct vmarg* make_operand(struct expr* expr){
 
  	struct vmarg* arg= malloc(sizeof(struct vmarg));
-printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+	//printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
 		case arithmeticexp_e:
 		case boolexp_e:
 		case newtable_e: {
+
 			arg->val=expr->sym->value.var->offset;
+
 			switch (expr->sym->scope_space) {
 				case program_var : 	arg->type=global_a;	break;
 				case function_loc : arg->type=local_a;	break;
 				case formal_arg : 	arg->type=formal_a;	break;
 				default :	assert(0);
 			}
+			break;
 		}
 		case constbool_e: {
 			arg->val= expr->boolconst;

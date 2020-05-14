@@ -34,7 +34,7 @@ typedef enum  {
 struct vmarg {
 
 	vmarg_t 		type;
-	unsigned int	val;
+	unsigned 		val;
 
 };
 //array of instruction , san to quads[]
@@ -43,11 +43,11 @@ struct instruction *instructions;
 
 struct instruction {
 
-	vmopcode		opcode;
+	vmopcode				opcode;
 	struct vmarg*			result;
 	struct vmarg*			arg1;
 	struct vmarg* 			arg2;
-	unsigned  	srcLine;
+	unsigned  				srcLine;
 
 };
 
