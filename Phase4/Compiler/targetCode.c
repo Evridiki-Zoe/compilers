@@ -103,3 +103,53 @@ void emitIns(vmopcode opcode ,struct vmarg* result ,struct vmarg* arg1, struct v
 	instructions[instrNo].srcLine=srcLine;
 	instrNo++;
 }
+
+
+void make_operand(struct expr* expr , struct vmarg* arg){
+
+	switch (expr->type) {
+		case var_e:
+		case tableitem_e:
+		case arithmeticexp_e:
+		case boolexp_e:
+		case newtable_e: {
+			arg->val=expr->sym->value.var->offset;
+			switch (expr->sym->scope_space) {
+				case program_var : 	arg->type=global_a;	break;
+				case function_loc : arg->type=local_a;	break;
+				case formal_arg : 	arg->type=formal_a;	break;
+				default :	assert(0);
+			}
+		}
+		case constbool_e: {
+			arg->val= expr->boolconst;
+			arg->type=bool_a;	break;
+		}
+		case conststring_e : {
+		//	arg->val = create new string in the table TODO
+			arg->type=string_a;	break;
+		}
+		case const_num_e : {
+			//arg->val= new number in table TODO
+			arg->type= number_a; break;
+		}
+		case nil_e : arg->type=nil_a; break;
+
+		case programfunc_e : {
+			arg->type = userfunc_a;
+			arg->val = expr->sym->value.func->funcAddress;
+			break;
+		}
+		case libfunc_e : {
+			arg->type= libfunc_a;
+			//arg->val = //TODO
+			break;
+
+		}
+		default : assert(0);
+
+	}
+
+
+
+}

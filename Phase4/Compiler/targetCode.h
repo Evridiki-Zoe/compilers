@@ -70,8 +70,12 @@ unsigned	totalNamedLibfuncs;
 struct userfunc*	userFuncs;
 unsigned	totalUserFuncs;
 
+
+void make_operand(struct expr* expr , struct vmarg* arg);
 void printInstructions();
 void emitIns(vmopcode opcode ,struct vmarg* result , struct vmarg* arg1, struct vmarg* arg2, unsigned  srcLine);
+
+
 
 void generate(void);
 
@@ -105,3 +109,19 @@ void generate_AND(struct quad *quad);
 void generate_OR(struct quad *quad);
 void generate_NOT(struct quad *quad);
 void generate_RET(struct quad *quad);
+
+
+
+
+
+struct incomplete_jump {
+	unsigned	instrNo;
+	unsigned	iadress;
+	struct incomplete_jump* next;
+};
+// 
+// struct incomplete_jump*	ij_head=(struct incomplete_jump*)0;
+// unsigned			ij_total=0;
+
+void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
+void patch_incomplete_jump();
