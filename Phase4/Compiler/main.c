@@ -1,6 +1,7 @@
 #include "lex.h"
 #include "parsing.h"
 #include "quads.h"
+#include "targetCode.h"
 #include "y.tab.h"
 
 int yyparse();
