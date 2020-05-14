@@ -6,7 +6,7 @@
 extern double QuadNo;
 unsigned instrNo=0;
 
-void generate_ADD (struct quad *quad){printf("add\n" ); }
+void generate_ADD (struct quad *quad){printf("add\n" ); generate(add_v,quad); printf("kai edo\n" );}
 void generate_SUB (struct quad *quad){printf("sub\n" );}
 void generate_MUL (struct quad *quad){printf("mul\n" );}
 void generate_DIV (struct quad *quad){printf("div\n" );}
@@ -72,12 +72,12 @@ generator_func_t generators[] = {
 void printInstructions(){
 	int i;
 	for (i = 0; i < instrNo; i++) {
-		printf("%d) code : %d , result :%d , arg1 : %d , arg2 : %d \n",i+1 ,instructions[i].opcode,instructions[i].result->type,instructions[i].arg1->val,instructions[i].arg2->val);
+	//	printf("%d) code : %d nano , result :%d , arg1 : %d , arg2 : %d \n",i+1 ,instructions[i].opcode,instructions[i].result->type,instructions[i].arg1->val,instructions[i].arg2->val);
 	}
 }
 
 
-void generate(void){
+void generateIns(void){
 
 	int i;
 
@@ -87,26 +87,51 @@ void generate(void){
 
 	instructions= (struct instruction*)malloc(QuadNo * sizeof(struct instruction) );
 	for ( i = 0; i < QuadNo; i++) {
-	printf("%d)",i+1 );
+	//printf("%d)",i+1 );
 	//		emitIns((int)(quads[i].opcode),tmpnode,tmpnode,tmpnode,400);
-		(*generators[quads[i].opcode])(quads+1);
+		printf("geiaa\n" );
+		(*generators[quads[i].opcode])(quads + i);
+		printf("geiaa\n" );
 	}
 
 
 }
 
-void emitIns(vmopcode opcode ,struct vmarg* result ,struct vmarg* arg1, struct vmarg* arg2, unsigned  srcLine){
-	instructions[instrNo].opcode=opcode;
-	instructions[instrNo].result=result;
-	instructions[instrNo].arg1=arg1;
-	instructions[instrNo].arg2=arg2;
-	instructions[instrNo].srcLine=srcLine;
+void generate(vmopcode code , struct quad* quad){
+
+	struct instruction* tmpins;
+	tmpins->opcode=code;
+	tmpins->arg1=make_operand(quad->arg1);
+
+	tmpins->arg2=make_operand(quad->arg2);
+	printf("1\n" );
+	tmpins->result=make_operand(quad->res);
+	printf("1\n" );
+	tmpins->srcLine=quad->line;
+	// TODO den ksero ti thelei na pei o poiitis sot -> quad.taddress=nexcf/...
+
+	emitIns(tmpins);
+	printf("irtha\n" );
+
+
+}
+
+void emitIns(struct instruction* ins){
+
+	instructions[instrNo].opcode=ins->opcode;
+	instructions[instrNo].result=ins->result;
+	instructions[instrNo].arg1=ins->arg1;
+	instructions[instrNo].arg2=ins->arg2;
+	instructions[instrNo].srcLine=ins->srcLine;
 	instrNo++;
+	printf("emit okey\n" );
 }
 
 
-void make_operand(struct expr* expr , struct vmarg* arg){
+struct vmarg* make_operand(struct expr* expr){
 
+ 	struct vmarg* arg= malloc(sizeof(struct vmarg));
+printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
@@ -150,6 +175,5 @@ void make_operand(struct expr* expr , struct vmarg* arg){
 
 	}
 
-
-
+	return arg;
 }

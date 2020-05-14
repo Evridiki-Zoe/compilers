@@ -71,13 +71,14 @@ struct userfunc*	userFuncs;
 unsigned	totalUserFuncs;
 
 
-void make_operand(struct expr* expr , struct vmarg* arg);
+struct vmarg* make_operand(struct expr* expr);
 void printInstructions();
-void emitIns(vmopcode opcode ,struct vmarg* result , struct vmarg* arg1, struct vmarg* arg2, unsigned  srcLine);
+void emitIns(struct instruction* ins);
 
 
 
-void generate(void);
+void generateIns(void);
+void generate(vmopcode code , struct quad* quad);
 
 void generate_ADD (struct quad *quad);
 void generate_SUB (struct quad *quad);
@@ -119,7 +120,7 @@ struct incomplete_jump {
 	unsigned	iadress;
 	struct incomplete_jump* next;
 };
-// 
+//
 // struct incomplete_jump*	ij_head=(struct incomplete_jump*)0;
 // unsigned			ij_total=0;
 
