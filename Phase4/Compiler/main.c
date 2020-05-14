@@ -68,16 +68,24 @@ int main(void) {
 generateIns();
 	printInstructions();
 
-
-	/*add_rval_string("lalal");
+/*
+	add_rval_string("lalal");
+	add_rval_string("lalal2");
+	add_rval_string("lalal3");
+	add_rval_string("lalal4");
+	add_rval_string("lalal5");
 
 	add_rval_num(5);
 	add_rval_num(3.123456789);
 	add_rval_num(-9);
+	add_rval_num(34);
+	add_rval_num(1);
 
 	add_rval_libfuncs("libfunc");
 	add_rval_libfuncs("libfunc2");
 	add_rval_libfuncs("libfunc3");
+	add_rval_libfuncs("libfunc4");
+	add_rval_libfuncs("libfunc5");
 
 
 	add_rval_userfuncs("userfunc",4,3,2);
@@ -85,9 +93,10 @@ generateIns();
 	add_rval_userfuncs("userfunc3",2,3,7);
 
 	int j=0;
-	while (j< totalUserFuncs) {
-		printf("%s\n", userFuncs[j]->id );
+	while (j< totalNumConsts) {
+		 printf("%f \n", numConsts[j]);
 		j++;
-	}*/
+	}
+*/
 	return 0;
 }

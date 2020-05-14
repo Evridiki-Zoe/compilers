@@ -61,6 +61,8 @@ struct userfunc {
 };
 
 
+
+
 double* 	numConsts; //rvalue numbers
 unsigned	totalNumConsts; //total number of  numbers
 char**		stringConsts; //rvalue strings

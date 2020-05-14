@@ -5,6 +5,10 @@
 
 extern double QuadNo;
 unsigned instrNo=0;
+int maxsize_num = 100;
+int maxsize_str = 100;
+int maxsize_libfunc = 100;
+int maxsize_userfunc = 100;
 
 void generate_ADD (struct quad *quad)			{generate(add_v,quad);}
 void generate_SUB (struct quad *quad)			{generate(sub_v,quad);}
@@ -89,7 +93,7 @@ void generateIns(void){
 
 	instructions= (struct instruction*)malloc(QuadNo * sizeof(struct instruction) );
 	for ( i = 0; i < QuadNo; i++) {
-		(*generators[quads[i].opcode])(quads+i);
+		(*generators[quads[i].opcode])(quads + i);
 
 	}
 
@@ -98,7 +102,7 @@ void generateIns(void){
 
 void generate(vmopcode code , struct quad* quad){
 
-	struct instruction* tmpins=malloc(sizeof(struct instruction));;
+	struct instruction* tmpins=malloc(sizeof(struct instruction));
 	tmpins->opcode=code;
 	tmpins->arg1=make_operand(quad->arg1);
 
@@ -169,14 +173,14 @@ struct vmarg* make_operand(struct expr* expr){
 		default : assert(0);
 
 	}
-
 	return arg;
-
 }
 
 void add_rval_string(char * str){
-			if(totalStringConsts == 50 );// TODO realloc pinaka, oxi 50 thelei global maxsize gia to kathena
-
+			if(totalStringConsts == maxsize_str ){
+					maxsize_str = maxsize_str * 2;
+					stringConsts = (char**) realloc(stringConsts, maxsize_str * sizeof(char *));
+			}
 			stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 			strcpy(stringConsts[totalStringConsts] , str);
 			printf("%s\n", stringConsts[totalStringConsts] );
@@ -184,7 +188,11 @@ void add_rval_string(char * str){
 }
 
 void add_rval_num(double number){ // xanei pshfia meta to 6o
-	if(totalNumConsts == 100 );// TODO realloc pinaka
+	if(totalNumConsts == maxsize_num ){
+
+			maxsize_num = maxsize_num * 2;
+			numConsts = (double *)	realloc(numConsts, maxsize_num * sizeof(double));
+	}
 
 	numConsts[totalNumConsts] = number;
 	printf("%f\n", numConsts[totalNumConsts] );
@@ -193,18 +201,26 @@ void add_rval_num(double number){ // xanei pshfia meta to 6o
 }
 
 void add_rval_libfuncs(char * libfunc){
-	if(totalNamedLibfuncs == 50 );// TODO realloc pinaka
+
+	if(totalNamedLibfuncs == maxsize_libfunc ){
+		maxsize_libfunc = maxsize_libfunc * 2;
+		namedLibfuncs = (char**) realloc(namedLibfuncs, maxsize_libfunc * sizeof(char *));
+	}
 
 	namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
 	strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
 	printf("%s\n", namedLibfuncs[totalNamedLibfuncs] );
 	totalNamedLibfuncs++;
-
 }
 
 void add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
 
-	if(totalUserFuncs == 50 );// TODO realloc pinaka
+	if(totalUserFuncs == maxsize_userfunc ){
+
+		maxsize_userfunc = maxsize_userfunc * 2;
+		userFuncs = (struct userfunc**)realloc(userFuncs, maxsize_userfunc * sizeof(struct userfunc*) );
+
+	}
 
 	struct userfunc* newnode = malloc(sizeof(struct userfunc));
 	newnode->address = address;
