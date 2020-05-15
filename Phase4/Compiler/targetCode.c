@@ -33,13 +33,36 @@ void generate_IF_GREATER(struct quad *quad)		{generate(jgt_v,quad);}
 void generate_IF_GREATEREQ(struct quad *quad)	{generate(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
 void generate_IF_LESS(struct quad *quad)		{generate(jlt_v,quad);}
 void generate_IF_LESSEQ(struct quad *quad)		{generate(jle_v,quad);}
-void generate_PARAM(struct quad *quad)			{}//TODO
-void generate_CALL(struct quad *quad)			{}//TODO
-void generate_GETRETVAL(struct quad *quad)		{}//TODO
+
+void generate_PARAM(struct quad *quad) {
+		//quad->taddress = 	instrNo; // TODO
+  	struct instruction* t;
+		t->opcode = pusharg_v;
+		t->arg1 = make_operand(quad->arg1);
+	  emitIns(t);
+}
+
+void generate_CALL(struct quad *quad) {
+		//quad->taddress = 	instrNo; // TODO
+		struct instruction* t;
+		t->opcode =  call_v;
+		t->arg1 = make_operand(quad->arg1);
+		emitIns(t);
+}
+
+void generate_GETRETVAL(struct quad *quad) {
+  	//quad->taddress = 	instrNo; // TODO
+		struct instruction* t;
+		t->opcode = assign_v;
+		t->result = make_operand(quad->res);
+		//make_retvaloperand(&t->arg1);
+		emitIns(t);
+}
+
 void generate_FUNCSTART(struct quad *quad)		{}//TODO
 void generate_RETURN(struct quad *quad)			{}//TODO
 void generate_FUNCEND(struct quad *quad)		{}//TODO
-void generate_UMINUS(struct quad *quad)			{}	// den nomizw na thelei kati
+void generate_UMINUS(struct quad *quad)			{ generate(mul_v,quad);}	// todo peiragmeno quad ????
 
 
 void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta
@@ -87,6 +110,7 @@ void printInstructions(){
 	printf("ela\n" );
 	for (i = 0; i < instrNo; i++) {
 		printf("%d) type: %d ",i+1, instructions[i].opcode);
+		if (instructions[i].result!=NULL)
 		printf("result : (%d,%u)\t",instructions[i].result->type,instructions[i].result->val );
 		if (instructions[i].arg1!=NULL) {
 			printf("arg1 : (%d,%u)\t",instructions[i].arg1->type,instructions[i].arg1->val );
@@ -120,9 +144,10 @@ void generate(vmopcode code , struct quad* quad){
 	tmpins->arg1=make_operand(quad->arg1);
 	if (quad->arg2!=NULL) {
 		tmpins->arg2=make_operand(quad->arg2);
-	}
 
-	tmpins->result=make_operand(quad->res);
+	}
+if(quad->res ==NULL) {}
+else	tmpins->result=make_operand(quad->res);
 	tmpins->srcLine=quad->line;
 	// TODO den ksero ti thelei na pei o poiitis sot -> quad.taddress=nexcf/...
 
@@ -142,7 +167,6 @@ void emitIns(struct instruction* ins){
 }
 
 struct vmarg* make_operand(struct expr* expr){
-
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
 //	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
