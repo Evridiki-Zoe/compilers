@@ -7,3 +7,5 @@ noop ti einai pou xrhsimopoieite
 and/or/not afou exoume kanei merikh den mas xreiazetai
 
 to return sigoura den einai 1-1 ? emas mas bgainoun idia se arithmo apla einai diaforetika se typo
+
+o kodikas tou front vazei 2 fores tis sinartiseis sti lista mia ston start kai mia sto end me to make operand

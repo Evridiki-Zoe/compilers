@@ -151,7 +151,7 @@ void generate_RET(struct quad *quad)			{
     //make_retvaloperand(&t->result);
 
     t->result = make_operand(quad->res);
-		emitIns(t);
+	//	emitIns(t);
     struct symbol_table_binding* f = malloc( sizeof(struct symbol_table_binding *));
     //f = top(funcstack);
     //append(f->return_list, instrNo);
@@ -303,12 +303,14 @@ void generate_relational(vmopcode code , struct quad* quad){
 	t->result=malloc(sizeof(struct vmarg));
 	t->result->type=label_a;
 
+	/* SE PERIPTOSI POU XREIASTOUN
 	if (quad->label<prossessquad) {
 		t->result->val=quads[quad->label].taddress;
 	} else {
 		add_incomplete_jump(instrNo,quad->label);
 	}
-
+*/
+	t->result->val=quad->label;
 	quad->taddress=instrNo;
 	emitIns(t);
 
