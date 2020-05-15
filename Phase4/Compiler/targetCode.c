@@ -37,13 +37,35 @@ void generate_IF_GREATER(struct quad *quad)		{generate_relational(jgt_v,quad);}
 void generate_IF_GREATEREQ(struct quad *quad)	{generate_relational(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
 void generate_IF_LESS(struct quad *quad)		{generate_relational(jlt_v,quad);}
 void generate_IF_LESSEQ(struct quad *quad)		{generate_relational(jle_v,quad);}
-void generate_PARAM(struct quad *quad)			{}//TODO
-void generate_CALL(struct quad *quad)			{}//TODO
-void generate_GETRETVAL(struct quad *quad)		{}//TODO
+void generate_PARAM(struct quad *quad) {
+		//quad->taddress = 	instrNo; // TODO
+  	struct instruction* t;
+		t->opcode = pusharg_v;
+		t->arg1 = make_operand(quad->arg1);
+	  emitIns(t);
+}
+
+void generate_CALL(struct quad *quad) {
+		//quad->taddress = 	instrNo; // TODO
+		struct instruction* t;
+		t->opcode =  call_v;
+		t->arg1 = make_operand(quad->arg1);
+		emitIns(t);
+}
+
+void generate_GETRETVAL(struct quad *quad) {
+  	//quad->taddress = 	instrNo; // TODO
+		struct instruction* t;
+		t->opcode = assign_v;
+		t->result = make_operand(quad->res);
+		//make_retvaloperand(&t->arg1);
+		emitIns(t);
+}
+
 void generate_FUNCSTART(struct quad *quad)		{}//TODO
 void generate_RETURN(struct quad *quad)			{}//TODO
 void generate_FUNCEND(struct quad *quad)		{}//TODO
-void generate_UMINUS(struct quad *quad)			{}	// den nomizw na thelei kati
+void generate_UMINUS(struct quad *quad)			{ generate(mul_v,quad);}	// todo peiragmeno quad ????
 
 
 void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta
@@ -183,12 +205,11 @@ void generate(vmopcode code , struct quad* quad){
 
 	if (quad->arg2!=NULL) {
 		tmpins->arg2=make_operand(quad->arg2);
-	}
 
 	if (quad->res!=NULL) {
 	tmpins->result=make_operand(quad->res);
 	}
-
+	
 	tmpins->srcLine=quad->line;
 	quad->taddress=instrNo;
 	emitIns(tmpins);
