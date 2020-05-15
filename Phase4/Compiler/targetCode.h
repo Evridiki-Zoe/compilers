@@ -122,7 +122,7 @@ void generate_RET(struct quad *quad);
 
 struct incomplete_jump {
 	unsigned	instrNo;
-	unsigned	iadress;
+	unsigned	iaddress;
 	struct incomplete_jump* next;
 };
 

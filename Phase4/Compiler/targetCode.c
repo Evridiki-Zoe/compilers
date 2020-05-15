@@ -38,27 +38,32 @@ void generate_IF_GREATEREQ(struct quad *quad)	{generate_relational(jge_v,quad);}
 void generate_IF_LESS(struct quad *quad)		{generate_relational(jlt_v,quad);}
 void generate_IF_LESSEQ(struct quad *quad)		{generate_relational(jle_v,quad);}
 void generate_PARAM(struct quad *quad) {
-		//quad->taddress = 	instrNo; // TODO
-  	struct instruction* t;
+		quad->taddress = 	instrNo; // TODO
+
+  		struct instruction* t=malloc(sizeof(struct instruction));
+
 		t->opcode = pusharg_v;
-		t->arg1 = make_operand(quad->arg1);
+
+		t->arg1 = make_operand(quad->res);
+		printf("fsad\n" );
 	  emitIns(t);
 }
 
 void generate_CALL(struct quad *quad) {
-		//quad->taddress = 	instrNo; // TODO
-		struct instruction* t;
+		quad->taddress = 	instrNo;
+		struct instruction* t=malloc(sizeof(struct instruction));
 		t->opcode =  call_v;
+
 		t->arg1 = make_operand(quad->arg1);
 		emitIns(t);
 }
 
 void generate_GETRETVAL(struct quad *quad) {
-  	//quad->taddress = 	instrNo; // TODO
-		struct instruction* t;
+  		quad->taddress = 	instrNo; // TODO
+		struct instruction* t=malloc(sizeof(struct instruction));
 		t->opcode = assign_v;
 		t->result = make_operand(quad->res);
-		//make_retvaloperand(&t->arg1);
+		
 		emitIns(t);
 }
 
@@ -148,7 +153,7 @@ void add_incomplete_jump(unsigned instrNo,unsigned iaddress){
 	if (ij_head==NULL) {
 		ij_head=malloc(sizeof(struct incomplete_jump));
 		ij_head->instrNo=instrNo;
-		ij_head->iadress=iaddress;
+		ij_head->iaddress=iaddress;
 		return;
 	}
 
@@ -158,8 +163,24 @@ void add_incomplete_jump(unsigned instrNo,unsigned iaddress){
 	}
 	tmp->next=malloc(sizeof(struct incomplete_jump));
 	tmp->instrNo=instrNo;
-	tmp->iadress=iaddress;
+	tmp->iaddress=iaddress;
 	return;
+}
+
+void patch_incomplete_jump(){
+	struct incomplete_jump* tmp=ij_head;
+
+	while (tmp) {
+		if (tmp->iaddress==QuadNo+1) {
+			instructions[tmp->instrNo].result->val=instrNo+1;
+
+		}else {
+			instructions[tmp->instrNo].result->val=quads[tmp->iaddress].taddress;
+		}
+		tmp=tmp->next;
+	}
+
+
 }
 
 void generate_relational(vmopcode code , struct quad* quad){
@@ -229,7 +250,7 @@ void emitIns(struct instruction* ins){
 
 struct vmarg* make_operand(struct expr* expr){
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-	//printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:

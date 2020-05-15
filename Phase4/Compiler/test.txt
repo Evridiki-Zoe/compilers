@@ -1,6 +1,7 @@
-function a(){
+b;
 
-		return a;
+
+{
+
+a(2);
 }
-x==10;
-y="hello";

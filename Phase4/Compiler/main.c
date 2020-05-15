@@ -66,6 +66,7 @@ int main(void) {
 //	print_list_rvalues();
 	print_quads();
 	generateIns();
+	patch_incomplete_jump();
 	printInstructions();
 
 /*
