@@ -72,10 +72,10 @@ unsigned	totalNamedLibfuncs;
 struct userfunc**	userFuncs;
 unsigned	totalUserFuncs;
 
-void add_rval_string(char * str);
-void add_rval_num(double number);
-void add_rval_libfuncs(char * libfunc);
-void add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs );
+unsigned add_rval_string(char * str);
+unsigned add_rval_num(double number);
+unsigned add_rval_libfuncs(char * libfunc);
+unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs );
 
 struct vmarg* make_operand(struct expr* expr);
 void printInstructions();

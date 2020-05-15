@@ -1,6 +1,5 @@
-
-
-
-
-a+b+c+d+e+f;
+x=10;
+y="hello";
+function f(x,y){return x+y;}
+z="world";
 

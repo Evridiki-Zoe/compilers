@@ -10,6 +10,12 @@ int maxsize_str = 100;
 int maxsize_libfunc = 100;
 int maxsize_userfunc = 100;
 
+
+unsigned	totalNumConsts=0; //total number of  numbers
+unsigned	totalStringConsts=0; //total number of strings
+unsigned	totalNamedLibfuncs=0;
+unsigned	totalUserFuncs=0;
+
 void generate_ADD (struct quad *quad)			{generate(add_v,quad);}
 void generate_SUB (struct quad *quad)			{generate(sub_v,quad);}
 void generate_MUL (struct quad *quad)			{generate(mul_v,quad);}
@@ -78,11 +84,17 @@ generator_func_t generators[] = {
 
 void printInstructions(){
 	int i;
+	printf("ela\n" );
 	for (i = 0; i < instrNo; i++) {
-		printf("%d)",i+1 );
+		printf("%d) type: %d ",i+1, instructions[i].opcode);
 		printf("result : (%d,%u)\t",instructions[i].result->type,instructions[i].result->val );
-		printf("arg1 : (%d,%u)\t",instructions[i].arg1->type,instructions[i].arg1->val );
-		printf("arg2 : (%d,%u)\n",instructions[i].arg2->type,instructions[i].arg2->val );
+		if (instructions[i].arg1!=NULL) {
+			printf("arg1 : (%d,%u)\t",instructions[i].arg1->type,instructions[i].arg1->val );
+		}
+		if (instructions[i].arg2!=NULL) {
+			printf("arg1 : (%d,%u)\t",instructions[i].arg2->type,instructions[i].arg2->val );
+		}
+		printf("\n" );
 	}
 }
 
@@ -105,8 +117,10 @@ void generate(vmopcode code , struct quad* quad){
 	struct instruction* tmpins=malloc(sizeof(struct instruction));
 	tmpins->opcode=code;
 	tmpins->arg1=make_operand(quad->arg1);
+	if (quad->arg2!=NULL) {
+		tmpins->arg2=make_operand(quad->arg2);
+	}
 
-	tmpins->arg2=make_operand(quad->arg2);
 	tmpins->result=make_operand(quad->res);
 	tmpins->srcLine=quad->line;
 	// TODO den ksero ti thelei na pei o poiitis sot -> quad.taddress=nexcf/...
@@ -150,11 +164,11 @@ struct vmarg* make_operand(struct expr* expr){
 			arg->type=bool_a;	break;
 		}
 		case conststring_e : {
-		//	arg->val = create new string in the table TODO
+			arg->val = add_rval_string(expr->strconst);
 			arg->type=string_a;	break;
 		}
 		case const_num_e : {
-			//arg->val= new number in table TODO
+			arg->val= add_rval_num(expr->numconst);
 			arg->type= number_a; break;
 		}
 		case nil_e : arg->type=nil_a; break;
@@ -173,10 +187,12 @@ struct vmarg* make_operand(struct expr* expr){
 		default : assert(0);
 
 	}
+
 	return arg;
 }
 
-void add_rval_string(char * str){
+unsigned add_rval_string(char * str){
+
 			if(totalStringConsts == maxsize_str ){
 					maxsize_str = maxsize_str * 2;
 					stringConsts = (char**) realloc(stringConsts, maxsize_str * sizeof(char *));
@@ -184,10 +200,10 @@ void add_rval_string(char * str){
 			stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 			strcpy(stringConsts[totalStringConsts] , str);
 			printf("%s\n", stringConsts[totalStringConsts] );
-			totalStringConsts++;
+			return totalStringConsts++;
 }
 
-void add_rval_num(double number){ // xanei pshfia meta to 6o
+unsigned add_rval_num(double number){ // xanei pshfia meta to 6o
 	if(totalNumConsts == maxsize_num ){
 
 			maxsize_num = maxsize_num * 2;
@@ -196,11 +212,11 @@ void add_rval_num(double number){ // xanei pshfia meta to 6o
 
 	numConsts[totalNumConsts] = number;
 	printf("%f\n", numConsts[totalNumConsts] );
-	totalNumConsts++;
+	return totalNumConsts++;
 
 }
 
-void add_rval_libfuncs(char * libfunc){
+unsigned add_rval_libfuncs(char * libfunc){
 
 	if(totalNamedLibfuncs == maxsize_libfunc ){
 		maxsize_libfunc = maxsize_libfunc * 2;
@@ -210,10 +226,10 @@ void add_rval_libfuncs(char * libfunc){
 	namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
 	strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
 	printf("%s\n", namedLibfuncs[totalNamedLibfuncs] );
-	totalNamedLibfuncs++;
+	return totalNamedLibfuncs++;
 }
 
-void add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
+unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
 
 	if(totalUserFuncs == maxsize_userfunc ){
 
@@ -231,5 +247,5 @@ void add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int local
 
 	userFuncs[totalUserFuncs]  = newnode;
 	printf("%s\n", userFuncs[totalUserFuncs] ->id );
-	totalUserFuncs++;
+	return totalUserFuncs++;
 }
