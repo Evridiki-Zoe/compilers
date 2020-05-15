@@ -63,13 +63,56 @@ void generate_GETRETVAL(struct quad *quad) {
 		struct instruction* t=malloc(sizeof(struct instruction));
 		t->opcode = assign_v;
 		t->result = make_operand(quad->res);
-		
+
 		emitIns(t);
 }
 
-void generate_FUNCSTART(struct quad *quad)		{}//TODO
-void generate_RETURN(struct quad *quad)			{}//TODO
-void generate_FUNCEND(struct quad *quad)		{}//TODO
+void generate_FUNCSTART(struct quad *quad)		{
+
+  	struct symbol_table_binding* f =malloc( sizeof(struct symbol_table_binding ));
+		f = quad->arg1->sym;
+
+    //f->address = instrNo;
+    quad->taddress = instrNo;
+
+    //add_rval_userfuncs(f->value.var->name, f->taddress, 444,666); //total locals
+    //push(funcstack, f);
+    struct instruction* t = malloc(sizeof(struct instruction));
+    t->opcode = funcenter_v;
+    t->result = make_operand(quad->arg1);
+    emitIns(t);
+
+
+}
+void generate_RETURN(struct quad *quad)			{
+    quad->taddress = instrNo;
+    struct instruction* t = malloc(sizeof(struct instruction));;
+    t->opcode = assign_v;
+    //make_retvaloperand(&t->result);
+    t->arg1 = make_operand(quad->arg1);
+
+    struct symbol_table_binding* f =malloc( sizeof(struct symbol_table_binding *));
+    //f = top(funcstack);
+    //append(f->return_list, instrNo);
+    t->opcode = jump_v;
+    //reset_operand(&t->arg1);
+    //reset_operand(&t->arg2);
+    t->result->type = label_a;
+    emitIns(t);
+
+}
+void generate_FUNCEND(struct quad *quad)		{
+  struct symbol_table_binding* f =malloc( sizeof(struct symbol_table_binding *));
+  //f = pop(funcstack);
+  //backpatch(f->return_list, instrNo);
+  quad->taddress = instrNo;
+  struct instruction* t = malloc(sizeof(struct instruction));;
+  t->opcode = funcexit_v;
+  t->result = make_operand(quad->arg1);
+  emitIns(t);
+
+
+}
 void generate_UMINUS(struct quad *quad)			{ generate(mul_v,quad);}	// todo peiragmeno quad ????
 
 
