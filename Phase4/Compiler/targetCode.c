@@ -17,6 +17,67 @@ unsigned	totalNamedLibfuncs=0;
 unsigned	totalUserFuncs=0;
 
 
+char* enum_toString_opCodes_v(vmopcode sym) {
+	switch (sym) {
+		case 0:
+				return "assign";
+		case 1:
+				return "add";
+		case 2:
+				return "sub";
+		case 3:
+				return "mul";
+	    case 4:
+				return "div";
+		case 5:
+				return "mod";
+		case 6:
+				return "uminus";
+		case 7:
+				return "and";
+		case 8:
+				return "or";
+		case 9:
+				return "not";
+		case 10:
+				return "if_eq";
+		case 11:
+				return "if_not_eq";
+		case 12:
+				return "if_lesseq";
+		case 13:
+				return "if_greatereq";
+		case 14:
+				return "if_less";
+	    case 15:
+				return "if_greater";
+		case 16:
+				return "call";
+		case 17:
+				return "param";
+		case 18:
+				return "funcstart";
+		case 19:
+				return "funcend";
+		case 20:
+				return "tablecreate";
+		case 21:
+				return "tablegetelem";
+		case 22:
+				return "table_setelem";
+		case 23:
+				return "nop_v";
+		case 24:
+				return "jump";
+		default:
+				return "not compatible type";
+
+	}
+}
+
+
+
+
 struct incomplete_jump* ij_head=NULL;
 unsigned ij_total;
 
@@ -161,7 +222,7 @@ void printInstructions(){
 	int i;
 
 	for (i = 0; i < instrNo; i++) {
-		printf("%d) type: %d ",i+1, instructions[i].opcode);
+		printf("%d) type: %s ",i+1, enum_toString_opCodes_v(instructions[i].opcode));
 		if (instructions[i].result!=NULL) {
 			printf("result : (%d,%u)\t",instructions[i].result->type,instructions[i].result->val );
 		}
@@ -234,13 +295,11 @@ void generate_relational(vmopcode code , struct quad* quad){
 
 	if (quad->arg1!=NULL) {
 	t->arg1=make_operand(quad->arg1);
-	printf("geiaa\n" );
 	}
 
 	if (quad->arg2!=NULL) {
 		t->arg2=make_operand(quad->arg2);
-			printf("geiaa\n" );
-	}
+		}
 
 	t->result=malloc(sizeof(struct vmarg));
 	t->result->type=label_a;
@@ -293,7 +352,7 @@ void emitIns(struct instruction* ins){
 
 struct vmarg* make_operand(struct expr* expr){
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+	//printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:

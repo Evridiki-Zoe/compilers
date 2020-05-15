@@ -1,7 +1,10 @@
-function b(){};
-
-
-{
-
-a(2);
+function b(){
+if(q == 9){q++;}
+else{
+ e = 8;
 }
+return x+u;};
+
+
+
+function a(w,f){};
