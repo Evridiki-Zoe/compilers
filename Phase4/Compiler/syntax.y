@@ -793,20 +793,6 @@ call   : call L_PARENTHES elist R_PARENTHES {
  			}
        | lvalue callsuffix {
 
-
-          if( strcmp($1->sym->value.var->name, "print") == 0 || strcmp($1->sym->value.var->name, "input") == 0 || strcmp($1->sym->value.var->name, "objectmemberkeys") == 0 || strcmp($1->sym->value.var->name, "objectcopy") == 0 \
-                    || strcmp($1->sym->value.var->name, "objectdef") == 0 || strcmp($1->sym->value.var->name, "objecttotalmembers") == 0|| strcmp($1->sym->value.var->name, "totalarguments") == 0 \
-                    || strcmp($1->sym->value.var->name, "argument") == 0 || strcmp($1->sym->value.var->name, "typeof") == 0 || strcmp($1->sym->value.var->name, "strtonum") == 0 \
-                    || strcmp($1->sym->value.var->name, "sqrt") == 0 || strcmp($1->sym->value.var->name, "cos") == 0 || strcmp($1->sym->value.var->name, "sin") == 0 ) {
-
-                  	add_rval_libfuncs($1->sym->value.var->name);
-                    }
-            else{
-            add_rval_userfuncs($1->sym->value.var->name,666,666,args); //TODO
-
-            printf("user func\n" );
-            }
-
           $1 = emit_iftable_item($1);
           if ($2->method ){
                 struct expr* t = $1;
@@ -815,7 +801,6 @@ call   : call L_PARENTHES elist R_PARENTHES {
                 $2->elist = t ;
 
           }
-          printf("lval(%s) callsuffix %s\n", $1->sym->value.var->name, $2->name);
 
           $$ = make_call($1, $2->elist);
 				}
@@ -1154,8 +1139,6 @@ const    : number {		$$=$1; 	}
 				strcpy(tmpnode->value.var->name, Lex_string);
 				$$ = (struct expr *)malloc(sizeof(struct expr));
 				$$ = new_expr(conststring_e,tmpnode,NULL,0,Lex_string,'\0',NULL);
-
-        add_rval_string(Lex_string);
 			}
          | NIL	 	{ $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
          | TRUE 	{ $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
@@ -1172,8 +1155,6 @@ number   : INTEGER 	{
     					$$ = (struct expr *)malloc(sizeof(struct expr));
     					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
 
-              printf("num%f\n", $1);
-              add_rval_num($1);
 					}
          | FLOAT	{
 			            result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
@@ -1184,7 +1165,6 @@ number   : INTEGER 	{
 			            $$ = (struct expr *)malloc(sizeof(struct expr));
 			            $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
 
-                  add_rval_num($1);
 
 					}
          ;
