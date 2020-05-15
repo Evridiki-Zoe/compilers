@@ -144,15 +144,15 @@ void generate_FUNCSTART(struct quad *quad)		{
 
 
 }
-void generate_RETURN(struct quad *quad)			{
+void generate_RET(struct quad *quad)			{
     quad->taddress = instrNo;
-    struct instruction* t = malloc(sizeof(struct instruction));;
+    struct instruction* t = malloc(sizeof(struct instruction));
     t->opcode = assign_v;
     //make_retvaloperand(&t->result);
-    t->arg1 = make_operand(quad->arg1);
-		emitIns(t);
 
-    struct symbol_table_binding* f =malloc( sizeof(struct symbol_table_binding *));
+    t->result = make_operand(quad->res);
+		emitIns(t);
+    struct symbol_table_binding* f = malloc( sizeof(struct symbol_table_binding *));
     //f = top(funcstack);
     //append(f->return_list, instrNo);
     t->opcode = jump_v;
@@ -180,7 +180,6 @@ void generate_UMINUS(struct quad *quad)			{ generate(mul_v,quad);}	// todo peira
 void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta
 void generate_OR(struct quad *quad){ return ;}
 void generate_NOT(struct quad *quad){ return ;}
-void generate_RET(struct quad *quad){ return ;}
 
 
 
