@@ -77,7 +77,6 @@ char* enum_toString_opCodes_v(vmopcode sym) {
 
 
 
-
 struct incomplete_jump* ij_head=NULL;
 unsigned ij_total;
 
@@ -151,6 +150,7 @@ void generate_RETURN(struct quad *quad)			{
     t->opcode = assign_v;
     //make_retvaloperand(&t->result);
     t->arg1 = make_operand(quad->arg1);
+		emitIns(t);
 
     struct symbol_table_binding* f =malloc( sizeof(struct symbol_table_binding *));
     //f = top(funcstack);
@@ -299,7 +299,7 @@ void generate_relational(vmopcode code , struct quad* quad){
 
 	if (quad->arg2!=NULL) {
 		t->arg2=make_operand(quad->arg2);
-		}
+	}
 
 	t->result=malloc(sizeof(struct vmarg));
 	t->result->type=label_a;
@@ -352,7 +352,7 @@ void emitIns(struct instruction* ins){
 
 struct vmarg* make_operand(struct expr* expr){
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-	//printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+//	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
