@@ -5,6 +5,7 @@
 
 extern double QuadNo;
 unsigned instrNo=0;
+unsigned prossessquad=0;
 int maxsize_num = 50;
 int maxsize_str = 50;
 int maxsize_libfunc = 50;
@@ -16,6 +17,9 @@ unsigned	totalNamedLibfuncs=0;
 unsigned	totalUserFuncs=0;
 
 
+struct incomplete_jump* ij_head=NULL;
+unsigned ij_total;
+
 void generate_ADD (struct quad *quad)			{generate(add_v,quad);}
 void generate_SUB (struct quad *quad)			{generate(sub_v,quad);}
 void generate_MUL (struct quad *quad)			{generate(mul_v,quad);}
@@ -26,13 +30,13 @@ void generate_TABLEGETELM (struct quad *quad)	{generate(tablegetelem_v,quad);}
 void generate_TABLESETELEM(struct quad *quad)	{generate(tablesetelem_v,quad);}
 void generate_ASSIGN (struct quad *quad)		{generate(assign_v,quad);}
 void generate_NOP (struct quad *quad)			{struct instruction *t=malloc(sizeof(struct instruction)); t->opcode=nop_v;emitIns(t);}// dunno ti rolo varaei
-void generate_JUMP(struct quad *quad)			{}//TODO generate jump
-void generate_IF_EQ(struct quad *quad)			{generate(jeq_v,quad);}	// thelei ta relational giati petaei segm
-void generate_IF_NOTEQ(struct quad *quad)		{generate(jne_v,quad);}
-void generate_IF_GREATER(struct quad *quad)		{generate(jgt_v,quad);}
-void generate_IF_GREATEREQ(struct quad *quad)	{generate(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
-void generate_IF_LESS(struct quad *quad)		{generate(jlt_v,quad);}
-void generate_IF_LESSEQ(struct quad *quad)		{generate(jle_v,quad);}
+void generate_JUMP(struct quad *quad)			{generate_relational(jump_v,quad);}
+void generate_IF_EQ(struct quad *quad)			{generate_relational(jeq_v,quad);}	// thelei ta relational giati petaei segm
+void generate_IF_NOTEQ(struct quad *quad)		{generate_relational(jne_v,quad);}
+void generate_IF_GREATER(struct quad *quad)		{generate_relational(jgt_v,quad);}
+void generate_IF_GREATEREQ(struct quad *quad)	{generate_relational(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
+void generate_IF_LESS(struct quad *quad)		{generate_relational(jlt_v,quad);}
+void generate_IF_LESSEQ(struct quad *quad)		{generate_relational(jle_v,quad);}
 void generate_PARAM(struct quad *quad)			{}//TODO
 void generate_CALL(struct quad *quad)			{}//TODO
 void generate_GETRETVAL(struct quad *quad)		{}//TODO
@@ -46,6 +50,7 @@ void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta
 void generate_OR(struct quad *quad){ return ;}
 void generate_NOT(struct quad *quad){ return ;}
 void generate_RET(struct quad *quad){ return ;}
+
 
 
 
@@ -84,10 +89,13 @@ generator_func_t generators[] = {
 
 void printInstructions(){
 	int i;
-	printf("ela\n" );
+
 	for (i = 0; i < instrNo; i++) {
 		printf("%d) type: %d ",i+1, instructions[i].opcode);
-		printf("result : (%d,%u)\t",instructions[i].result->type,instructions[i].result->val );
+		if (instructions[i].result!=NULL) {
+			printf("result : (%d,%u)\t",instructions[i].result->type,instructions[i].result->val );
+		}
+
 		if (instructions[i].arg1!=NULL) {
 			printf("arg1 : (%d,%u)\t",instructions[i].arg1->type,instructions[i].arg1->val );
 		}
@@ -106,26 +114,83 @@ void generateIns(void){
 	instructions= (struct instruction*)malloc(QuadNo * sizeof(struct instruction) );
 	for ( i = 0; i < QuadNo; i++) {
 		(*generators[quads[i].opcode])(quads + i);
-
+		prossessquad++;
 	}
 
 	//theloume patch ta incomplete jumps giati exoume segm
 
 }
 
+
+void add_incomplete_jump(unsigned instrNo,unsigned iaddress){
+	if (ij_head==NULL) {
+		ij_head=malloc(sizeof(struct incomplete_jump));
+		ij_head->instrNo=instrNo;
+		ij_head->iadress=iaddress;
+		return;
+	}
+
+	struct incomplete_jump* tmp=ij_head;
+	while (tmp->next!=NULL) {
+		tmp=tmp->next;
+	}
+	tmp->next=malloc(sizeof(struct incomplete_jump));
+	tmp->instrNo=instrNo;
+	tmp->iadress=iaddress;
+	return;
+}
+
+void generate_relational(vmopcode code , struct quad* quad){
+
+	struct instruction* t=malloc(sizeof(struct instruction));
+	t->opcode=code;
+
+
+	if (quad->arg1!=NULL) {
+	t->arg1=make_operand(quad->arg1);
+	printf("geiaa\n" );
+	}
+
+	if (quad->arg2!=NULL) {
+		t->arg2=make_operand(quad->arg2);
+			printf("geiaa\n" );
+	}
+
+	t->result=malloc(sizeof(struct vmarg));
+	t->result->type=label_a;
+
+	if (quad->label<prossessquad) {
+		t->result->val=quads[quad->label].taddress;
+	} else {
+		add_incomplete_jump(instrNo,quad->label);
+	}
+
+	quad->taddress=instrNo;
+	emitIns(t);
+
+
+}
+
+
 void generate(vmopcode code , struct quad* quad){
 
 	struct instruction* tmpins=malloc(sizeof(struct instruction));
 	tmpins->opcode=code;
-	tmpins->arg1=make_operand(quad->arg1);
+
+	if (quad->arg1!=NULL) {
+		tmpins->arg1=make_operand(quad->arg1);
+	}
+
 	if (quad->arg2!=NULL) {
 		tmpins->arg2=make_operand(quad->arg2);
 	}
 
+	if (quad->res!=NULL) {
 	tmpins->result=make_operand(quad->res);
-	tmpins->srcLine=quad->line;
-	// TODO den ksero ti thelei na pei o poiitis sot -> quad.taddress=nexcf/...
+	}
 
+	tmpins->srcLine=quad->line;
+	quad->taddress=instrNo;
 	emitIns(tmpins);
 }
 
@@ -142,9 +207,8 @@ void emitIns(struct instruction* ins){
 }
 
 struct vmarg* make_operand(struct expr* expr){
-
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-//	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+	//printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
@@ -178,7 +242,7 @@ struct vmarg* make_operand(struct expr* expr){
 
 		case programfunc_e : {
 			arg->type = userfunc_a;
-			arg->val = expr->sym->value.func->funcAddress;	/* Isws na itan kalytero na ta apothikeuame se pinaka opws libfuncs*/
+			arg->val = add_rval_userfuncs(expr->sym->value.func->name,instrNo,50,expr->sym->value.func->totalVars);
 			break;
 		}
 		case libfunc_e : {
@@ -190,6 +254,7 @@ struct vmarg* make_operand(struct expr* expr){
 		default : assert(0);
 
 	}
+
 	return arg;
 }
 

@@ -239,6 +239,7 @@ void emit(iopcode opcode, struct expr* arg1, struct expr* arg2, struct expr* res
 	new_quad->res = res_expr;
 	new_quad->line = line;
 	new_quad->label = label;
+	new_quad->taddress=-1;
 	quads[(int)QuadNo-1]= *new_quad;
 }
 

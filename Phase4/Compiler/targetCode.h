@@ -10,7 +10,8 @@ typedef enum  {
 	jle_v,			jge_v,				jlt_v,
 	jgt_v,			call_v,				pusharg_v,
 	funcenter_v,	funcexit_v,			newtable_v,
-	tablegetelem_v,	tablesetelem_v, 	nop_v
+	tablegetelem_v,	tablesetelem_v, 	nop_v,
+	jump_v
 
 }vmopcode;
 
@@ -83,6 +84,8 @@ void emitIns(struct instruction* ins);
 
 void generateIns(void);
 void generate(vmopcode code , struct quad* quad);
+void generate_relational(vmopcode code , struct quad* quad);
+
 
 void generate_ADD (struct quad *quad);
 void generate_SUB (struct quad *quad);
@@ -122,9 +125,9 @@ struct incomplete_jump {
 	unsigned	iadress;
 	struct incomplete_jump* next;
 };
-//
-// struct incomplete_jump*	ij_head=(struct incomplete_jump*)0;
-// unsigned			ij_total=0;
+
+ struct incomplete_jump*	ij_head;
+ unsigned			ij_total;
 
 void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
 void patch_incomplete_jump();

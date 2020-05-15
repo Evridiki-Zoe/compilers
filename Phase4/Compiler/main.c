@@ -65,7 +65,7 @@ int main(void) {
 	print_table();
 //	print_list_rvalues();
 	print_quads();
-//generateIns();
+	generateIns();
 	printInstructions();
 
 /*

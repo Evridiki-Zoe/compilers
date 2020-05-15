@@ -1,20 +1,6 @@
-"lala";
-"bye";
-"ok";
+function a(){
 
-x=a+9;
-w=5;
-a=3.7;
-
-//a+b+c+d+e+f;
-
-a();
-b();
-c(x,y,z);
-d(e,t,gohome);
-f(ww,jj);
-g();
-
-print();
-cos();
-sin(w);
+		return a;
+}
+x==10;
+y="hello";
