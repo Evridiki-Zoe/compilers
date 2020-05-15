@@ -10,11 +10,11 @@ int maxsize_str = 50;
 int maxsize_libfunc = 50;
 int maxsize_userfunc = 50;
 
-
 unsigned	totalNumConsts=0; //total number of  numbers
 unsigned	totalStringConsts=0; //total number of strings
 unsigned	totalNamedLibfuncs=0;
 unsigned	totalUserFuncs=0;
+
 
 void generate_ADD (struct quad *quad)			{generate(add_v,quad);}
 void generate_SUB (struct quad *quad)			{generate(sub_v,quad);}
@@ -27,7 +27,7 @@ void generate_TABLESETELEM(struct quad *quad)	{generate(tablesetelem_v,quad);}
 void generate_ASSIGN (struct quad *quad)		{generate(assign_v,quad);}
 void generate_NOP (struct quad *quad)			{struct instruction *t=malloc(sizeof(struct instruction)); t->opcode=nop_v;emitIns(t);}// dunno ti rolo varaei
 void generate_JUMP(struct quad *quad)			{}//TODO generate jump
-void generate_IF_EQ(struct quad *quad)			{generate(jeq_v,quad);}	// thelei ta relational giati petaei segm 
+void generate_IF_EQ(struct quad *quad)			{generate(jeq_v,quad);}	// thelei ta relational giati petaei segm
 void generate_IF_NOTEQ(struct quad *quad)		{generate(jne_v,quad);}
 void generate_IF_GREATER(struct quad *quad)		{generate(jgt_v,quad);}
 void generate_IF_GREATEREQ(struct quad *quad)	{generate(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
@@ -39,8 +39,8 @@ void generate_GETRETVAL(struct quad *quad)		{}//TODO
 void generate_FUNCSTART(struct quad *quad)		{}//TODO
 void generate_RETURN(struct quad *quad)			{}//TODO
 void generate_FUNCEND(struct quad *quad)		{}//TODO
-
 void generate_UMINUS(struct quad *quad)			{}	// den nomizw na thelei kati
+
 
 void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta
 void generate_OR(struct quad *quad){ return ;}
@@ -161,21 +161,19 @@ struct vmarg* make_operand(struct expr* expr){
 			break;
 
 		}
-
 		case constbool_e: {
 			arg->val= expr->boolconst;
 			arg->type=bool_a;	break;
 		}
 		case conststring_e : {
-			arg->val = add_rval_string(expr->strconst);
+   		arg->val = add_rval_string(expr->strconst);
+
 			arg->type=string_a;	break;
 		}
-
 		case const_num_e : {
 			arg->val= add_rval_num(expr->numconst);
 			arg->type= number_a; break;
 		}
-
 		case nil_e : arg->type=nil_a; break;
 
 		case programfunc_e : {
@@ -183,7 +181,6 @@ struct vmarg* make_operand(struct expr* expr){
 			arg->val = expr->sym->value.func->funcAddress;	/* Isws na itan kalytero na ta apothikeuame se pinaka opws libfuncs*/
 			break;
 		}
-
 		case libfunc_e : {
 			arg->type= libfunc_a;
 			arg->val = add_rval_libfuncs(expr->sym->value.func->name);
@@ -193,17 +190,14 @@ struct vmarg* make_operand(struct expr* expr){
 		default : assert(0);
 
 	}
-
 	return arg;
 }
 
 unsigned add_rval_string(char * str){
-
 			if(totalStringConsts == maxsize_str ){
 					maxsize_str = maxsize_str * 2;
 					stringConsts = (char**) realloc(stringConsts, maxsize_str * sizeof(char *));
 			}
-
 			stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 			strcpy(stringConsts[totalStringConsts] , str);
 			printf("string: %s\n", stringConsts[totalStringConsts] );
@@ -218,8 +212,8 @@ unsigned add_rval_num(double number){ // xanei pshfia meta to 6o
 	}
 
 	numConsts[totalNumConsts] = number;
-	printf("num: %f\n", number );	//to epsaksa giati typwnei mono 6 psifia. Auto einai to default tou %f 
-	// alla an to allakseis den ksereis posa psifia exeis esy kai mporei na typwnei midenika 
+	printf("num: %f\n", number );	//to epsaksa giati typwnei mono 6 psifia. Auto einai to default tou %f
+	// alla an to allakseis den ksereis posa psifia exeis esy kai mporei na typwnei midenika
 	return totalNumConsts++;
 
 }
@@ -259,6 +253,7 @@ unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int l
 	printf("userfunc: %s\n", userFuncs[totalUserFuncs] ->id );
 	return totalUserFuncs++;
 }
+
 
 
 /* Einai stis dialekseis, den kserw pou tha xreiastoun */

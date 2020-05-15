@@ -65,7 +65,7 @@ int main(void) {
 	print_table();
 //	print_list_rvalues();
 	print_quads();
-	generateIns();
+//generateIns();
 	printInstructions();
 
 /*
@@ -91,12 +91,32 @@ int main(void) {
 	add_rval_userfuncs("userfunc",4,3,2);
 	add_rval_userfuncs("userfunc2",1,3,3);
 	add_rval_userfuncs("userfunc3",2,3,7);
+*/
+printf("=========strings:============\n" );
 
 	int j=0;
+	while (j< totalStringConsts) {
+		 printf("%s \n", stringConsts[j]);
+		j++;
+	}
+printf("=========nums:============\n" );
+	j=0;
 	while (j< totalNumConsts) {
 		 printf("%f \n", numConsts[j]);
 		j++;
 	}
-*/
+
+	printf("========lib funcs:============\n" );
+	j=0;
+	while (j< totalNamedLibfuncs) {
+		 printf("%s \n", namedLibfuncs[j]);
+		j++;
+	}
+	printf("========user funcs:============\n" );
+	j=0;
+	while (j< totalUserFuncs) {
+		 printf("%s #args %d\n", userFuncs[j]->id, userFuncs[j]->totalargs);
+		j++;
+	}
 	return 0;
 }

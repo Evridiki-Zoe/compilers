@@ -7,6 +7,7 @@
 #include "lex.h"
 #include "parsing.h"
 #include "quads.h"
+#include "targetCode.h"
 
 
 #define RED   "\x1B[31m"
@@ -295,7 +296,7 @@ expr :
 				backpatchList($1->falselist,$4+1);
 				orLists($$,$1,$5);
 
-			
+
 	 exprflag=1;
 	}
 	|	NOT expr {
@@ -320,7 +321,7 @@ expr :
 			emit(assign,true_expr,NULL,$$,yylineno,0);
 			emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			emit(assign,false_expr,NULL,$$,yylineno,0);
-			
+
 			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
 		}
 
@@ -498,7 +499,7 @@ boolResexpr :  expr GREATER expr {
 term  : L_PARENTHES {
 	push_E(exprflag); exprflag=0;
 } expr R_PARENTHES { printf(RED " (expression) \n" RESET);
-     
+
           $$ = $3;
 
 		 exprflag=pop_E();
@@ -791,7 +792,21 @@ call   : call L_PARENTHES elist R_PARENTHES {
 
  			}
        | lvalue callsuffix {
-		
+
+
+          if( strcmp($1->sym->value.var->name, "print") == 0 || strcmp($1->sym->value.var->name, "input") == 0 || strcmp($1->sym->value.var->name, "objectmemberkeys") == 0 || strcmp($1->sym->value.var->name, "objectcopy") == 0 \
+                    || strcmp($1->sym->value.var->name, "objectdef") == 0 || strcmp($1->sym->value.var->name, "objecttotalmembers") == 0|| strcmp($1->sym->value.var->name, "totalarguments") == 0 \
+                    || strcmp($1->sym->value.var->name, "argument") == 0 || strcmp($1->sym->value.var->name, "typeof") == 0 || strcmp($1->sym->value.var->name, "strtonum") == 0 \
+                    || strcmp($1->sym->value.var->name, "sqrt") == 0 || strcmp($1->sym->value.var->name, "cos") == 0 || strcmp($1->sym->value.var->name, "sin") == 0 ) {
+
+                  	add_rval_libfuncs($1->sym->value.var->name);
+                    }
+            else{
+            add_rval_userfuncs($1->sym->value.var->name,666,666,args); //TODO
+
+            printf("user func\n" );
+            }
+
           $1 = emit_iftable_item($1);
           if ($2->method ){
                 struct expr* t = $1;
@@ -800,6 +815,7 @@ call   : call L_PARENTHES elist R_PARENTHES {
                 $2->elist = t ;
 
           }
+          printf("lval(%s) callsuffix %s\n", $1->sym->value.var->name, $2->name);
 
           $$ = make_call($1, $2->elist);
 				}
@@ -820,7 +836,7 @@ callsuffix : normcall { printf(RED"callsuffix:: (elist)\n"RESET);
            }
            ;
 
-normcall : L_PARENTHES elist R_PARENTHES  { 
+normcall : L_PARENTHES elist R_PARENTHES  {
               $$ = malloc(sizeof(struct call));
               $$->elist = $2;
               $$->method = 0;
@@ -872,7 +888,7 @@ elist : expr multi_exprs {
       ;
 
 multi_exprs	:  COMMA expr multi_exprs {
-					args++; 
+					args++;
 
           struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
           newnode->value.var = malloc(sizeof(struct variable));
@@ -888,6 +904,7 @@ multi_exprs	:  COMMA expr multi_exprs {
           $$ = temp_elem; //pernaw to neo expression me to next, sto $$
 	}
       |  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET);
+                  args = 0; //mallon eixe ksexastei ayto
                   struct expr* temp_elem = new_expr(var_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
                   $$ = temp_elem;
       }
@@ -1040,7 +1057,7 @@ indexedelem	  : L_CBRACKET expr  {
 	  patchLists(($2),(int)QuadNo-2,(int)QuadNo);
    }
 }
-	COLON expr R_CBRACKET { 
+	COLON expr R_CBRACKET {
 					if (exprflag) {
 					   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 					   struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -1129,7 +1146,7 @@ funcname : IDENTIFIER {
 					 $$=tmpexpr;
 		 }
 
-const    : number {		$$=$1;	}
+const    : number {		$$=$1; 	}
          | STRING 	{
 				tmpnode=malloc(sizeof(struct symbol_table_binding));
 				tmpnode->value.var = malloc(sizeof(struct variable));
@@ -1137,6 +1154,8 @@ const    : number {		$$=$1;	}
 				strcpy(tmpnode->value.var->name, Lex_string);
 				$$ = (struct expr *)malloc(sizeof(struct expr));
 				$$ = new_expr(conststring_e,tmpnode,NULL,0,Lex_string,'\0',NULL);
+
+        add_rval_string(Lex_string);
 			}
          | NIL	 	{ $$ = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
          | TRUE 	{ $$ = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
@@ -1152,7 +1171,9 @@ number   : INTEGER 	{
     					strcpy(newnode->value.var->name, result);
     					$$ = (struct expr *)malloc(sizeof(struct expr));
     					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
-    					
+
+              printf("num%f\n", $1);
+              add_rval_num($1);
 					}
          | FLOAT	{
 			            result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
@@ -1162,6 +1183,9 @@ number   : INTEGER 	{
 			            strcpy(newnode->value.var->name, result);
 			            $$ = (struct expr *)malloc(sizeof(struct expr));
 			            $$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
+
+                  add_rval_num($1);
+
 					}
          ;
 
