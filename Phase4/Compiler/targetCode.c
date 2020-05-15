@@ -5,10 +5,10 @@
 
 extern double QuadNo;
 unsigned instrNo=0;
-int maxsize_num = 100;
-int maxsize_str = 100;
-int maxsize_libfunc = 100;
-int maxsize_userfunc = 100;
+int maxsize_num = 50;
+int maxsize_str = 50;
+int maxsize_libfunc = 50;
+int maxsize_userfunc = 50;
 
 
 unsigned	totalNumConsts=0; //total number of  numbers
@@ -27,7 +27,7 @@ void generate_TABLESETELEM(struct quad *quad)	{generate(tablesetelem_v,quad);}
 void generate_ASSIGN (struct quad *quad)		{generate(assign_v,quad);}
 void generate_NOP (struct quad *quad)			{struct instruction *t=malloc(sizeof(struct instruction)); t->opcode=nop_v;emitIns(t);}// dunno ti rolo varaei
 void generate_JUMP(struct quad *quad)			{}//TODO generate jump
-void generate_IF_EQ(struct quad *quad)			{generate(jeq_v,quad);}
+void generate_IF_EQ(struct quad *quad)			{generate(jeq_v,quad);}	// thelei ta relational giati petaei segm 
 void generate_IF_NOTEQ(struct quad *quad)		{generate(jne_v,quad);}
 void generate_IF_GREATER(struct quad *quad)		{generate(jgt_v,quad);}
 void generate_IF_GREATEREQ(struct quad *quad)	{generate(jge_v,quad);}//Ta leei allios alla nomizo tha imaste komple
@@ -39,13 +39,13 @@ void generate_GETRETVAL(struct quad *quad)		{}//TODO
 void generate_FUNCSTART(struct quad *quad)		{}//TODO
 void generate_RETURN(struct quad *quad)			{}//TODO
 void generate_FUNCEND(struct quad *quad)		{}//TODO
-void generate_UMINUS(struct quad *quad)			{}//TODO
 
+void generate_UMINUS(struct quad *quad)			{}	// den nomizw na thelei kati
 
-void generate_AND(struct quad *quad){} 		//Den tha ta xreiastoume afta
-void generate_OR(struct quad *quad){}
-void generate_NOT(struct quad *quad){}
-void generate_RET(struct quad *quad){}
+void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta
+void generate_OR(struct quad *quad){ return ;}
+void generate_NOT(struct quad *quad){ return ;}
+void generate_RET(struct quad *quad){ return ;}
 
 
 
@@ -92,7 +92,7 @@ void printInstructions(){
 			printf("arg1 : (%d,%u)\t",instructions[i].arg1->type,instructions[i].arg1->val );
 		}
 		if (instructions[i].arg2!=NULL) {
-			printf("arg1 : (%d,%u)\t",instructions[i].arg2->type,instructions[i].arg2->val );
+			printf("arg2 : (%d,%u)\t",instructions[i].arg2->type,instructions[i].arg2->val );
 		}
 		printf("\n" );
 	}
@@ -109,6 +109,7 @@ void generateIns(void){
 
 	}
 
+	//theloume patch ta incomplete jumps giati exoume segm
 
 }
 
@@ -128,6 +129,7 @@ void generate(vmopcode code , struct quad* quad){
 	emitIns(tmpins);
 }
 
+//void generate_relational()  afou exoume meriki tha xreiastei gia kapoia jumps (ypothetw)
 
 void emitIns(struct instruction* ins){
 
@@ -159,6 +161,7 @@ struct vmarg* make_operand(struct expr* expr){
 			break;
 
 		}
+
 		case constbool_e: {
 			arg->val= expr->boolconst;
 			arg->type=bool_a;	break;
@@ -167,20 +170,23 @@ struct vmarg* make_operand(struct expr* expr){
 			arg->val = add_rval_string(expr->strconst);
 			arg->type=string_a;	break;
 		}
+
 		case const_num_e : {
 			arg->val= add_rval_num(expr->numconst);
 			arg->type= number_a; break;
 		}
+
 		case nil_e : arg->type=nil_a; break;
 
 		case programfunc_e : {
 			arg->type = userfunc_a;
-			arg->val = expr->sym->value.func->funcAddress;
+			arg->val = expr->sym->value.func->funcAddress;	/* Isws na itan kalytero na ta apothikeuame se pinaka opws libfuncs*/
 			break;
 		}
+
 		case libfunc_e : {
 			arg->type= libfunc_a;
-			//arg->val = //TODO
+			arg->val = add_rval_libfuncs(expr->sym->value.func->name);
 			break;
 
 		}
@@ -197,9 +203,10 @@ unsigned add_rval_string(char * str){
 					maxsize_str = maxsize_str * 2;
 					stringConsts = (char**) realloc(stringConsts, maxsize_str * sizeof(char *));
 			}
+
 			stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 			strcpy(stringConsts[totalStringConsts] , str);
-			printf("%s\n", stringConsts[totalStringConsts] );
+			printf("string: %s\n", stringConsts[totalStringConsts] );
 			return totalStringConsts++;
 }
 
@@ -211,11 +218,13 @@ unsigned add_rval_num(double number){ // xanei pshfia meta to 6o
 	}
 
 	numConsts[totalNumConsts] = number;
-	printf("%f\n", numConsts[totalNumConsts] );
+	printf("num: %f\n", number );	//to epsaksa giati typwnei mono 6 psifia. Auto einai to default tou %f 
+	// alla an to allakseis den ksereis posa psifia exeis esy kai mporei na typwnei midenika 
 	return totalNumConsts++;
 
 }
 
+/* Isws xreiazetai na tsekaroume an yparxei idi mesa, etsi den tha vazoume kopies tis idias func */
 unsigned add_rval_libfuncs(char * libfunc){
 
 	if(totalNamedLibfuncs == maxsize_libfunc ){
@@ -225,10 +234,11 @@ unsigned add_rval_libfuncs(char * libfunc){
 
 	namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
 	strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
-	printf("%s\n", namedLibfuncs[totalNamedLibfuncs] );
+	printf("libfunc: %s\n", namedLibfuncs[totalNamedLibfuncs] );
 	return totalNamedLibfuncs++;
 }
 
+/* Isws xreiazetai check to onoma gia kopia */
 unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
 
 	if(totalUserFuncs == maxsize_userfunc ){
@@ -246,6 +256,22 @@ unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int l
 	strcpy(newnode->id, userfunc);
 
 	userFuncs[totalUserFuncs]  = newnode;
-	printf("%s\n", userFuncs[totalUserFuncs] ->id );
+	printf("userfunc: %s\n", userFuncs[totalUserFuncs] ->id );
 	return totalUserFuncs++;
+}
+
+
+/* Einai stis dialekseis, den kserw pou tha xreiastoun */
+void make_booloperand(struct vmarg *arg, unsigned val) {
+	arg->val = val;
+	arg->type = bool_a;
+}
+
+void make_numberoperand(struct vmarg *arg, double val) {
+	arg->val = add_rval_num(val);
+	arg->type = number_a;
+}
+
+void make_revaloperand(struct vmarg *arg) {
+	arg->type = retval_a;
 }

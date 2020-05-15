@@ -38,7 +38,7 @@ int main(void) {
 	stringConsts = (char**) malloc(50 * sizeof(char*)); //pianw 50 theseis gia ta strings
 	totalStringConsts=0;
 
-	numConsts = (double *) malloc(100 * sizeof(double)); //pianw 100 theseis gia numbers
+	numConsts = (double *) malloc(50 * sizeof(double)); //pianw 100 theseis gia numbers
 	totalNumConsts = 0 ;
 
 	namedLibfuncs = (char**) malloc(50 * sizeof(char*)); //pianw 50 theseis gia ta libfunc
@@ -65,7 +65,7 @@ int main(void) {
 	print_table();
 //	print_list_rvalues();
 	print_quads();
-generateIns();
+	generateIns();
 	printInstructions();
 
 /*
