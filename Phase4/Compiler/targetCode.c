@@ -205,11 +205,11 @@ void generate(vmopcode code , struct quad* quad){
 
 	if (quad->arg2!=NULL) {
 		tmpins->arg2=make_operand(quad->arg2);
-
+}
 	if (quad->res!=NULL) {
 	tmpins->result=make_operand(quad->res);
 	}
-	
+
 	tmpins->srcLine=quad->line;
 	quad->taddress=instrNo;
 	emitIns(tmpins);
