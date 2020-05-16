@@ -174,7 +174,13 @@ void generate_FUNCEND(struct quad *quad)		{
 
 
 }
-void generate_UMINUS(struct quad *quad)			{ generate(mul_v,quad);}	// todo peiragmeno quad ????
+void generate_UMINUS(struct quad *quad)			{
+	 	quad->arg2 =malloc(sizeof(struct expr));
+		quad->arg2->sym = malloc(sizeof(struct symbol_table_binding));
+ 		quad->arg2->sym =insertVar("_m",-1,-1);
+ 		quad->arg2 = new_expr(8,quad->arg2->sym,NULL,-1,"",'\0',NULL);
+	  	generate(mul_v,quad);
+ }	// todo peiragmeno quad ????
 
 
 void generate_AND(struct quad *quad){ return ;} 		//Den tha ta xreiastoume afta

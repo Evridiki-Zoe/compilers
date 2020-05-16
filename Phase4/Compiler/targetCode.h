@@ -110,7 +110,6 @@ void generate_PARAM(struct quad *quad);
 void generate_CALL(struct quad *quad);
 void generate_GETRETVAL(struct quad *quad);
 void generate_FUNCSTART(struct quad *quad);
-void generate_RETURN(struct quad *quad);
 void generate_FUNCEND(struct quad *quad);
 void generate_UMINUS(struct quad *quad);
 void generate_AND(struct quad *quad);
