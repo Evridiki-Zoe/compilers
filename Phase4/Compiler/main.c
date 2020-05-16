@@ -116,7 +116,7 @@ printf("=========nums:============\n" );
 	printf("========user funcs:============\n" );
 	j=0;
 	while (j< totalUserFuncs) {
-		 printf("%s #args %d\n", userFuncs[j]->id, userFuncs[j]->totalargs);
+		 printf("%s #args %d   locals %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize);
 		j++;
 	}
 	return 0;

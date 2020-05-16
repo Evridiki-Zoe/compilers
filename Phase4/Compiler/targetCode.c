@@ -387,7 +387,7 @@ struct vmarg* make_operand(struct expr* expr){
 
 		case programfunc_e : {
 			arg->type = userfunc_a;
-			arg->val = add_rval_userfuncs(expr->sym->value.func->name,instrNo,50,expr->sym->value.func->totalVars);
+			arg->val = add_rval_userfuncs(expr->sym->value.func->name,instrNo,expr->sym->value.func->totalVars,expr->sym->value.func->totalArgs);
 			break;
 		}
 		case libfunc_e : {

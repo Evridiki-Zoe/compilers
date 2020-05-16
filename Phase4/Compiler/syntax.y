@@ -1090,7 +1090,7 @@ indexedelem	  : L_CBRACKET expr  {
 block   :  L_CBRACKET { scope++; if(scope > maxScope) maxScope = scope; }multi_stmts R_CBRACKET {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
         ;
 
-funcdef  :  funcstart funcname  L_PARENTHES {push_SP(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES { tmpoffset=0; make_not_accessible(scope+1);  push_E(exprflag); exprflag=0; } block {
+funcdef  :  funcstart funcname  L_PARENTHES {push_SP(tmpoffset); tmpoffset=0; insideFunc++;} idlist R_PARENTHES {  $2->sym->value.func->totalArgs=tmpoffset; tmpoffset=0; make_not_accessible(scope+1);  push_E(exprflag); exprflag=0; } block {
 			  make_accessible_again(scope+1);
 			  insideFunc--;
 			  emit(funcend,$2,NULL,NULL,yylineno,0);
