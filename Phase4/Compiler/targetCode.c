@@ -240,6 +240,7 @@ void printInstructions(){
 		}
 		printf("\n" );
 	}
+
 }
 
 
@@ -485,4 +486,181 @@ void make_numberoperand(struct vmarg *arg, double val) {
 
 void make_revaloperand(struct vmarg *arg) {
 	arg->type = retval_a;
+}
+
+/*periexomena binary FILE
+// magic number
+//arrays
+// total strings (unsigned) size(unsigned) char*  null terminator
+// total nums (unsigned) double*
+// total userfuncs (unsigned) address(unsigned) localsize(unsigned) id(size(unsigned) char*)
+// total libfuncs (unsigned) size(unsigned) char*
+
+//code
+// total(unsigned)  opcode(byte) operand( type(byte) value(unsigned) )
+                      // operand( type(byte) value(unsigned) ) operand( type(byte) value(unsigned) )
+//   fputs("2", fp);
+
+*/
+int create_bin(){
+
+	 FILE *fp = NULL;
+   fp = fopen("test.bin", "wb");
+   int magicnum = 340200501;
+	 int i =0; //counter
+   fwrite(&magicnum,sizeof(int), 1, fp); //magic number
+//   fprintf(fp, "340200501\n"); // ANTEGAMHSOU:)
+	 fwrite(&totalStringConsts,sizeof(unsigned int), 1, fp); //total strings
+
+	    for(i=0; i<totalStringConsts; i++){
+							unsigned int len = strlen(stringConsts[i]);
+						  fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
+	  	        fwrite(&stringConsts[i],sizeof(char )* len, 1, fp);
+	    }
+
+	 fwrite(&totalNumConsts,sizeof(unsigned int), 1, fp); //total numbers
+
+
+   for(i=0; i<totalNumConsts; i++){
+ 	        fwrite(&numConsts[i],sizeof(double), 1, fp);
+   }
+
+	 fwrite(&totalUserFuncs,sizeof(unsigned int), 1, fp); //total user functions
+
+	 	    for(i=0; i<totalUserFuncs; i++){
+	 							unsigned int len = strlen(userFuncs[i]->id);
+								fwrite(&userFuncs[i]->address,sizeof(unsigned int), 1, fp); //total strings
+								fwrite(&userFuncs[i]->localSize,sizeof(unsigned int), 1, fp); //total strings
+
+	 						  fwrite(&len,sizeof(unsigned int), 1, fp);
+								fwrite(&userFuncs[i]->id,sizeof(char )* len, 1, fp);
+	 	    }
+
+
+	 fwrite(&totalNamedLibfuncs,sizeof(unsigned int), 1, fp); //total lib functions
+	 for(i=0; i<totalNamedLibfuncs; i++){
+					 unsigned int len = strlen(namedLibfuncs[i]);
+					 fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
+					 fwrite(&namedLibfuncs[i],sizeof(char )* len, 1, fp);
+	 }
+
+
+	 fwrite(&instrNo,sizeof(unsigned int), 1, fp); //total strings
+
+	 for (i = 0; i < instrNo; i++) {
+					 fwrite(&instructions[i].opcode,sizeof(int ), 1, fp);
+ 		if (instructions[i].result!=NULL) {
+ 			  fwrite(&instructions[i].result->type,sizeof( int), 1, fp);
+			  fwrite(&instructions[i].result->val,sizeof( int), 1, fp);
+ 		}
+		else{ //an den uparxei vazw meion einai
+			int flag = -1;
+			fwrite(&flag,sizeof( int), 1, fp);
+			fwrite(&flag,sizeof( int), 1, fp);
+
+		}
+		if (instructions[i].arg1!=NULL) {
+ 			  fwrite(&instructions[i].arg1->type,sizeof( int), 1, fp);
+			  fwrite(&instructions[i].arg1->val,sizeof( int), 1, fp);
+ 		}
+		else{ //an den uparxei vazw meion einai
+			int flag = -1;
+			fwrite(&flag,sizeof( int), 1, fp);
+			fwrite(&flag,sizeof( int), 1, fp);
+
+		}
+		if (instructions[i].arg2!=NULL) {
+ 			  fwrite(&instructions[i].arg2->type,sizeof( int), 1, fp);
+			  fwrite(&instructions[i].arg2->val,sizeof( int), 1, fp);
+ 		}
+		else{ //an den uparxei vazw meion einai
+			int flag = -1;
+			fwrite(&flag,sizeof( int), 1, fp);
+			fwrite(&flag,sizeof( int), 1, fp);
+
+		}
+
+	}
+
+   fclose(fp);
+
+
+//oi fread tha mpoun se allh sunarthsh mallon mesa sto vm kapou afou ekei tha diavazontai
+
+	 //   fputs("2", fp);
+   fp = fopen("test.bin", "rb");
+int magic;
+unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
+      fread(&magic, sizeof(int), 1, fp);
+      printf("\nmagic number is: %d with addr %p\n", magic, &magic);
+			fread(&totalStr, sizeof(unsigned int), 1, fp);
+			printf("\ntotal string is %d \n", totalStr);
+
+	    for(i=0; i<totalStringConsts; i++){
+							unsigned int len;
+							char * str = malloc(sizeof(char )*100);
+						  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
+							fread(&str,sizeof(char )*len , 1, fp);
+							printf("size (%d) of str: %s\n",len, str );
+	    }
+
+			fread(&totalNums, sizeof(unsigned int), 1, fp);
+			printf("\ntotal nums is %d \n", totalNums);
+			for(i=0; i<totalNums; i++){
+		        double num;
+		        fread(&num,sizeof(double), 1, fp);
+		        printf("num:%f\n", num);
+			}
+
+			fread(&totaluserF, sizeof(unsigned int), 1, fp);
+			printf("\ntotal userfuncs is %d \n", totaluserF);
+
+ 	    for(i=0; i<totaluserF; i++){
+ 							unsigned int len, addr, localsize;
+							char * id = malloc(sizeof(char )*50);
+							fread(&addr,sizeof(unsigned int), 1, fp); //total strings
+							fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
+ 						  fread(&len,sizeof(unsigned int), 1, fp); //total strings
+ 	  	        fread(&id,sizeof(char )* len, 1, fp);
+							//TODO ??
+							//an to onoma tis sunarthshs einai 1 char px a den to tupwnei, enw an einai parapanw einai komple
+							printf("size (%d) of userF: %s, with address %d and localsize %d\n",len, id, addr, localsize );
+
+
+ 	    }
+			fread(&totallibF, sizeof(unsigned int), 1, fp);
+			printf("\ntotal libfuncs is %d \n", totallibF);
+			for(i=0; i<totallibF; i++){
+							unsigned int len;
+							char * libF = malloc(sizeof(char )*50);
+						  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
+							fread(&libF,sizeof(char )*len , 1, fp);
+							printf("size (%d) of libF: %s\n",len, libF );
+	    }
+
+			fread(&totalins, sizeof(unsigned int), 1, fp);
+			printf("\ntotal instructions is %d \n", totalins);
+
+
+				 for (i = 0; i < totalins; i++) {
+					 			 int opcode, type, val;
+								 fread(&opcode,sizeof(int ), 1, fp);
+								 fread(&type,sizeof( int), 1, fp);
+				 			   fread(&val,sizeof( int), 1, fp);
+								 //TODO
+								/* if(type == -1) //ignore
+								 if(val == -1) //ignore
+								 */
+								 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
+								 fread(&type,sizeof( int), 1, fp);
+				 			   fread(&val,sizeof( int), 1, fp);
+								 printf("\tARG1: type(%d), value(%d) \n", type, val );
+								 fread(&type,sizeof( int), 1, fp);
+				 			   fread(&val,sizeof( int), 1, fp);
+								 printf("\tARG2: type(%d), value(%d) \n", type, val );
+
+				}
+			fclose(fp);
+
+
 }

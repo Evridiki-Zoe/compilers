@@ -62,8 +62,6 @@ struct userfunc {
 };
 
 
-
-
 double* 	numConsts; //rvalue numbers
 unsigned	totalNumConsts; //total number of  numbers
 char**		stringConsts; //rvalue strings
@@ -130,3 +128,5 @@ struct incomplete_jump {
 
 void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
 void patch_incomplete_jump();
+
+int  create_bin();

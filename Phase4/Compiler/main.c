@@ -116,8 +116,15 @@ printf("=========nums:============\n" );
 	printf("========user funcs:============\n" );
 	j=0;
 	while (j< totalUserFuncs) {
-		 printf("%s #args %d   locals %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize);
+		 printf("%s #args %d   locals %d address %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize, userFuncs[j]->address);
 		j++;
 	}
+
+
+
+
+printf("\n\n");
+
+ create_bin();
 	return 0;
 }
