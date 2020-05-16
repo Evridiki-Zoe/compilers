@@ -1,10 +1,65 @@
+// to get retval pou einai to 55 quad edw, ginetai assign
+//den uparxei getretval sta instructins
+
 function b(){
-if(q == 9){q++;}
-else{
- e = 8;
+if(q == 9){
+  for (i = 0; i < 2; i++){
+  q++;
+  continue;
+  }
+
 }
-return x+u;};
+else{
+
+  while(x!=0){
+   e = s and not x;
+   break;
+
+
+   vec3=[
+       {"hey" : "zero"},
+       {1 : true}
+   ];
+   }
+}
+return x+u; //to return ginetai assign kai jump
+print();
+
+};
+
+table = [1,2,3];
+
+function a(w,f){
+f = 4;
+w = nil;
+};
+
+//function f(x,y) { return x+y; }
 
 
 
-function a(w,f){};
+
+
+
+/*
+
+
+
+=========strings:============
+hey
+zero
+=========nums:============
+9.000000
+0.000000
+2.000000
+1.000000
+1.000000
+0.000000
+1.000000
+========lib funcs:============
+========user funcs:============
+b #args 19
+b #args 19
+a #args 0
+a #args 0
+*/
