@@ -350,7 +350,7 @@ void execute_assign (struct instruction* ins){
 	avm_assign(lv,rv);
 }
 
-void execute_add 	(struct instruction* ins) {}
+void execute_add 	(struct instruction* ins) {  execute_arithmetic(ins); } //?? }
 void execute_sub	(struct instruction* ins) {}
 void execute_mul	(struct instruction* ins) {}
 void execute_div	(struct instruction* ins) {}
@@ -598,8 +598,55 @@ void execute_funcexit	(struct instruction* ins){
 }
 
 void execute_newtable		(struct instruction* ins){}
-void execute_tablegetelem	(struct instruction* ins){}
-void execute_tablesetelem	(struct instruction* ins){}
+void execute_tablegetelem	(struct instruction* ins){
+
+	struct avm_memcell* lv = avm_translate_operand(ins->result, (struct avm_memcell*)0);
+	struct avm_memcell* t = avm_translate_operand(ins->arg1, (struct avm_memcell*)0);
+	struct avm_memcell* i = avm_translate_operand(ins->arg2, &ax);
+
+	//assert(lv && &stack[N - 1] >= lv && &stack[top] < lv || lv == &retval);// TODO N
+	//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
+	assert(i);
+
+	avm_memcellclear(lv);
+	lv->type = nil_m; //default val
+
+	if(t->type != table_m ){
+		avm_error("illegal use of variable as a table! \n");
+
+	}
+	else{
+			struct avm_memcell* content;// = avm_tablegetelem(t->data.tableVal, i ); //todo
+			if(content){
+				avm_assign(lv,content);
+			}
+			else{
+					char * ts = avm_tostring(t);
+					char * is = avm_tostring(i);
+					avm_warning("getelem:: Not found! \n");
+					free(ts);
+					free(is);
+
+			}
+
+	}
+
+
+}
+void execute_tablesetelem	(struct instruction* ins){
+
+		struct avm_memcell* t = avm_translate_operand(ins->result, (struct avm_memcell*)0);
+		struct avm_memcell* i = avm_translate_operand(ins->arg1, &ax);
+		struct avm_memcell* c = avm_translate_operand(ins->arg2, &bx);
+
+		//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
+		assert(i && c);
+
+		if(t->type != table_m)		avm_error("illegal use of variable as a table! \n");
+		else {
+			//avm_setelem(t->data.tableVal, i, c); //todo
+		}
+}
 void execute_nop	(struct instruction* ins){}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
@@ -638,7 +685,7 @@ unsigned char avm_tobool(struct avm_memcell* m){
 
 void  libfunc_typeof(){
 
-unsigned n ; //= avm_totalactuals(); //TODO
+unsigned n = avm_totalactuals();
 
 if(n != 1) avm_error("libfunc typeof:: error ");
 else{
@@ -646,7 +693,7 @@ else{
 	//to return a result we set the retval register
 	avm_memcellclear(&retval);
 	retval.type = string_m;
-	//retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]); //todo
+	retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
 }
 
 }
