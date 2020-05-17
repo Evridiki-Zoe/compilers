@@ -6,6 +6,13 @@
 #define AVM_STACKENV_SIZE	4
 #define AVM_ENDING_PC	codeSize
 
+typedef double (*arithmetic_func_t) (double x, double y);
+
+double add_impl(double x, double y);
+double sub_impl(double x, double y);
+double mul_impl(double x, double y);
+double div_impl(double x, double y);
+double mod_impl(double x, double y);
 
 typedef enum 	{
 
@@ -108,6 +115,7 @@ typedef void (*execute_func_t) (struct instruction* ins);
 
 #define AVM_MAX_INSTRUCTIONS (unsigned) nop_v
 
+void execute_arithmetic(struct instruction* instr);
 
 
 void execute_assign (struct instruction* ins);
@@ -151,4 +159,5 @@ unsigned		codeSize ;
 
 struct instruction*  code;
 
+void avm_error(char *msg);
 void execute_cycle	(void);
