@@ -278,9 +278,20 @@ void execute_call		(struct instruction* ins){
 			}
 			}
 }
+void execute_pusharg	(struct instruction* ins){}
+void execute_funcenter	(struct instruction* ins){}
+void execute_funcexit	(struct instruction* ins){}
+
+void execute_newtable		(struct instruction* ins){}
+void execute_tablegetelem	(struct instruction* ins){}
+void execute_tablesetelem	(struct instruction* ins){}
+void execute_nop	(struct instruction* ins){}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
   printf("\nError: %s ",msg);
 	exit(1); //???
+}
+void avm_warning(char* msg ){
+	 printf("\nWarning: %s ",msg);
 }
