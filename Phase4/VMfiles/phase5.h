@@ -3,6 +3,12 @@
 #include <strings.h>
 #include <assert.h>
 
+#define AVM_NUMACTUALS_OFFSET 	+4
+#define AVM_SAVEDPC_OFFSET		+3
+#define AVM_SAVEDTOP_OFFSET		+2
+#define AVM_SAVEDTOPSP_OFFSET	+1
+
+
 #define AVM_STACKENV_SIZE	4
 #define AVM_ENDING_PC	codeSize
 
@@ -100,6 +106,15 @@ struct instruction {
 
 };
 
+struct userfunc {
+
+	unsigned int 	address;
+	unsigned int 	localSize;
+	unsigned int 	totalargs;
+	char* 			id;
+
+};
+
 //----------from phase4----------------------
 
 
@@ -121,7 +136,11 @@ void execute_arithmetic(struct instruction* instr);
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv);
 
+void avm_dec_top (void);
+void avm_push_envvalue (unsigned val);
+unsigned avm_get_envvalue(unsigned i);
 
+unsigned avm_totalactuals(void);
 
 void execute_assign (struct instruction* ins);
 
@@ -178,5 +197,24 @@ void avm_tableincrefcounter(struct avm_table* m);
 
 void avm_warning(char* msg );
 
-void avm_callsaveenviroment();
-void avm_calllibfunc(char* name);
+void avm_callsaveenviroment(void);
+void avm_calllibfunc(char* id);
+
+typedef void (*library_funcs_t)(void);
+library_funcs_t avm_getlibraryfunc (char* id);
+
+typedef char* (*tostring_func_t)(struct avm_memcell*);
+char* avm_tostring(struct avm_memcell* cell);
+
+char* number_tostring (struct avm_memcell* cell);
+char* string_tostring (struct avm_memcell* cell);
+char* bool_tostring (struct avm_memcell* cell);
+char* table_tostring (struct avm_memcell* cell);
+char* userfunc_tostring (struct avm_memcell* cell);
+char* libfunc_tostring (struct avm_memcell* cell);
+char* nil_tostring (struct avm_memcell* cell);
+char* undef_tostring (struct avm_memcell* cell);
+
+struct userfunc* avm_getfuncinfo(unsigned address);
+
+void avm_registerlibfunc (char* id , library_funcs_t addr);
