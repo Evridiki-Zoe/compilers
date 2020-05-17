@@ -20,7 +20,9 @@ typedef enum 	{
 
 }avm_memcell_t;
 
-
+struct avm_table{
+		//TODO
+};
 
 struct avm_memcell {
 	avm_memcell_t type;
@@ -109,6 +111,9 @@ typedef void (*execute_func_t) (struct instruction* ins);
 #define AVM_MAX_INSTRUCTIONS (unsigned) nop_v
 
 
+void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv);
+
+
 
 void execute_assign (struct instruction* ins);
 
@@ -152,3 +157,17 @@ unsigned		codeSize ;
 struct instruction*  code;
 
 void execute_cycle	(void);
+
+typedef void (*memclear_func_t) (struct avm_memcell*);
+
+void avm_memcellclear(struct avm_memcell* m);
+void memclear_string(struct avm_memcell* m);
+void memclear_table(struct avm_memcell* m);
+
+void avm_tablecrefcounter(struct avm_table* m);
+void avm_tableincrefcounter(struct avm_table* m);
+
+void avm_warning(char* msg );
+
+void avm_callsaveenviroment();
+void avm_calllibfunc(char* name);

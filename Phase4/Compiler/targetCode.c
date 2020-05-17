@@ -532,8 +532,8 @@ int create_bin(){
 								fwrite(&userFuncs[i]->address,sizeof(unsigned int), 1, fp); //total strings
 								fwrite(&userFuncs[i]->localSize,sizeof(unsigned int), 1, fp); //total strings
 
-	 						  fwrite(&len,sizeof(unsigned int), 1, fp);
-								fwrite(&userFuncs[i]->id,sizeof(char )* len, 1, fp);
+	 						  	fwrite(&len,sizeof(unsigned int), 1, fp);
+								fwrite(&userFuncs[i]->id,sizeof(char )* len , 1, fp);
 	 	    }
 
 
@@ -620,8 +620,8 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 							char * id = malloc(sizeof(char )*50);
 							fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 							fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
- 						  fread(&len,sizeof(unsigned int), 1, fp); //total strings
- 	  	        fread(&id,sizeof(char )* len, 1, fp);
+ 						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
+ 	  	        			fread(&id,sizeof(char )* len , 1, fp);
 							//TODO ??
 							//an to onoma tis sunarthshs einai 1 char px a den to tupwnei, enw an einai parapanw einai komple
 							printf("size (%d) of userF: %s, with address %d and localsize %d\n",len, id, addr, localsize );
@@ -662,5 +662,5 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 				}
 			fclose(fp);
 
-
+			return 0;
 }
