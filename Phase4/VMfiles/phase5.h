@@ -14,6 +14,7 @@
 
 typedef double (*arithmetic_func_t) (double x, double y);
 
+
 double add_impl(double x, double y);
 double sub_impl(double x, double y);
 double mul_impl(double x, double y);
@@ -197,8 +198,7 @@ void avm_tableincrefcounter(struct avm_table* m);
 
 void avm_warning(char* msg );
 
-void avm_callsaveenviroment(void);
-void avm_calllibfunc(char* id);
+
 
 typedef void (*library_funcs_t)(void);
 library_funcs_t avm_getlibraryfunc (char* id);
@@ -218,3 +218,10 @@ char* undef_tostring (struct avm_memcell* cell);
 struct userfunc* avm_getfuncinfo(unsigned address);
 
 void avm_registerlibfunc (char* id , library_funcs_t addr);
+
+void avm_callsaveenviroment();
+void avm_calllibfunc(char* name);
+
+unsigned char avm_tobool(struct avm_memcell* m);
+
+void  libfunc_typeof();
