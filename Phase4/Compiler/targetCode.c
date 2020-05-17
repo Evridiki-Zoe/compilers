@@ -532,8 +532,10 @@ int create_bin(){
 								fwrite(&userFuncs[i]->address,sizeof(unsigned int), 1, fp); //total strings
 								fwrite(&userFuncs[i]->localSize,sizeof(unsigned int), 1, fp); //total strings
 
-	 						  	fwrite(&len,sizeof(unsigned int), 1, fp);
-								fwrite(&userFuncs[i]->id,sizeof(char )* len , 1, fp);
+
+									fwrite(&len,sizeof(unsigned int), 1, fp);
+								fwrite(&userFuncs[i]->id,sizeof(char *) , 1, fp);
+
 	 	    }
 
 
@@ -541,7 +543,7 @@ int create_bin(){
 	 for(i=0; i<totalNamedLibfuncs; i++){
 					 unsigned int len = strlen(namedLibfuncs[i]);
 					 fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
-					 fwrite(&namedLibfuncs[i],sizeof(char )* len, 1, fp);
+					 fwrite(&namedLibfuncs[i],sizeof(char *) , 1, fp);
 	 }
 
 
@@ -621,9 +623,7 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 							fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 							fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
  						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
- 	  	        			fread(&id,sizeof(char )* len , 1, fp);
-							//TODO ??
-							//an to onoma tis sunarthshs einai 1 char px a den to tupwnei, enw an einai parapanw einai komple
+ 	  	        			fread(&id,sizeof(char *) , 1, fp);
 							printf("size (%d) of userF: %s, with address %d and localsize %d\n",len, id, addr, localsize );
 
 
@@ -634,7 +634,7 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 							unsigned int len;
 							char * libF = malloc(sizeof(char )*50);
 						  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
-							fread(&libF,sizeof(char )*len , 1, fp);
+							fread(&libF,sizeof(char *)  , 1, fp);
 							printf("size (%d) of libF: %s\n",len, libF );
 	    }
 
@@ -664,3 +664,4 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 
 			return 0;
 }
+
