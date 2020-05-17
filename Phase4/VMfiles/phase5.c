@@ -1,5 +1,5 @@
 #include "phase5.h"
-/* TODO ???
+/* TODO
 
 #define execute_add execute_arithmetic
 #define execute_sub execute_arithmetic
@@ -145,16 +145,31 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 	}
 }
 
+void avm_initstack(){
 
-double	consts_getnumber(unsigned index){return 0;}
+}
+
+double	consts_getnumber(unsigned index){return 0;} //TODO
 char*	consts_getstring(unsigned index){return NULL;}
 char*	libfuncs_getused(unsigned index){return NULL;}
 
 double add_impl(double x, double y){return x+y;}
 double sub_impl(double x, double y){return x-y;}
 double mul_impl(double x, double y){return x*y;}
-double div_impl(double x, double y){if(y == 0){printf("Division by zero!\n" ); exit(1);} return x/y;}
-double mod_impl(double x, double y){return (unsigned)x % (unsigned)y;} //todo error (??)
+double div_impl(double x, double y){
+	if(y == 0){
+		avm_error("Division by zero!" );
+		executionFinished=1;
+		return 0;
+	}else  return x/y;
+}
+double mod_impl(double x, double y){
+	if(y == 0){
+		avm_error("Mod by zero!" );
+		executionFinished=1;
+		return 0;
+	}else return (unsigned)x % (unsigned)y;
+}
 
 void execute_cycle	(void){
 
@@ -217,6 +232,8 @@ void memclear_table(struct avm_memcell* m){
 }
 void avm_tableincrefcounter(struct avm_table* m){} //TODO
 
+
+struct avm_table* avm_tablenew(){return NULL;}//TODO
 
 //----------------------------------------------------------
 
@@ -315,7 +332,38 @@ void libfunc_print(void){
 	}
 }
 
-void avm_registerlibfunc (char* id , library_funcs_t addr){} //?? TODO
+void  libfunc_typeof(){
+
+unsigned n = avm_totalactuals();
+
+if(n != 1) avm_error("libfunc typeof:: error ");
+else{
+
+	//to return a result we set the retval register
+	avm_memcellclear(&retval);
+	retval.type = string_m;
+	retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
+}
+
+}
+
+void avm_registerlibfunc (char* id , library_funcs_t addr){} // TODO
+
+void libfunc_totalarguments(void){
+
+	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
+	avm_memcellclear(&retval);
+
+	if (!p_topsp) {
+		avm_error("'totalarguments' called outside a function!");
+		retval.type=nil_m;
+	}else {
+		retval.type = number_m;
+		retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
+	}
+
+
+}
 //------------------------------------------
 
 void execute_arithmetic(struct instruction* instr){
@@ -323,7 +371,7 @@ void execute_arithmetic(struct instruction* instr){
 		struct avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
 
-		assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); //TODO slide 25 to exei alliws
+		//assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); ?? slide 25 to exei alliws
 		assert(rv1 && rv2);
 
 		if( rv1->type != number_m  || rv2->type != number_m ){
@@ -343,7 +391,7 @@ void execute_arithmetic(struct instruction* instr){
 
 void execute_assign (struct instruction* ins){
 
-	struct avm_memcell*	lv = avm_translate_operand(ins->result , NULL); // ??
+	struct avm_memcell*	lv = avm_translate_operand(ins->result , NULL);
 	struct avm_memcell*	rv = avm_translate_operand(ins->arg1 , &ax);
 
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
@@ -597,7 +645,15 @@ void execute_funcexit	(struct instruction* ins){
 	}
 }
 
-void execute_newtable		(struct instruction* ins){}
+void execute_newtable		(struct instruction* ins){
+	struct avm_memcell* lv = avm_translate_operand(ins->result , NULL);
+	//assert(lv &&)
+	avm_memcellclear(lv);
+
+	lv->type 			=table_m;
+	lv->data.tableVal	=avm_tablenew();
+	avm_tableincrefcounter(lv->data.tableVal);
+}
 void execute_tablegetelem	(struct instruction* ins){}
 void execute_tablesetelem	(struct instruction* ins){}
 void execute_nop	(struct instruction* ins){}
@@ -605,8 +661,7 @@ void execute_nop	(struct instruction* ins){}
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
 	executionFinished = 1;
-  printf("\nError: %s ",msg);
-	exit(1); //???
+  	printf("\nError: %s ",msg);
 }
 void avm_warning(char* msg ){
 	 printf("\nWarning: %s ",msg);
@@ -633,20 +688,4 @@ char* undef_tostring (struct avm_memcell* cell){return NULL;}
 unsigned char avm_tobool(struct avm_memcell* m){
 		assert(m->type >= 0 && m->type < undef_m);
 		return (*toboolFuncs[m->type])(m);
-}
-
-
-void  libfunc_typeof(){
-
-unsigned n ; //= avm_totalactuals(); //TODO
-
-if(n != 1) avm_error("libfunc typeof:: error ");
-else{
-
-	//to return a result we set the retval register
-	avm_memcellclear(&retval);
-	retval.type = string_m;
-	//retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]); //todo
-}
-
 }

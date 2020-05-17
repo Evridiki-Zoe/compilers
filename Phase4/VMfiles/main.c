@@ -6,6 +6,14 @@
 
 
 int main(int argc, char const *argv[]) {
-	/* code */
+
+	avm_initstack();
+
+	//register all libfuncs with avm_registerlibfunc
+
+	while (!executionFinished) {
+		execute_cycle();
+	}
+
 	return 0;
 }

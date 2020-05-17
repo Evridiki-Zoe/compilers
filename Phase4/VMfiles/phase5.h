@@ -14,6 +14,7 @@
 
 typedef double (*arithmetic_func_t) (double x, double y);
 
+void avm_initstack();
 
 double add_impl(double x, double y);
 double sub_impl(double x, double y);
@@ -195,6 +196,7 @@ void memclear_table(struct avm_memcell* m);
 
 void avm_tablecrefcounter(struct avm_table* m);
 void avm_tableincrefcounter(struct avm_table* m);
+struct avm_table* avm_tablenew();
 
 void avm_warning(char* msg );
 
@@ -225,3 +227,5 @@ void avm_calllibfunc(char* name);
 unsigned char avm_tobool(struct avm_memcell* m);
 
 void  libfunc_typeof();
+
+void libfunc_totalarguments(void);
