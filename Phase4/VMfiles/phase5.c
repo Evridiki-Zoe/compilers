@@ -1,4 +1,12 @@
 #include "phase5.h"
+/* TODO ???
+
+#define execute_add execute_arithmetic
+#define execute_sub execute_arithmetic
+#define execute_mul execute_arithmetic
+#define execute_div execute_arithmetic
+#define execute_mod execute_arithmetic
+*/
 
 execute_func_t executeFuncs[] = {
 	 execute_assign ,
@@ -26,6 +34,15 @@ execute_func_t executeFuncs[] = {
 	 execute_tablesetelem	,
 	 execute_nop	,
 
+};
+
+
+arithmetic_func_t arithmeticFuncs[] = {
+  add_impl,
+  sub_impl,
+  mul_impl,
+  div_impl,
+  mod_impl
 };
 
 unsigned char	executionFinished = 0 ;
@@ -91,6 +108,12 @@ char*	libfuncs_getused(unsigned index){return NULL;}
 
 
 
+
+double add_impl(double x, double y){return x+y;}
+double sub_impl(double x, double y){return x-y;}
+double mul_impl(double x, double y){return x*y;}
+double div_impl(double x, double y){if(y == 0){printf("Division by zero!\n" ); exit(1);} return x/y;}
+double mod_impl(double x, double y){return (unsigned)x % (unsigned)y;} //todo error (??)
 
 void execute_cycle	(void){
 
@@ -183,7 +206,26 @@ void avm_calllibfunc(char* name){} //TODO
 
 
 
+void execute_arithmetic(struct instruction* instr){
+	  	struct avm_memcell* lv = avm_translate_operand(instr->result, (struct avm_memcell*)0);
+		struct avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
+		struct avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
 
+		assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); //TODO slide 25 to exei alliws
+		assert(rv1 && rv2);
+
+		if( rv1->type != number_m  || rv2->type != number_m ){
+				avm_error("arithmetic ex:: not a number! \n");
+				executionFinished = 1;
+		}
+		else{
+				arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_v];
+				//avm_memcellclear(lv); //TODO
+				lv->type = number_m;
+				lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+
+		}
+}
 
 
 
@@ -236,14 +278,9 @@ void execute_call		(struct instruction* ins){
 			}
 			}
 }
-void execute_pusharg	(struct instruction* ins){}
-void execute_funcenter	(struct instruction* ins){}
-void execute_funcexit	(struct instruction* ins){}
 
-void execute_newtable		(struct instruction* ins){}
-void execute_tablegetelem	(struct instruction* ins){}
-void execute_tablesetelem	(struct instruction* ins){}
-
-void execute_nop	(struct instruction* ins){}
-
-void avm_warning(char* msg ){printf("%s\n",msg );}
+//den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
+void avm_error(char *msg){
+  printf("\nError: %s ",msg);
+	exit(1); //???
+}
