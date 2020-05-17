@@ -8,6 +8,7 @@
 
 typedef double (*arithmetic_func_t) (double x, double y);
 
+
 double add_impl(double x, double y);
 double sub_impl(double x, double y);
 double mul_impl(double x, double y);
@@ -100,6 +101,12 @@ struct instruction {
 
 };
 
+
+
+
+
+
+
 //----------from phase4----------------------
 
 
@@ -180,3 +187,7 @@ void avm_warning(char* msg );
 
 void avm_callsaveenviroment();
 void avm_calllibfunc(char* name);
+
+unsigned char avm_tobool(struct avm_memcell* m);
+
+void  libfunc_typeof();

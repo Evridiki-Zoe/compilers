@@ -36,6 +36,16 @@ execute_func_t executeFuncs[] = {
 
 };
 
+char* typeStrings[] = {
+		"number",
+		"string",
+		"bool",
+		"table",
+		"userfunc",
+		"libfunc",
+		"nil",
+		"undef"
+};
 
 arithmetic_func_t arithmeticFuncs[] = {
   add_impl,
@@ -43,6 +53,30 @@ arithmetic_func_t arithmeticFuncs[] = {
   mul_impl,
   div_impl,
   mod_impl
+};
+
+
+typedef unsigned char (*tobool_func_t)(struct avm_memcell* m);
+
+unsigned char number_tobool(struct avm_memcell* m){ return m->data.numVal != 0;}
+unsigned char string_tobool(struct avm_memcell* m){ return m->data.strVal[0] != 0;}
+unsigned char bool_tobool(struct avm_memcell* m){ return m->data.bool; }
+unsigned char table_tobool(struct avm_memcell* m){ return 1;}
+unsigned char userfunc_tobool(struct avm_memcell* m){ return 1;}
+unsigned char libfunc_tobool(struct avm_memcell* m){ return 1;}
+unsigned char nil_tobool(struct avm_memcell* m){ return 0;}
+unsigned char undef_tobool(struct avm_memcell* m){ assert(0); return 0;}
+
+tobool_func_t toboolFuncs[] ={
+	number_tobool,
+	string_tobool,
+	bool_tobool,
+	table_tobool,
+	userfunc_tobool,
+	libfunc_tobool,
+	nil_tobool,
+	undef_tobool
+
 };
 
 unsigned char	executionFinished = 0 ;
@@ -220,7 +254,7 @@ void execute_arithmetic(struct instruction* instr){
 		}
 		else{
 				arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_v];
-				//avm_memcellclear(lv); //TODO
+				avm_memcellclear(lv);
 				lv->type = number_m;
 				lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
 
@@ -249,12 +283,182 @@ void execute_and 	(struct instruction* ins) {}//XXXXXXXXXXXX NO USE
 void execute_or 	(struct instruction* ins){}//XXXXXXXXXXXX NO USE
 void execute_not 	(struct instruction* ins){}//XXXXXXXXXXXX NO USE
 
-void execute_jeq	(struct instruction* ins){}
-void execute_jne	(struct instruction* ins){}
-void execute_jle	(struct instruction* ins){}
-void execute_jge	(struct instruction* ins){}
-void execute_jlt	(struct instruction* ins){}
-void execute_jgt	(struct instruction* ins){}
+void execute_jeq	(struct instruction* ins){
+		assert(ins->result->type == label_a);
+		struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
+		struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
+
+		unsigned char result = 0;
+		if (rv1->type == undef_m || rv2->type == undef_m) {
+				avm_error("undef involved in equality\n");
+				executionFinished = 1;
+		}
+		else if( rv1->type == nil_m  || rv2->type == nil_m ){
+			 	result = (rv1->type == nil_m  && rv2->type == nil_m );
+
+		}
+		else if ( rv1->type == bool_m  || rv2->type == bool_m ){
+			 	result = (avm_tobool(rv1) && avm_tobool(rv2)  );
+		}
+		else if ( rv1->type !=rv2->type ){
+				avm_error("illegal types in jeq!\n");
+		}
+		else{
+			// TODO Equality check with Dispaching for rv1
+		}
+
+		if(!executionFinished && result )
+				pc = ins->result->val;
+
+}
+
+void execute_jne	(struct instruction* ins){
+
+	assert(ins->result->type == label_a);
+	struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
+	struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
+
+	unsigned char result = 0;
+	if (rv1->type == undef_m || rv2->type == undef_m) {
+			avm_error("undef involved in equality\n");
+			executionFinished = 1;
+	}
+	else if( rv1->type == nil_m  || rv2->type == nil_m ){
+			result = (rv1->type == nil_m  && rv2->type == nil_m );
+
+	}
+	else if ( rv1->type == bool_m  || rv2->type == bool_m ){
+			result = (avm_tobool(rv1) && avm_tobool(rv2)  );
+	}
+	else if ( rv1->type !=rv2->type ){
+			avm_error("illegal types in jeq!\n");
+	}
+	else{
+		// TODO Equality check with Dispaching for rv1
+		//+++++++
+	}
+
+	if(!executionFinished && result )
+			pc = ins->result->val;
+}
+
+void execute_jle	(struct instruction* ins){
+	assert(ins->result->type == label_a);
+	struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
+	struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
+
+	unsigned char result = 0;
+	if (rv1->type == undef_m || rv2->type == undef_m) {
+			avm_error("undef involved in equality\n");
+			executionFinished = 1;
+	}
+	else if( rv1->type == nil_m  || rv2->type == nil_m ){
+			result = (rv1->type == nil_m  && rv2->type == nil_m );
+
+	}
+	else if ( rv1->type == bool_m  || rv2->type == bool_m ){
+			result = (avm_tobool(rv1) && avm_tobool(rv2)  );
+	}
+	else if ( rv1->type !=rv2->type ){
+			avm_error("illegal types in jeq!\n");
+	}
+	else{
+		// TODO Equality check with Dispaching for rv1
+		//+++++++
+	}
+
+	if(!executionFinished && result )
+			pc = ins->result->val;
+}
+
+void execute_jge	(struct instruction* ins){
+
+	assert(ins->result->type == label_a);
+	struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
+	struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
+
+	unsigned char result = 0;
+	if (rv1->type == undef_m || rv2->type == undef_m) {
+			avm_error("undef involved in equality\n");
+			executionFinished = 1;
+	}
+	else if( rv1->type == nil_m  || rv2->type == nil_m ){
+			result = (rv1->type == nil_m  && rv2->type == nil_m );
+
+	}
+	else if ( rv1->type == bool_m  || rv2->type == bool_m ){
+			result = (avm_tobool(rv1) && avm_tobool(rv2)  );
+	}
+	else if ( rv1->type !=rv2->type ){
+			avm_error("illegal types in jeq!\n");
+	}
+	else{
+		// TODO Equality check with Dispaching for rv1
+		//+++++++
+	}
+
+	if(!executionFinished && result )
+			pc = ins->result->val;
+}
+
+void execute_jlt	(struct instruction* ins){
+
+	assert(ins->result->type == label_a);
+	struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
+	struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
+
+	unsigned char result = 0;
+	if (rv1->type == undef_m || rv2->type == undef_m) {
+			avm_error("undef involved in equality\n");
+			executionFinished = 1;
+	}
+	else if( rv1->type == nil_m  || rv2->type == nil_m ){
+			result = (rv1->type == nil_m  && rv2->type == nil_m );
+
+	}
+	else if ( rv1->type == bool_m  || rv2->type == bool_m ){
+			result = (avm_tobool(rv1) && avm_tobool(rv2)  );
+	}
+	else if ( rv1->type !=rv2->type ){
+			avm_error("illegal types in jeq!\n");
+	}
+	else{
+		// TODO Equality check with Dispaching for rv1
+		//+++++++
+	}
+
+	if(!executionFinished && result )
+			pc = ins->result->val;
+}
+
+void execute_jgt(struct instruction* ins){
+	assert(ins->result->type == label_a);
+	struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
+	struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
+
+	unsigned char result = 0;
+	if (rv1->type == undef_m || rv2->type == undef_m) {
+			avm_error("undef involved in equality\n");
+			executionFinished = 1;
+	}
+	else if( rv1->type == nil_m  || rv2->type == nil_m ){
+			result = (rv1->type == nil_m  && rv2->type == nil_m );
+
+	}
+	else if ( rv1->type == bool_m  || rv2->type == bool_m ){
+			result = (avm_tobool(rv1) && avm_tobool(rv2)  );
+	}
+	else if ( rv1->type !=rv2->type ){
+			avm_error("illegal types in jeq!\n");
+	}
+	else{
+		// TODO Equality check with Dispaching for rv1
+		//+++++++
+	}
+
+	if(!executionFinished && result )
+			pc = ins->result->val;
+}
 
 void execute_call		(struct instruction* ins){
 
@@ -289,9 +493,32 @@ void execute_nop	(struct instruction* ins){}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
+	executionFinished = 1;
   printf("\nError: %s ",msg);
 	exit(1); //???
 }
 void avm_warning(char* msg ){
 	 printf("\nWarning: %s ",msg);
+}
+
+
+unsigned char avm_tobool(struct avm_memcell* m){
+		assert(m->type >= 0 && m->type < undef_m);
+		return (*toboolFuncs[m->type])(m);
+}
+
+
+void  libfunc_typeof(){
+
+unsigned n ; //= avm_totalactuals(); //TODO
+
+if(n != 1) avm_error("libfunc typeof:: error ");
+else{
+
+	//to return a result we set the retval register
+	avm_memcellclear(&retval);
+	retval.type = string_m;
+	//retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]); //todo
+}
+
 }
