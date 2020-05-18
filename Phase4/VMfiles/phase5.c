@@ -756,16 +756,17 @@ void read_binfile(){
 
 		    for(i=0; i<totalStr; i++){
 								unsigned int len = 0;
-								char * str = (char *)malloc(sizeof(char )*5);
+								char * str = (char *)malloc(sizeof(char )*100);
+								str = "lala";
 								assert(str);
 								printf("edw erxesai?\n" );
 							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
 							printf("size (%d)  ",len );
-printf("edw? \n" );
-							if(fread(&str,sizeof(char *) , 1, fp)!= 1)
+							printf("edw? \n" );
+							if(fread(&str,sizeof(char )*len , 1, fp)!= 1)
 								printf("Error reading file \n");
-							printf("str: %s\n",str );
+						//	printf("str: %s\n",str );
 		    }
 
 				fread(&totalNums, sizeof(unsigned int), 1, fp);
@@ -785,8 +786,8 @@ printf("edw? \n" );
 								fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 								fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
 	 						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
-	 	  	        			fread(&id,sizeof(char *) , 1, fp);
-								printf("size (%d) of userF: %s, with address %d and localsize %d\n",len, id, addr, localsize );
+	 	  	        			fread(&id,sizeof(char )*len , 1, fp);
+								printf("size (%d) , with address %d and localsize %d\n",len, addr, localsize );
 
 
 	 	    }
@@ -796,8 +797,8 @@ printf("edw? \n" );
 								unsigned int len;
 								char * libF = malloc(sizeof(char )*50);
 							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
-								fread(&libF,sizeof(char *)  , 1, fp);
-								printf("size (%d) of libF: %s\n",len, libF );
+								fread(&libF,sizeof(char )*len  , 1, fp);
+								//printf("size (%d) of libF: %s\n",len, libF );
 		    }
 
 				fread(&totalins, sizeof(unsigned int), 1, fp);
