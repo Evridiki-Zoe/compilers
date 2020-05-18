@@ -534,7 +534,7 @@ int create_bin(){
 
 
 									fwrite(&len,sizeof(unsigned int), 1, fp);
-								fwrite(&userFuncs[i]->id,sizeof(char)*len , 1, fp);
+								fwrite(userFuncs[i]->id,sizeof(char)*len , 1, fp);
 
 	 	    }
 
@@ -543,7 +543,7 @@ int create_bin(){
 	 for(i=0; i<totalNamedLibfuncs; i++){
 					 unsigned int len = strlen(namedLibfuncs[i]);
 					 fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
-					 fwrite(&namedLibfuncs[i],sizeof(char)*len , 1, fp);
+					 fwrite(namedLibfuncs[i],sizeof(char)*len , 1, fp);
 	 }
 
 
