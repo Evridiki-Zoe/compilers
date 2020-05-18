@@ -759,6 +759,7 @@ void read_binfile(){
 				FILE *fp = NULL;
 				int i =0;
 		 		//   fputs("2", fp);
+				//printf("ff\n" );
 	   		fp = fopen("test.bin", "rb");
 		 		int magic;
 		 		unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
@@ -788,18 +789,21 @@ void read_binfile(){
 
 				fread(&totalNums, sizeof(unsigned int), 1, fp);
 			//	printf("\ntotal nums is %d \n", totalNums);
+				numConsts = malloc(sizeof(double)* totalNums);
 				for(i=0; i<totalNums; i++){
 			        double num;
 			        fread(&num,sizeof(double), 1, fp);
-			   //     printf("num:%f\n", num);
+			       // printf("num:%f\n", num);
 				 add_consts_num(num);
+				// printf("fasd\n" );
 
 				}
 
 				fread(&totaluserF, sizeof(unsigned int), 1, fp);
 				//printf("\ntotal userfuncs is %d \n", totaluserF);
+				userFuncs = malloc(sizeof(struct userfunc)* totallibF);
 
-	 	    for(i=0; i<totaluserF; i++){
+	 	    	for(i=0; i<totaluserF; i++){
 	 							unsigned int len, addr, localsize;
 								fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 								fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
@@ -811,13 +815,14 @@ void read_binfile(){
 										if(fread(&id[i],sizeof(char ) , 1, fp)!= 1)
 											printf("Error reading file \n");
 									}
-	   						//	printf("size (%d) of %s, with address %d and localsize %d\n",len,id,  addr, localsize );
+	   							printf("size (%d) of %s, with address %d and localsize %d\n",len,id,  addr, localsize );
 								add_consts_userfuncs(id,addr,localsize,-1);
 
 
 	 	    }
 				fread(&totallibF, sizeof(unsigned int), 1, fp);
 				printf("\ntotal libfuncs is %d \n", totallibF);
+				namedLibfuncs=malloc(sizeof(char*)*totaluserF);
 				for(i=0; i<totallibF; i++){
 								unsigned int len;
 							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
@@ -830,7 +835,7 @@ void read_binfile(){
 								}
 								add_consts_libfuncs(libF);
 
-								//printf("size (%d) of libF: %s\n",len, libF );
+								printf("size (%d) of libF: %s\n",len, libF );
 		    }
 
 				fread(&totalins, sizeof(unsigned int), 1, fp);
