@@ -1,4 +1,6 @@
 #include "phase5.h"
+#include <string.h>
+
 /* TODO
 
 #define execute_add execute_arithmetic
