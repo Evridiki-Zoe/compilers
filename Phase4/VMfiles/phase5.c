@@ -849,39 +849,39 @@ void read_binfile(){
 									 if(code == NULL) code = malloc(sizeof(struct instruction *)*codeSize);
 									 	  code[i] = malloc(sizeof(struct instruction));
 											code[i]->opcode = opcode;
-
+										//	printf("opcode %d kai code opcode %d\n",opcode , code[i]->opcode );
 									 // result
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
 											 if(type == -1 && val == -1){
- 												  code[i] = malloc(sizeof(struct instruction));
+ 												  code[i]->arg1 = malloc(sizeof(struct instruction));
 												  code[i]->arg1 = NULL;
 											 }
 											 else{
-												  code[i] = malloc(sizeof(struct instruction));
+												  code[i]->result = malloc(sizeof(struct instruction));
 												  code[i]->result = malloc(sizeof(	struct vmarg));
 												  code[i]->result->type = type;
 												  code[i]->result->val = val;
 											 }
 
-									 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
+								//	 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
 
 									 // arg1
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
 
 												 if(type == -1 && val == -1){
- 													  code[i] = malloc(sizeof(struct instruction));
-													  code[i]->arg1 = NULL;
+ 													  code[i]->result = malloc(sizeof(struct instruction));
+													  code[i]->result = NULL;
 													}
 												 else{
- 													  code[i] = malloc(sizeof(struct instruction));
+ 													  code[i]->arg1 = malloc(sizeof(struct instruction));
 													  code[i]->arg1 = malloc(sizeof(	struct vmarg));
 													  code[i]->arg1->type = type;
 													  code[i]->arg1->val = val;
 												 }
 
-									 printf("\tARG1: type(%d), value(%d) \n", type, val );
+								//	 printf("\tARG1: type(%d), value(%d) \n", type, val );
 
 									 // arg2
 									 fread(&type,sizeof( int), 1, fp);
@@ -889,18 +889,18 @@ void read_binfile(){
 									 //if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
 
 											 if(type == -1 && val == -1) {
- 												    code[i] = malloc(sizeof(struct instruction));
+ 												    code[i]->arg2 = malloc(sizeof(struct instruction));
 												 		code[i]->arg2 = NULL;
 													}
 											 else{
-												 	code[i] = malloc(sizeof(struct instruction));
+												 	code[i]->arg2 = malloc(sizeof(struct instruction));
 												  code[i]->arg2 = malloc(sizeof(	struct vmarg));
 
 												  code[i]->arg2->type = type;
 												  code[i]->arg2->val = val;
 											 }
 
-									 printf("\tARG2: type(%d), value(%d) \n", type, val );
+								//	 printf("\tARG2: type(%d), value(%d) \n", type, val );
 
 					}
 				fclose(fp);
@@ -928,6 +928,12 @@ void read_binfile(){
 					j=0;
 					while (j< totalUserFuncs) {
 						 printf("%s #args %d   locals %d address %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize, userFuncs[j]->address);
+						j++;
+					}
+
+					j=0;
+					while (j< totalins) {
+						 printf("opcode %d\n", code[j]->opcode);
 						j++;
 					}
 }
