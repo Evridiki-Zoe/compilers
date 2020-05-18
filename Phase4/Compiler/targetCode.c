@@ -515,7 +515,7 @@ int create_bin(){
 	    for(i=0; i<totalStringConsts; i++){
 							unsigned int len = strlen(stringConsts[i]);
 						  fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
-	  	        fwrite(&stringConsts[i],sizeof(char) *len , 1, fp);
+	  	        fwrite(stringConsts[i],sizeof(char) *len , 1, fp);
 	    }
 
 	 fwrite(&totalNumConsts,sizeof(unsigned int), 1, fp); //total numbers

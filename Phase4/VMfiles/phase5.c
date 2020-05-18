@@ -756,17 +756,20 @@ void read_binfile(){
 
 		    for(i=0; i<totalStr; i++){
 								unsigned int len = 0;
-								char * str = (char *)malloc(sizeof(char )*100);
-								str = "lala";
-								assert(str);
+
 								printf("edw erxesai?\n" );
 							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
 							printf("size (%d)  ",len );
 							printf("edw? \n" );
-							if(fread(&str,sizeof(char )*len , 1, fp)!= 1)
-								printf("Error reading file \n");
-						//	printf("str: %s\n",str );
+							char* str = malloc(sizeof(char) *len);
+							int i = 0;
+							for ( ;i < len; i++) {
+								if(fread(&str[i],sizeof(char ) , 1, fp)!= 1)
+									printf("Error reading file \n");
+							}
+
+							printf("str: %s\n",str );
 		    }
 
 				fread(&totalNums, sizeof(unsigned int), 1, fp);
