@@ -127,6 +127,6 @@ printf("\n\n");
 
  create_bin();
 
- read_binfile();
+// read_binfile();
 	return 0;
 }

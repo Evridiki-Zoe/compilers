@@ -505,7 +505,7 @@ void make_revaloperand(struct vmarg *arg) {
 int create_bin(){
 
 	 FILE *fp = NULL;
-   fp = fopen("test.bin", "wb");
+   fp = fopen("../VMfiles/test.bin", "wb");
    int magicnum = 340200501;
 	 int i =0; //counter
    fwrite(&magicnum,sizeof(int), 1, fp); //magic number
@@ -515,7 +515,7 @@ int create_bin(){
 	    for(i=0; i<totalStringConsts; i++){
 							unsigned int len = strlen(stringConsts[i]);
 						  fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
-	  	        fwrite(&stringConsts[i],sizeof(char *) , 1, fp);
+	  	        fwrite(&stringConsts[i],sizeof(char) *len , 1, fp);
 	    }
 
 	 fwrite(&totalNumConsts,sizeof(unsigned int), 1, fp); //total numbers
@@ -534,7 +534,7 @@ int create_bin(){
 
 
 									fwrite(&len,sizeof(unsigned int), 1, fp);
-								fwrite(&userFuncs[i]->id,sizeof(char *) , 1, fp);
+								fwrite(&userFuncs[i]->id,sizeof(char)*len , 1, fp);
 
 	 	    }
 
@@ -543,7 +543,7 @@ int create_bin(){
 	 for(i=0; i<totalNamedLibfuncs; i++){
 					 unsigned int len = strlen(namedLibfuncs[i]);
 					 fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
-					 fwrite(&namedLibfuncs[i],sizeof(char *) , 1, fp);
+					 fwrite(&namedLibfuncs[i],sizeof(char)*len , 1, fp);
 	 }
 
 
@@ -612,7 +612,7 @@ void read_binfile(){
 							 		printf("Error reading file \n");
 							printf("size (%d)  ",len );
 printf("edw? \n" );
-							if(fread(&str,sizeof(char *) , 1, fp)!= 1)
+							if(fread(&str,sizeof(char )*len , 1, fp)!= 1)
 								printf("Error reading file \n");
 							printf("str: %s\n",str );
 		    }
@@ -634,7 +634,7 @@ printf("edw? \n" );
 								fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 								fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
 	 						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
-	 	  	        			fread(&id,sizeof(char *) , 1, fp);
+	 	  	        			fread(&id,sizeof(char )*len , 1, fp);
 								printf("size (%d) of userF: %s, with address %d and localsize %d\n",len, id, addr, localsize );
 
 
@@ -645,7 +645,7 @@ printf("edw? \n" );
 								unsigned int len;
 								char * libF = malloc(sizeof(char )*50);
 							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
-								fread(&libF,sizeof(char *)  , 1, fp);
+								fread(&libF,sizeof(char )*len  , 1, fp);
 								printf("size (%d) of libF: %s\n",len, libF );
 		    }
 
