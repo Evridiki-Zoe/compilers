@@ -174,7 +174,7 @@ void execute_tablegetelem	(struct instruction* ins);
 void execute_tablesetelem	(struct instruction* ins);
 
 void execute_nop	(struct instruction* ins);
-
+void execute_jump	(struct instruction* ins);
 
 
 
@@ -183,7 +183,7 @@ unsigned		pc ;
 unsigned		currLine ;
 unsigned		codeSize ;
 
-struct instruction*  code;
+struct instruction**  code;
 
 void avm_error(char *msg);
 void execute_cycle	(void);

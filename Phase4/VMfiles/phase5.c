@@ -48,6 +48,7 @@ execute_func_t executeFuncs[] = {
 	 execute_tablegetelem	,
 	 execute_tablesetelem	,
 	 execute_nop	,
+	 execute_jump
 
 };
 
@@ -99,7 +100,7 @@ unsigned		pc = 0; //deixnei sthn epoemnh instruction
 unsigned		currLine = 0;
 unsigned		codeSize = 0;
 
-struct instruction*  code = NULL;
+struct instruction**  code = NULL;
 
 
 
@@ -191,16 +192,19 @@ void execute_cycle	(void){
 
 
 		struct instruction* instr = malloc(sizeof(struct instruction));
-		instr = code + pc;
-		printf("instr type %d noop is %d\n",instr->opcode, AVM_MAX_INSTRUCTIONS );
+		instr = code[0] + pc;
+		printf("now running ins(%d) \n", code[0]->opcode);
+		printf("instr type %d and max is %d\n",instr->opcode, AVM_MAX_INSTRUCTIONS);
 
 		assert(instr->opcode>=0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
-		if (instr->srcLine) currLine = instr->srcLine;
-printf("edwww\n" );
+		if (instr->srcLine) currLine = instr->srcLine; //todo mallon ??
 		unsigned oldPC = pc;
 
+
+		printf("instr type %d\n",instr->opcode);
 		(*executeFuncs[instr->opcode]) (instr);
-		if (pc == oldPC) {
+
+		if (pc == oldPC) { // an DEN  htan jump
 			++pc;
 		}
 	}
@@ -607,7 +611,7 @@ void execute_call		(struct instruction* ins){
 
 				pc = func->data.funcVal;
 				assert(pc < AVM_ENDING_PC);
-				assert(code[pc].opcode == funcenter_v);
+				assert(code[pc]->opcode == funcenter_v);
 				break;
 			}
 			case string_m:		avm_calllibfunc(func->data.strVal); break;
@@ -716,6 +720,7 @@ void execute_tablesetelem	(struct instruction* ins){
 }
 
 void execute_nop	(struct instruction* ins){}
+void execute_jump	(struct instruction* ins){}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
@@ -754,23 +759,22 @@ void read_binfile(){
 				FILE *fp = NULL;
 				int i =0;
 		 		//   fputs("2", fp);
-	   			fp = fopen("test.bin", "rb");
+	   		fp = fopen("test.bin", "rb");
 		 		int magic;
 		 		unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
-	      		fread(&magic, sizeof(int), 1, fp);
-	      	//	printf("\nmagic number is: %d \n", magic);
+	      fread(&magic, sizeof(int), 1, fp);
+	      //printf("\nmagic number is: %d \n", magic);
 				fread(&totalStr, sizeof(unsigned int), 1, fp);
-			//	printf("\ntotal string is %d \n", totalStr);
-
+				//printf("\ntotal string is %d \n", totalStr);
 				totalNumConsts=totalStringConsts=totalNamedLibfuncs=totalUserFuncs=0;
 				stringConsts = malloc(sizeof(char*) * totalStr);
-		    	for(i=0; i<totalStr; i++){
 
-							unsigned int len = 0;
+		    for(i=0; i<totalStr; i++){
+								unsigned int len = 0;
 
-							if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
+							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
-						//	printf("size (%d)  ",len );
+							//printf("size (%d)  ",len );
 							char* str = malloc(sizeof(char) *len);
 							int i = 0;
 							for ( ;i < len; i++) {
@@ -778,46 +782,42 @@ void read_binfile(){
 									printf("Error reading file \n");
 							}
 							add_consts_string(str);
-						//	printf("str: %s\n",str );
+
+							//printf("str: %s\n",str );
 		    }
 
 				fread(&totalNums, sizeof(unsigned int), 1, fp);
 			//	printf("\ntotal nums is %d \n", totalNums);
-
-				numConsts = malloc(sizeof(double) * totalNums);
-
 				for(i=0; i<totalNums; i++){
 			        double num;
 			        fread(&num,sizeof(double), 1, fp);
-			       // printf("num:%f\n", num);
-					add_consts_num(num);
+			   //     printf("num:%f\n", num);
+				 add_consts_num(num);
+
 				}
 
 				fread(&totaluserF, sizeof(unsigned int), 1, fp);
 				//printf("\ntotal userfuncs is %d \n", totaluserF);
 
-				userFuncs = malloc(sizeof(struct userfunc*) * totaluserF);
-
-	 	    	for(i=0; i<totaluserF; i++){
+	 	    for(i=0; i<totaluserF; i++){
 	 							unsigned int len, addr, localsize;
 								fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 								fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
 	 						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
-								char * id = malloc(sizeof(char )*len);
+									char * id = malloc(sizeof(char )*len);
 
-								int i = 0;
-								for ( ;i < len; i++) {
-									if(fread(&id[i],sizeof(char ) , 1, fp)!= 1)
-										printf("Error reading file \n");
-								}
+									int i = 0;
+									for ( ;i < len; i++) {
+										if(fread(&id[i],sizeof(char ) , 1, fp)!= 1)
+											printf("Error reading file \n");
+									}
 	   						//	printf("size (%d) of %s, with address %d and localsize %d\n",len,id,  addr, localsize );
 								add_consts_userfuncs(id,addr,localsize,-1);
 
-	 	    	}
-				fread(&totallibF, sizeof(unsigned int), 1, fp);
-				//printf("\ntotal libfuncs is %d \n", totallibF);
 
-				namedLibfuncs = malloc(sizeof(char*) * totallibF);
+	 	    }
+				fread(&totallibF, sizeof(unsigned int), 1, fp);
+				printf("\ntotal libfuncs is %d \n", totallibF);
 				for(i=0; i<totallibF; i++){
 								unsigned int len;
 							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
@@ -829,69 +829,76 @@ void read_binfile(){
 										printf("Error reading file \n");
 								}
 								add_consts_libfuncs(libF);
-			//					printf("size (%d) of libF: %s\n",len, libF );
+
+								//printf("size (%d) of libF: %s\n",len, libF );
 		    }
 
 				fread(&totalins, sizeof(unsigned int), 1, fp);
-			//	printf("\ntotal instructions is %d \n", totalins);
+				//printf("\ntotal instructions is %d \n", totalins);
 
 				codeSize = totalins;
 					 for (i = 0; i < totalins; i++) {
 						 			 int opcode, type, val;
 									 fread(&opcode,sizeof(int ), 1, fp);
 
-									 if(code == NULL) code = malloc(sizeof(struct instruction));
-									 if(i ==0 ) // giati theloume mono to prwto na graftei sto code
-									 	  code->opcode = opcode;
+									 if(code == NULL) code = malloc(sizeof(struct instruction *)*codeSize);
+									 	  code[i] = malloc(sizeof(struct instruction));
+											code[i]->opcode = opcode;
 
 									 // result
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
-									 if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
-											 if(type == -1 && val == -1){ code->arg1 = NULL;}
-											 else{
-												  code->result = malloc(sizeof(	struct vmarg));
-												  code->result->type = type;
-												  code->result->val = val;
+											 if(type == -1 && val == -1){
+ 												  code[i] = malloc(sizeof(struct instruction));
+												  code[i]->arg1 = NULL;
 											 }
-								   }
+											 else{
+												  code[i] = malloc(sizeof(struct instruction));
+												  code[i]->result = malloc(sizeof(	struct vmarg));
+												  code[i]->result->type = type;
+												  code[i]->result->val = val;
+											 }
+
 									 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
 
 									 // arg1
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
-									 if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
 
-												 if(type == -1 && val == -1) code->arg1 = NULL;
+												 if(type == -1 && val == -1){
+ 													  code[i] = malloc(sizeof(struct instruction));
+													  code[i]->arg1 = NULL;
+													}
 												 else{
-													  code->arg1 = malloc(sizeof(	struct vmarg));
-
-													  code->arg1->type = type;
-													  code->arg1->val = val;
+ 													  code[i] = malloc(sizeof(struct instruction));
+													  code[i]->arg1 = malloc(sizeof(	struct vmarg));
+													  code[i]->arg1->type = type;
+													  code[i]->arg1->val = val;
 												 }
-								 	 }
+
 									 printf("\tARG1: type(%d), value(%d) \n", type, val );
 
 									 // arg2
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
-									 if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
+									 //if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
 
-											 if(type == -1 && val == -1) code->arg2 = NULL;
+											 if(type == -1 && val == -1) {
+ 												    code[i] = malloc(sizeof(struct instruction));
+												 		code[i]->arg2 = NULL;
+													}
 											 else{
-												  code->arg2 = malloc(sizeof(	struct vmarg));
+												 	code[i] = malloc(sizeof(struct instruction));
+												  code[i]->arg2 = malloc(sizeof(	struct vmarg));
 
-												  code->arg2->type = type;
-												  code->arg2->val = val;
+												  code[i]->arg2->type = type;
+												  code[i]->arg2->val = val;
 											 }
-									 }
+
 									 printf("\tARG2: type(%d), value(%d) \n", type, val );
 
 					}
-
-				printf("code at the end:: %d type %d val %d\n", code->opcode, code->result->type,  code->result->val );
 				fclose(fp);
-
 				printf("=========strings:============\n" );
 
 					int j=0;
