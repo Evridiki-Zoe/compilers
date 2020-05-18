@@ -229,3 +229,5 @@ unsigned char avm_tobool(struct avm_memcell* m);
 void  libfunc_typeof();
 
 void libfunc_totalarguments(void);
+
+void read_binfile();

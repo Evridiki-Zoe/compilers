@@ -95,7 +95,7 @@ tobool_func_t toboolFuncs[] ={
 };
 
 unsigned char	executionFinished = 0 ;
-unsigned		pc = 0;
+unsigned		pc = 0; //deixnei sthn epoemnh instruction
 unsigned		currLine = 0;
 unsigned		codeSize = 0;
 
@@ -739,4 +739,88 @@ char* undef_tostring (struct avm_memcell* cell){return NULL;}
 unsigned char avm_tobool(struct avm_memcell* m){
 		assert(m->type >= 0 && m->type < undef_m);
 		return (*toboolFuncs[m->type])(m);
+}
+
+
+void read_binfile(){
+				FILE *fp = NULL;
+				int i =0;
+		 		//   fputs("2", fp);
+	   		fp = fopen("test.bin", "rb");
+		 		int magic;
+		 		unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
+	      fread(&magic, sizeof(int), 1, fp);
+	      printf("\nmagic number is: %d \n", magic);
+				fread(&totalStr, sizeof(unsigned int), 1, fp);
+				printf("\ntotal string is %d \n", totalStr);
+
+		    for(i=0; i<totalStr; i++){
+								unsigned int len = 0;
+								char * str = (char *)malloc(sizeof(char )*5);
+								assert(str);
+								printf("edw erxesai?\n" );
+							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
+							 		printf("Error reading file \n");
+							printf("size (%d)  ",len );
+printf("edw? \n" );
+							if(fread(&str,sizeof(char *) , 1, fp)!= 1)
+								printf("Error reading file \n");
+							printf("str: %s\n",str );
+		    }
+
+				fread(&totalNums, sizeof(unsigned int), 1, fp);
+				printf("\ntotal nums is %d \n", totalNums);
+				for(i=0; i<totalNums; i++){
+			        double num;
+			        fread(&num,sizeof(double), 1, fp);
+			        printf("num:%f\n", num);
+				}
+
+				fread(&totaluserF, sizeof(unsigned int), 1, fp);
+				printf("\ntotal userfuncs is %d \n", totaluserF);
+
+	 	    for(i=0; i<totaluserF; i++){
+	 							unsigned int len, addr, localsize;
+								char * id = malloc(sizeof(char )*50);
+								fread(&addr,sizeof(unsigned int), 1, fp); //total strings
+								fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
+	 						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
+	 	  	        			fread(&id,sizeof(char *) , 1, fp);
+								printf("size (%d) of userF: %s, with address %d and localsize %d\n",len, id, addr, localsize );
+
+
+	 	    }
+				fread(&totallibF, sizeof(unsigned int), 1, fp);
+				printf("\ntotal libfuncs is %d \n", totallibF);
+				for(i=0; i<totallibF; i++){
+								unsigned int len;
+								char * libF = malloc(sizeof(char )*50);
+							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
+								fread(&libF,sizeof(char *)  , 1, fp);
+								printf("size (%d) of libF: %s\n",len, libF );
+		    }
+
+				fread(&totalins, sizeof(unsigned int), 1, fp);
+				printf("\ntotal instructions is %d \n", totalins);
+
+
+					 for (i = 0; i < totalins; i++) {
+						 			 int opcode, type, val;
+									 fread(&opcode,sizeof(int ), 1, fp);
+									 fread(&type,sizeof( int), 1, fp);
+					 			   fread(&val,sizeof( int), 1, fp);
+									 //TODO
+									 //if(type == -1) //ignore
+									// if(val == -1) //ignore
+
+									 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
+									 fread(&type,sizeof( int), 1, fp);
+					 			   fread(&val,sizeof( int), 1, fp);
+									 printf("\tARG1: type(%d), value(%d) \n", type, val );
+									 fread(&type,sizeof( int), 1, fp);
+					 			   fread(&val,sizeof( int), 1, fp);
+									 printf("\tARG2: type(%d), value(%d) \n", type, val );
+
+					}
+				fclose(fp);
 }
