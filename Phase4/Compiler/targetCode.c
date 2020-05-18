@@ -515,7 +515,7 @@ int create_bin(){
 	    for(i=0; i<totalStringConsts; i++){
 							unsigned int len = strlen(stringConsts[i]);
 						  fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
-	  	        fwrite(&stringConsts[i],sizeof(char )* len, 1, fp);
+	  	        fwrite(&stringConsts[i],sizeof(char *) , 1, fp);
 	    }
 
 	 fwrite(&totalNumConsts,sizeof(unsigned int), 1, fp); //total numbers
@@ -602,7 +602,7 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 							unsigned int len;
 							char * str = malloc(sizeof(char )*100);
 						  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
-							fread(&str,sizeof(char )*len , 1, fp);
+							fread(&str,sizeof(char *) , 1, fp);
 							printf("size (%d) of str: %s\n",len, str );
 	    }
 
@@ -664,4 +664,5 @@ unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 
 			return 0;
 }
+
 
