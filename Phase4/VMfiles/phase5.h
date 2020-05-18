@@ -132,7 +132,7 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 
 typedef void (*execute_func_t) (struct instruction* ins);
 
-#define AVM_MAX_INSTRUCTIONS (unsigned) nop_v
+#define AVM_MAX_INSTRUCTIONS (unsigned) jump_v
 
 void execute_arithmetic(struct instruction* instr);
 

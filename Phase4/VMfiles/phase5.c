@@ -176,19 +176,27 @@ double mod_impl(double x, double y){
 void execute_cycle	(void){
 
 	if (executionFinished) {
+		printf("if \n");
 		return;
 	} else if (pc == AVM_ENDING_PC) {
+		printf("else if \n");
+
 			executionFinished = 1;
 			return;
 	} else {
+		printf("else \n");
+
 
 		assert(pc < AVM_ENDING_PC);
 
-		struct instruction* instr = code + pc;
+
+		struct instruction* instr = malloc(sizeof(struct instruction));
+		instr = code + pc;
+		printf("instr type %d noop is %d\n",instr->opcode, AVM_MAX_INSTRUCTIONS );
+
 		assert(instr->opcode>=0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
-
 		if (instr->srcLine) currLine = instr->srcLine;
-
+printf("edwww\n" );
 		unsigned oldPC = pc;
 
 		(*executeFuncs[instr->opcode]) (instr);
@@ -815,24 +823,60 @@ void read_binfile(){
 				fread(&totalins, sizeof(unsigned int), 1, fp);
 				printf("\ntotal instructions is %d \n", totalins);
 
-
+				codeSize = totalins;
 					 for (i = 0; i < totalins; i++) {
 						 			 int opcode, type, val;
 									 fread(&opcode,sizeof(int ), 1, fp);
-									 fread(&type,sizeof( int), 1, fp);
-					 			   fread(&val,sizeof( int), 1, fp);
-									 //TODO
-									 //if(type == -1) //ignore
-									// if(val == -1) //ignore
 
+									 if(code == NULL) code = malloc(sizeof(struct instruction));
+									 if(i ==0 ) // giati theloume mono to prwto na graftei sto code
+									 	  code->opcode = opcode;
+
+									 // result
+									 fread(&type,sizeof( int), 1, fp);
+					 			   fread(&val,sizeof( int), 1, fp);
+									 if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
+											 if(type == -1 && val == -1){ code->arg1 = NULL;}
+											 else{
+												  code->result = malloc(sizeof(	struct vmarg));
+												  code->result->type = type;
+												  code->result->val = val;
+											 }
+								   }
 									 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
+
+									 // arg1
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
+									 if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
+
+												 if(type == -1 && val == -1) code->arg1 = NULL;
+												 else{
+													  code->arg1 = malloc(sizeof(	struct vmarg));
+
+													  code->arg1->type = type;
+													  code->arg1->val = val;
+												 }
+								 	 }
 									 printf("\tARG1: type(%d), value(%d) \n", type, val );
+
+									 // arg2
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
+									 if(i ==0 ){ // giati theloume mono to prwto na graftei sto code
+
+											 if(type == -1 && val == -1) code->arg2 = NULL;
+											 else{
+												  code->arg2 = malloc(sizeof(	struct vmarg));
+
+												  code->arg2->type = type;
+												  code->arg2->val = val;
+											 }
+									 }
 									 printf("\tARG2: type(%d), value(%d) \n", type, val );
 
 					}
+
+				printf("code at the end:: %d type %d val %d\n", code->opcode, code->result->type,  code->result->val );
 				fclose(fp);
 }
