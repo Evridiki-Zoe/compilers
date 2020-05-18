@@ -10,10 +10,14 @@ printf("vm:: \n" );
 read_binfile();
 	//register all libfuncs with avm_registerlibfunc
 
-	while (!executionFinished) {
-		printf("executionFinished 0\n" );
-		execute_cycle();
-	}
+
+
+	// while (!executionFinished) {
+	// 	printf("executionFinished 0\n" );
+	// 	//execute_cycle();
+	// }
+
+
 
 	return 0;
 }

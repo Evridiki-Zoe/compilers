@@ -754,59 +754,70 @@ void read_binfile(){
 				FILE *fp = NULL;
 				int i =0;
 		 		//   fputs("2", fp);
-	   		fp = fopen("test.bin", "rb");
+	   			fp = fopen("test.bin", "rb");
 		 		int magic;
 		 		unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
-	      fread(&magic, sizeof(int), 1, fp);
-	      printf("\nmagic number is: %d \n", magic);
+	      		fread(&magic, sizeof(int), 1, fp);
+	      	//	printf("\nmagic number is: %d \n", magic);
 				fread(&totalStr, sizeof(unsigned int), 1, fp);
-				printf("\ntotal string is %d \n", totalStr);
+			//	printf("\ntotal string is %d \n", totalStr);
 
-		    for(i=0; i<totalStr; i++){
-								unsigned int len = 0;
+				totalNumConsts=totalStringConsts=totalNamedLibfuncs=totalUserFuncs=0;
+				stringConsts = malloc(sizeof(char*) * totalStr);
+		    	for(i=0; i<totalStr; i++){
 
-							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
+							unsigned int len = 0;
+
+							if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
-							printf("size (%d)  ",len );
+						//	printf("size (%d)  ",len );
 							char* str = malloc(sizeof(char) *len);
 							int i = 0;
 							for ( ;i < len; i++) {
 								if(fread(&str[i],sizeof(char ) , 1, fp)!= 1)
 									printf("Error reading file \n");
 							}
-
-							printf("str: %s\n",str );
+							add_consts_string(str);
+						//	printf("str: %s\n",str );
 		    }
 
 				fread(&totalNums, sizeof(unsigned int), 1, fp);
-				printf("\ntotal nums is %d \n", totalNums);
+			//	printf("\ntotal nums is %d \n", totalNums);
+
+				numConsts = malloc(sizeof(double) * totalNums);
+
 				for(i=0; i<totalNums; i++){
 			        double num;
 			        fread(&num,sizeof(double), 1, fp);
-			        printf("num:%f\n", num);
+			       // printf("num:%f\n", num);
+					add_consts_num(num);
 				}
 
 				fread(&totaluserF, sizeof(unsigned int), 1, fp);
-				printf("\ntotal userfuncs is %d \n", totaluserF);
+				//printf("\ntotal userfuncs is %d \n", totaluserF);
 
-	 	    for(i=0; i<totaluserF; i++){
+				userFuncs = malloc(sizeof(struct userfunc*) * totaluserF);
+
+	 	    	for(i=0; i<totaluserF; i++){
 	 							unsigned int len, addr, localsize;
 								fread(&addr,sizeof(unsigned int), 1, fp); //total strings
 								fread(&localsize,sizeof(unsigned int), 1, fp); //total strings
 	 						  	fread(&len,sizeof(unsigned int), 1, fp); //total strings
-									char * id = malloc(sizeof(char )*len);
+								char * id = malloc(sizeof(char )*len);
 
-									int i = 0;
-									for ( ;i < len; i++) {
-										if(fread(&id[i],sizeof(char ) , 1, fp)!= 1)
-											printf("Error reading file \n");
-									}
-	   							printf("size (%d) of %s, with address %d and localsize %d\n",len,id,  addr, localsize );
+								int i = 0;
+								for ( ;i < len; i++) {
+									if(fread(&id[i],sizeof(char ) , 1, fp)!= 1)
+										printf("Error reading file \n");
+								}
+	   						//	printf("size (%d) of %s, with address %d and localsize %d\n",len,id,  addr, localsize );
+								add_consts_userfuncs(id,addr,localsize,-1);
 
-
-	 	    }
+	 	    	}
 				fread(&totallibF, sizeof(unsigned int), 1, fp);
-				printf("\ntotal libfuncs is %d \n", totallibF);
+				//printf("\ntotal libfuncs is %d \n", totallibF);
+
+				namedLibfuncs = malloc(sizeof(char*) * totallibF);
 				for(i=0; i<totallibF; i++){
 								unsigned int len;
 							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
@@ -817,11 +828,12 @@ void read_binfile(){
 									if(fread(&libF[i],sizeof(char ) , 1, fp)!= 1)
 										printf("Error reading file \n");
 								}
-								printf("size (%d) of libF: %s\n",len, libF );
+								add_consts_libfuncs(libF);
+			//					printf("size (%d) of libF: %s\n",len, libF );
 		    }
 
 				fread(&totalins, sizeof(unsigned int), 1, fp);
-				printf("\ntotal instructions is %d \n", totalins);
+			//	printf("\ntotal instructions is %d \n", totalins);
 
 				codeSize = totalins;
 					 for (i = 0; i < totalins; i++) {
@@ -879,4 +891,63 @@ void read_binfile(){
 
 				printf("code at the end:: %d type %d val %d\n", code->opcode, code->result->type,  code->result->val );
 				fclose(fp);
+
+				printf("=========strings:============\n" );
+
+					int j=0;
+					while (j< totalStringConsts) {
+						 printf("%s \n", stringConsts[j]);
+						j++;
+					}
+				printf("=========nums:============\n" );
+					j=0;
+					while (j< totalNumConsts) {
+						 printf("%f \n", numConsts[j]);
+						j++;
+					}
+
+					printf("========lib funcs:============\n" );
+					j=0;
+					while (j< totalNamedLibfuncs) {
+						 printf("%s \n", namedLibfuncs[j]);
+						j++;
+					}
+					printf("========user funcs:============\n" );
+					j=0;
+					while (j< totalUserFuncs) {
+						 printf("%s #args %d   locals %d address %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize, userFuncs[j]->address);
+						j++;
+					}
 }
+
+
+void add_consts_string(char * str){
+		stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
+		strcpy(stringConsts[totalStringConsts] , str);
+		totalStringConsts++;
+}
+
+void add_consts_num(double number){
+		numConsts[totalNumConsts] = number;
+		totalNumConsts++;
+}
+
+void add_consts_libfuncs(char * libfunc){
+		namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
+		strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
+		totalNamedLibfuncs++;
+
+}
+
+void add_consts_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
+
+		struct userfunc* newnode = malloc(sizeof(struct userfunc));
+		newnode->address = address;
+		newnode->localSize = localsize;
+		newnode->totalargs =  totalargs;
+		newnode->id = malloc(sizeof(char) * strlen(userfunc));
+		strcpy(newnode->id, userfunc);
+
+		userFuncs[totalUserFuncs]  = newnode;
+		totalUserFuncs++;
+	}

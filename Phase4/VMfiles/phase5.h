@@ -231,3 +231,20 @@ void  libfunc_typeof();
 void libfunc_totalarguments(void);
 
 void read_binfile();
+
+//-----------------tables retrieve----
+double* 	numConsts; //rvalue numbers
+unsigned	totalNumConsts; //total number of  numbers
+char**		stringConsts; //rvalue strings
+unsigned	totalStringConsts; //total number of strings
+char**		namedLibfuncs;
+unsigned	totalNamedLibfuncs;
+struct userfunc**	userFuncs;
+unsigned	totalUserFuncs;
+
+void add_consts_string(char * str);
+void add_consts_num(double number);
+void add_consts_libfuncs(char * libfunc);
+void add_consts_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs );
+
+///----------------------------------
