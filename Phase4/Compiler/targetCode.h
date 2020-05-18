@@ -61,6 +61,7 @@ struct userfunc {
 
 };
 
+unsigned globals;
 
 double* 	numConsts; //rvalue numbers
 unsigned	totalNumConsts; //total number of  numbers

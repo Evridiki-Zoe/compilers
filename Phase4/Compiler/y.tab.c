@@ -2050,7 +2050,7 @@ yyreduce:
 #line 372 "syntax.y"
     {
 		    if(checkTypes((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)) == 1) {
-		          (yyval.expression) = smallFunc(const_num_e);
+		          (yyval.expression) = smallFunc(arithmeticexp_e);
 		          emit(Div, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), (yyval.expression), yylineno, 0);
 		    }
 		    else {
@@ -2064,7 +2064,7 @@ yyreduce:
 #line 382 "syntax.y"
     {
 		    if(checkTypes((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)) == 1) {
-		          (yyval.expression) = smallFunc(const_num_e);
+		          (yyval.expression) = smallFunc(arithmeticexp_e);
 		          emit(mod, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), (yyval.expression), yylineno, 0);
 		    }
 		    else {

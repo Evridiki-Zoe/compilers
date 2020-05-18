@@ -105,27 +105,32 @@ struct instruction**  code = NULL;
 
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
-
+	 //printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
-		case global_a:	return &stack[AVM_STACKENV_SIZE - 1 - arg->val];
+		case global_a:	printf("erxomai gia to %d\n",arg->val ); return &stack[arg->val];
 		case local_a:	return &stack[topsp - arg->val];
 		case formal_a:	return &stack[topsp+AVM_STACKENV_SIZE + 1 + arg->val];
 
 		case retval_a:	return &retval;
 
 		case number_a:	{
+			reg= malloc(sizeof(struct avm_memcell));
+
 			reg->type = number_m;
 			reg->data.numVal = consts_getnumber(arg->val);
+		
 			return reg;
 		}
 
 		case string_a:	{
+		//	reg= malloc(sizeof(struct avm_memcell));
 			reg->type = string_m;
 			reg->data.strVal = strdup(consts_getstring(arg->val));
 			return reg;
 		}
 
 		case bool_a:	{
+		//	reg= malloc(sizeof(struct avm_memcell));
 			reg->type = bool_m;
 			reg->data.bool = arg->val;
 			return reg;
@@ -134,11 +139,13 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 		case nil_a : reg->type = nil_m; return reg;
 
 		case userfunc_a : {
+		//	reg= malloc(sizeof(struct avm_memcell));
 			reg->type = userfunc_m;
 			reg->data.funcVal = arg->val;
 			return reg;
 		}
 		case libfunc_a : {
+		//	reg= malloc(sizeof(struct avm_memcell));
 			reg->type = lib_func_m;
 			reg->data.libfuncVal = libfuncs_getused(arg->val);
 			return reg;
@@ -149,12 +156,17 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 }
 
 void avm_initstack(){
+	//gia ta globals
+	topsp = globals;
+	for (size_t i = 0; i < globals+1; i++) {
+		stack[i] =*(struct avm_memcell*) malloc(sizeof(struct avm_memcell));
+	}
 
 }
 
-double	consts_getnumber(unsigned index){return 0;} //TODO
-char*	consts_getstring(unsigned index){return NULL;}
-char*	libfuncs_getused(unsigned index){return NULL;}
+double	consts_getnumber(unsigned index){return numConsts[index];} //TODO
+char*	consts_getstring(unsigned index){return stringConsts[index];}
+char*	libfuncs_getused(unsigned index){return namedLibfuncs[index];}
 
 double add_impl(double x, double y){return x+y;}
 double sub_impl(double x, double y){return x-y;}
@@ -164,14 +176,16 @@ double div_impl(double x, double y){
 		avm_error("Division by zero!" );
 		executionFinished=1;
 		return 0;
-	}else  return x/y;
+	}else  return (double)x/y;
 }
 double mod_impl(double x, double y){
+	printf("--------------irtha\n" );
 	if(y == 0){
 		avm_error("Mod by zero!" );
 		executionFinished=1;
 		return 0;
-	}else return (unsigned)x % (unsigned)y;
+	}else return 10000;//(unsigned)x % (unsigned)y;
+
 }
 
 void execute_cycle	(void){
@@ -179,29 +193,29 @@ void execute_cycle	(void){
 	if (executionFinished) {
 		printf("if \n");
 		return;
-	} else if (pc == AVM_ENDING_PC) {
+	} else if (pc >= AVM_ENDING_PC) {
 		printf("else if \n");
 
 			executionFinished = 1;
 			return;
 	} else {
-		printf("else \n");
+		//printf("else \n");
 
 
 		assert(pc < AVM_ENDING_PC);
 
 
 		struct instruction* instr = malloc(sizeof(struct instruction));
-		instr = code[0] + pc;
-		printf("now running ins(%d) \n", code[0]->opcode);
-		printf("instr type %d and max is %d\n",instr->opcode, AVM_MAX_INSTRUCTIONS);
+		instr = code[pc];
+		printf("now running ins(%d) \n", code[pc]->opcode);
+		printf("instr type %d \n",instr->opcode);
 
 		assert(instr->opcode>=0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
 		if (instr->srcLine) currLine = instr->srcLine; //todo mallon ??
 		unsigned oldPC = pc;
 
 
-		printf("instr type %d\n",instr->opcode);
+	//	printf("instr type %d\n",instr->opcode);
 		(*executeFuncs[instr->opcode]) (instr);
 
 		if (pc == oldPC) { // an DEN  htan jump
@@ -381,22 +395,27 @@ void libfunc_totalarguments(void){
 //------------------------------------------
 
 void execute_arithmetic(struct instruction* instr){
-	  	struct avm_memcell* lv = avm_translate_operand(instr->result, (struct avm_memcell*)0);
+	  	struct avm_memcell* lv = avm_translate_operand(instr->result, NULL);
+		lv->data.numVal=43423;
 		struct avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
-
+		printf("geiaaa , insopcode = %d\n",instr->opcode );
 		//assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); ?? slide 25 to exei alliws
 		assert(rv1 && rv2);
-
 		if( rv1->type != number_m  || rv2->type != number_m ){
 				avm_error("arithmetic ex:: not a number! \n");
 				executionFinished = 1;
 		}
 		else{
+				printf("irtha\n" );
+
 				arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_v];
-				avm_memcellclear(lv);
+				printf("code %d\n",instr->opcode );
+				//avm_memcellclear(lv);
 				lv->type = number_m;
 				lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+
+				printf("after arithmetic lv num is %f\n", lv->data.numVal );
 
 		}
 }
@@ -412,11 +431,11 @@ void execute_assign (struct instruction* ins){
 	avm_assign(lv,rv);
 }
 
-void execute_add 	(struct instruction* ins) {  execute_arithmetic(ins); } //?? }
-void execute_sub	(struct instruction* ins) {}
-void execute_mul	(struct instruction* ins) {}
-void execute_div	(struct instruction* ins) {}
-void execute_mod	(struct instruction* ins) {}
+void execute_add 	(struct instruction* ins) { execute_arithmetic(ins);	} //?? }
+void execute_sub	(struct instruction* ins) {	execute_arithmetic(ins);	}
+void execute_mul	(struct instruction* ins) { execute_arithmetic(ins);	}
+void execute_div	(struct instruction* ins) { execute_arithmetic(ins);	}
+void execute_mod	(struct instruction* ins) { execute_arithmetic(ins); 	}
 void execute_uminus	(struct instruction* ins) {}//XXXXXXXXXXXX NO USE
 
 void execute_and 	(struct instruction* ins) {}//XXXXXXXXXXXX NO USE
@@ -720,7 +739,7 @@ void execute_tablesetelem	(struct instruction* ins){
 }
 
 void execute_nop	(struct instruction* ins){}
-void execute_jump	(struct instruction* ins){}
+void execute_jump	(struct instruction* ins){ pc = ins->result->val; printf("%d %d \n", ins->result->val , pc );}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
@@ -760,11 +779,13 @@ void read_binfile(){
 				int i =0;
 		 		//   fputs("2", fp);
 				//printf("ff\n" );
-	   		fp = fopen("test.bin", "rb");
+	   			fp = fopen("test.bin", "rb");
 		 		int magic;
 		 		unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
-	      fread(&magic, sizeof(int), 1, fp);
-	      //printf("\nmagic number is: %d \n", magic);
+	      		fread(&magic, sizeof(int), 1, fp);
+	      		//printf("\nmagic number is: %d \n", magic);
+		  		fread(&globals,sizeof(unsigned int),1,fp);
+
 				fread(&totalStr, sizeof(unsigned int), 1, fp);
 				//printf("\ntotal string is %d \n", totalStr);
 				totalNumConsts=totalStringConsts=totalNamedLibfuncs=totalUserFuncs=0;
@@ -854,8 +875,7 @@ void read_binfile(){
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
 											 if(type == -1 && val == -1){
- 												  code[i]->arg1 = malloc(sizeof(struct instruction));
-												  code[i]->arg1 = NULL;
+												  code[i]->result = NULL;
 											 }
 											 else{
 												  code[i]->result = malloc(sizeof(struct instruction));
@@ -871,8 +891,7 @@ void read_binfile(){
 					 			   fread(&val,sizeof( int), 1, fp);
 
 												 if(type == -1 && val == -1){
- 													  code[i]->result = malloc(sizeof(struct instruction));
-													  code[i]->result = NULL;
+													  code[i]->arg1 = NULL;
 													}
 												 else{
  													  code[i]->arg1 = malloc(sizeof(struct instruction));
@@ -890,8 +909,8 @@ void read_binfile(){
 
 											 if(type == -1 && val == -1) {
  												    code[i]->arg2 = malloc(sizeof(struct instruction));
-												 		code[i]->arg2 = NULL;
-													}
+												 	code[i]->arg2 = NULL;
+											}
 											 else{
 												 	code[i]->arg2 = malloc(sizeof(struct instruction));
 												  code[i]->arg2 = malloc(sizeof(	struct vmarg));
@@ -938,6 +957,13 @@ void read_binfile(){
 					}
 }
 
+
+void printStack(){
+
+	for (int i = 0; i < 20; i++) {
+		printf("stack[%d] = %.2f\n", i,stack[i].data.numVal);
+	}
+}
 
 void add_consts_string(char * str){
 		stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));

@@ -231,7 +231,7 @@ void  libfunc_typeof();
 void libfunc_totalarguments(void);
 
 void read_binfile();
-
+void printStack();
 //-----------------tables retrieve----
 double* 	numConsts; //rvalue numbers
 unsigned	totalNumConsts; //total number of  numbers
@@ -241,6 +241,7 @@ char**		namedLibfuncs;
 unsigned	totalNamedLibfuncs;
 struct userfunc**	userFuncs;
 unsigned	totalUserFuncs;
+unsigned globals;
 
 void add_consts_string(char * str);
 void add_consts_num(double number);

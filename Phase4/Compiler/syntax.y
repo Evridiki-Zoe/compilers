@@ -371,7 +371,7 @@ arexpr :
 		}
 		|  expr DIV expr {
 		    if(checkTypes($1, $3) == 1) {
-		          $$ = smallFunc(const_num_e);
+		          $$ = smallFunc(arithmeticexp_e);
 		          emit(Div, $1, $3, $$, yylineno, 0);
 		    }
 		    else {
@@ -381,7 +381,7 @@ arexpr :
 		}
 		|  expr MOD expr {
 		    if(checkTypes($1, $3) == 1) {
-		          $$ = smallFunc(const_num_e);
+		          $$ = smallFunc(arithmeticexp_e);
 		          emit(mod, $1, $3, $$, yylineno, 0);
 		    }
 		    else {

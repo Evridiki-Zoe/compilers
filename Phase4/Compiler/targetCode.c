@@ -2,7 +2,7 @@
 #include "parsing.h"
 #include "lex.h"
 #include "targetCode.h"
-
+extern int tmpoffset;
 extern double QuadNo;
 unsigned instrNo=0;
 unsigned prossessquad=0;
@@ -10,6 +10,8 @@ int maxsize_num = 50;
 int maxsize_str = 50;
 int maxsize_libfunc = 50;
 int maxsize_userfunc = 50;
+
+unsigned globals=0;
 
 unsigned	totalNumConsts=0; //total number of  numbers
 unsigned	totalStringConsts=0; //total number of strings
@@ -360,7 +362,7 @@ void emitIns(struct instruction* ins){
 
 struct vmarg* make_operand(struct expr* expr){
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-//	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
@@ -369,7 +371,7 @@ struct vmarg* make_operand(struct expr* expr){
 		case newtable_e: {
 			arg->val=expr->sym->value.var->offset;
 			switch (expr->sym->scope_space) {
-				case program_var : 	arg->type=global_a;	break;
+				case program_var : 	arg->type=global_a; globals++;	break;
 				case function_loc : arg->type=local_a;	break;
 				case formal_arg : 	arg->type=formal_a;	break;
 				default :	assert(0);
@@ -504,15 +506,17 @@ void make_revaloperand(struct vmarg *arg) {
 */
 int create_bin(){
 
-	 FILE *fp = NULL;
-   fp = fopen("../VMfiles/test.bin", "wb");
-   int magicnum = 340200501;
-	 int i =0; //counter
-   fwrite(&magicnum,sizeof(int), 1, fp); //magic number
-//   fprintf(fp, "340200501\n"); // ANTEGAMHSOU:)
-	 fwrite(&totalStringConsts,sizeof(unsigned int), 1, fp); //total strings
+	FILE *fp = NULL;
+	printf("globals are %d\n",tmpoffset );
+   	fp = fopen("../VMfiles/test.bin", "wb");
+   	int magicnum = 340200501;
+	int i =0; //counter
+   	fwrite(&magicnum,sizeof(int), 1, fp); //magic number
+//  fprintf(fp, "340200501\n"); // ANTEGAMHSOU:)
+	fwrite(&tmpoffset,sizeof(unsigned int),1,fp); //no of globals
+ 	fwrite(&totalStringConsts,sizeof(unsigned int), 1, fp); //total strings
 
-	    for(i=0; i<totalStringConsts; i++){
+	for(i=0; i<totalStringConsts; i++){
 							unsigned int len = strlen(stringConsts[i]);
 						  fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
 	  	        fwrite(stringConsts[i],sizeof(char) *len , 1, fp);
