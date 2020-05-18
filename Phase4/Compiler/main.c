@@ -126,5 +126,7 @@ printf("=========nums:============\n" );
 printf("\n\n");
 
  create_bin();
+
+ read_binfile();
 	return 0;
 }

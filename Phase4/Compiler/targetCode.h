@@ -130,3 +130,5 @@ void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
 void patch_incomplete_jump();
 
 int  create_bin();
+
+void read_binfile();
