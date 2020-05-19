@@ -105,7 +105,7 @@ struct instruction**  code = NULL;
 
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
-	 //printf("type of vmarg %d\n",arg->type );
+	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a:	printf("erxomai gia to %d\n",arg->val ); return &stack[arg->val];
 		case local_a:	return &stack[topsp - arg->val];
@@ -263,11 +263,22 @@ void memclear_table(struct avm_memcell* m){
 void avm_tableincrefcounter(struct avm_table* m){} //TODO
 
 
-struct avm_table* avm_tablenew(){return NULL;}//TODO
+struct avm_table* avm_tablenew(){
+	struct avm_table* tmp = malloc(sizeof(struct avm_table));
+	printf("dsfndsoifnsd\n" );
+	tmp->data= malloc(sizeof(struct avm_memcell));
+	tmp->data->type=undef_m;
+	tmp->index.numVal=0;
+	tmp->next=NULL;
+
+	return tmp;
+}
 
 //----------------------------------------------------------
 
-
+void avm_setelem(struct avm_table* table , struct avm_memcell* index , struct avm_memcell* data){
+	
+}
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 
@@ -395,6 +406,8 @@ void libfunc_totalarguments(void){
 
 }
 //------------------------------------------
+
+
 
 void execute_arithmetic(struct instruction* instr){
 	  	struct avm_memcell* lv = avm_translate_operand(instr->result, NULL);
@@ -683,11 +696,12 @@ void execute_funcexit	(struct instruction* ins){
 
 void execute_newtable		(struct instruction* ins){
 	struct avm_memcell* lv = avm_translate_operand(ins->result , NULL);
-	//assert(lv &&)
+
 	avm_memcellclear(lv);
 
 	lv->type 			=table_m;
 	lv->data.tableVal	=avm_tablenew();
+
 	avm_tableincrefcounter(lv->data.tableVal);
 }
 void execute_tablegetelem	(struct instruction* ins){
@@ -736,7 +750,7 @@ void execute_tablesetelem	(struct instruction* ins){
 
 		if(t->type != table_m)		avm_error("illegal use of variable as a table! \n");
 		else {
-			//avm_setelem(t->data.tableVal, i, c); //todo
+			avm_setelem(t->data.tableVal, i, c); //todo
 		}
 }
 
@@ -972,6 +986,15 @@ void printStack(){
 			case lib_func_m:printf("%s\n",stack[i].data.libfuncVal);break;
 			case userfunc_m:printf("%.1u\n", stack[i].data.funcVal);break;
 			case undef_m:	printf("undef\n" ); break;
+			case table_m:{
+				struct avm_table* tmp = stack[i].data.tableVal;
+				while (tmp) {
+					printf("index : %.2f\t data type: %d",tmp->index.numVal,tmp->data->type );
+					tmp=tmp->next;
+				}
+				printf("\n" );
+				break;
+			}
 			default: printf("ekanes malakia\n");
 		}
 	}
