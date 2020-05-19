@@ -501,6 +501,17 @@ term  : L_PARENTHES {
 } expr R_PARENTHES { printf(RED " (expression) \n" RESET);
 
           $$ = $3;
+		  if(exprflag == 1) {
+			  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+  			emit(assign,true_expr,NULL,$$,yylineno,0);
+  			emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+  			emit(assign,false_expr,NULL,$$,yylineno,0);
+
+  			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
+  		}
+
 
 		 exprflag=pop_E();
 
