@@ -1,14 +1,7 @@
 #include "phase5.h"
 #include <string.h>
 
-/* TODO
 
-#define execute_add execute_arithmetic
-#define execute_sub execute_arithmetic
-#define execute_mul execute_arithmetic
-#define execute_div execute_arithmetic
-#define execute_mod execute_arithmetic
-*/
 
 unsigned totalActuals=0;
 
@@ -459,10 +452,13 @@ void execute_not 	(struct instruction* ins){}//XXXXXXXXXXXX NO USE
 
 void execute_jeq	(struct instruction* ins){
 		assert(ins->result->type == label_a);
+		printf("arxh jeq\n" );
 		struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
 
 		unsigned char result = 0;
+		printf("lalala\n");
+
 		if (rv1->type == undef_m || rv2->type == undef_m) {
 				avm_error("undef involved in equality\n");
 				executionFinished = 1;
@@ -474,17 +470,46 @@ void execute_jeq	(struct instruction* ins){
 		else if ( rv1->type == bool_m  || rv2->type == bool_m ){
 			 	result = (avm_tobool(rv1) && avm_tobool(rv2)  );
 		}
-		else if ( rv1->type !=rv2->type ){
-				avm_error("illegal types in jeq!\n");
-		}
+		else 	if ( rv1->type !=rv2->type ){
+						 avm_error("illegal types in jeq!\n");
+				  }
 		else{
-			// TODO Equality check with Dispaching for rv1
+			if( rv1->type == number_m &&  rv2->type == number_m ){
+					printf("JEQ 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
+					if(rv1->data.numVal == rv2->data.numVal ) result = 1;
+					else result = 0;
+
+					printf("result is %d\n",result );
+					}
+			if( rv1->type == string_m &&  rv2->type == string_m ){
+				//MPOREI TODO ?? ston intermediate to "a" == 3 pernaei alla edw thewrhtika prepei na bgazei illegal
+					printf("JEQ 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
+
+				  if(strcmp(rv1->data.strVal,rv2->data.strVal) == 0 ) result = 1;
+					else result = 0;
+
+					printf("result is %d\n",result );
+			}
+			if( rv1->type == lib_func_m &&  rv2->type == lib_func_m ){
+				printf("JEQ 2 lib funcs  %s   kai %s \n", rv1->data.libfuncVal,  rv2->data.libfuncVal );
+
+				if(strcmp( rv1->data.libfuncVal,  rv2->data.libfuncVal ) == 0 ) result = 1;
+				else result = 0;
+				printf("result is %d\n",result );
+			}
+			if( rv1->type == userfunc_m){
+				// todo den to xw ftiaksei giati petaei seg sthn call tha to dw meta
+				printf("JEQ 2 libfuncs %d   kai %d \n", rv1->data.funcVal,  rv2->data.funcVal );
+			}
+
 		}
 
 		if(!executionFinished && result )
 				pc = ins->result->val;
 
 }
+
 
 void execute_jne	(struct instruction* ins){
 
