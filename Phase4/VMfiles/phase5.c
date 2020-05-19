@@ -118,7 +118,7 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 
 			reg->type = number_m;
 			reg->data.numVal = consts_getnumber(arg->val);
-		
+
 			return reg;
 		}
 
@@ -158,8 +158,10 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 void avm_initstack(){
 	//gia ta globals
 	topsp = globals;
-	for (size_t i = 0; i < globals+1; i++) {
+	int i;
+	for ( i = 0; i < 50; i++) {
 		stack[i] =*(struct avm_memcell*) malloc(sizeof(struct avm_memcell));
+		stack[i].type = undef_m;
 	}
 
 }
@@ -184,7 +186,7 @@ double mod_impl(double x, double y){
 		avm_error("Mod by zero!" );
 		executionFinished=1;
 		return 0;
-	}else return 10000;//(unsigned)x % (unsigned)y;
+	}else return (unsigned)x % (unsigned)y;
 
 }
 
@@ -960,8 +962,18 @@ void read_binfile(){
 
 void printStack(){
 
-	for (int i = 0; i < 20; i++) {
-		printf("stack[%d] = %.2f\n", i,stack[i].data.numVal);
+	for (int i = 0; i < 50; i++) {
+
+		printf("stack[%d]", i);
+		switch (stack[i].type) {
+			case number_m:	printf("%.2f\n", stack[i].data.numVal); break;
+			case string_m:	printf("%s\n", stack[i].data.strVal );	break;
+			case bool_m:	printf("%c\n", stack[i].data.bool);	break;
+			case lib_func_m:printf("%s\n",stack[i].data.libfuncVal);break;
+			case userfunc_m:printf("%.1u\n", stack[i].data.funcVal);break;
+			case undef_m:	printf("undef\n" ); break;
+			default: printf("ekanes malakia\n");
+		}
 	}
 }
 
