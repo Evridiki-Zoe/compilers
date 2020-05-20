@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <assert.h>
+#include <math.h>
 
-#define AVM_NUMACTUALS_OFFSET 	+4
-#define AVM_SAVEDPC_OFFSET		+3
-#define AVM_SAVEDTOP_OFFSET		+2
-#define AVM_SAVEDTOPSP_OFFSET	+1
+// meion afou thn kanoume anapoda?
+#define AVM_NUMACTUALS_OFFSET 	-4 //???
+#define AVM_SAVEDPC_OFFSET		-3
+#define AVM_SAVEDTOP_OFFSET		-2
+#define AVM_SAVEDTOPSP_OFFSET	-1
 
 
 #define AVM_STACKENV_SIZE	4
@@ -240,6 +242,10 @@ unsigned char avm_tobool(struct avm_memcell* m);
 void  libfunc_typeof();
 
 void libfunc_totalarguments(void);
+double libfunc_strtonum(char *str);
+double libfunc_sqrt(double rad);
+double libfunc_cos(double rad);
+double libfunc_sin(double rad);
 
 void read_binfile();
 void printStack();

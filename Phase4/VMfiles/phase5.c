@@ -1,8 +1,6 @@
 #include "phase5.h"
 #include <string.h>
 
-
-
 unsigned totalActuals=0;
 
 tostring_func_t tostringFuncs[] = {
@@ -273,8 +271,8 @@ void avm_setelem(struct avm_table* table , struct avm_memcell* index , struct av
 }
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
-
 	if (lv == rv) return;
+	printf("avm assign\n" );
 
 	if (lv->type == table_m && rv->type == table_m && lv->data.tableVal == rv->data.tableVal ) return;
 
@@ -283,7 +281,7 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 	avm_memcellclear(lv);
 
 	memcpy(lv,rv,sizeof(struct avm_memcell));
-printf("lv in avm assign is %d \n", lv->data.bool );
+
 	if (lv->type == string_m) {
 		lv->data.strVal = strdup(rv->data.strVal);
 	} else if (lv->type == table_m) {
@@ -292,7 +290,7 @@ printf("lv in avm assign is %d \n", lv->data.bool );
 }
 
 void avm_callsaveenviroment(void){
-	printf("call save env\n" );
+	printf("call save env:: totalActuals(%d), pc+1(%d), top+totalActuals+2(%d), topsp(%d)\n",totalActuals, pc+1, (top+totalActuals + 2), topsp );
 	avm_push_envvalue(totalActuals);
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top+totalActuals + 2);
@@ -301,10 +299,10 @@ void avm_callsaveenviroment(void){
 
 void avm_dec_top (void){
 	printf("dec top(%d)\n", top );
-	if (!top) {
+	if (top >1024 ) { // na ginei max  
 		avm_error("Stack overflow\n");
 		executionFinished=1;
-	} else --top;
+	} else ++top;
 }
 
 void avm_push_envvalue (unsigned val) {
@@ -315,9 +313,10 @@ void avm_push_envvalue (unsigned val) {
 }
 
 unsigned avm_get_envvalue(unsigned i){
-	assert(stack[i].type = number_m);
+	assert(stack[i].type == number_m);
 	unsigned val = (unsigned) stack[i].data.numVal;
-	assert(stack[i].data.numVal == ((double) val));
+  printf("env val is %d\n", val);
+	assert(stack[i].data.numVal == ((double) val)); // wtf?? gia poio logo afou egine molis twra
 	return val;
 }
 
@@ -351,8 +350,20 @@ struct avm_memcell* avm_getactual(unsigned i){
 	return &stack[topsp + AVM_STACKENV_SIZE + 1 + i];
 }
 
-struct userfunc* avm_getfuncinfo(unsigned address){return NULL;}//TODO
-
+struct userfunc* avm_getfuncinfo(unsigned address){
+/*		printf("generate info of userfunction(%d)\n", address );
+		struct userfunc* ufunc = malloc(sizeof(struct userfunc));
+		int i = 0;
+		while(i< totalUserFuncs){
+			if(userFuncs[i]->address == address){
+		 			ufunc = userFuncs[i];
+					return ufunc;
+			}
+			else{ i++; }
+			return NULL;
+		}
+*/
+}
 //--------------------------------------
 
 
@@ -370,16 +381,16 @@ void libfunc_print(void){
 
 void  libfunc_typeof(){
 
-unsigned n = avm_totalactuals();
+		unsigned n = avm_totalactuals();
 
-if(n != 1) avm_error("libfunc typeof:: error ");
-else{
+		if(n != 1) avm_error("libfunc typeof:: error ");
+		else{
 
-	//to return a result we set the retval register
-	avm_memcellclear(&retval);
-	retval.type = string_m;
-	retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
-}
+			//to return a result we set the retval register
+			avm_memcellclear(&retval);
+			retval.type = string_m;
+			retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
+		}
 
 }
 
@@ -400,6 +411,47 @@ void libfunc_totalarguments(void){
 
 
 }
+
+//TODO oles oi lib func theloun allages
+
+double libfunc_strtonum(char *str){
+	//todo to nil
+	double tonum = atoi(str);
+	//if(atoi(str) == 0) avm_error("cannot convert string to number! \n" );
+	//else
+	return tonum;
+
+}
+
+//thelei check gia -1, ekei pou kaleitai!!!
+double libfunc_sqrt(double num ){
+/*	unsigned n = avm_totalactuals();
+
+	if(n != 1) avm_error("libfunc sqrt: error arguments");
+	else{
+*/
+			if(num < 0 ) {
+					avm_error("Cannot calculate sqrt of subzero number!\n");
+					return -1;
+			}
+			return 	sqrt(num);
+//	}
+}
+
+double libfunc_cos(double rad ){
+	// Converting to radian
+	rad = (rad * 3.14159265) / 180;
+	return cos(rad);
+
+}
+
+double libfunc_sin(double rad){
+	// Converting to radian
+	rad = (rad * 3.14159265) / 180;
+	return sin(rad);
+
+}
+
 //------------------------------------------
 
 
@@ -687,6 +739,8 @@ unsigned oldpc = pc;
 					  printf("Undefined user function %s!\n", userFuncs[func->data.funcVal]->id);
 						executionFinished =1;
 					}
+//					assert(code[pc]->opcode == funcenter_v);
+
 				break;
 			}
 			case string_m:		avm_calllibfunc(func->data.strVal); break;
@@ -703,29 +757,36 @@ unsigned oldpc = pc;
 			}
 }
 void execute_pusharg	(struct instruction* ins){
+	//printf("push: type %d val %d \n",ins->arg1->type , ins->arg1->val  );
 	struct avm_memcell* arg = avm_translate_operand(ins->arg1,&ax);
 	assert(arg);
+	//printf("arg is %d\n", arg->type );
 	avm_assign(&stack[top],arg);
 	++totalActuals;
 	avm_dec_top();
+//	printf("stack after push arg\n" );
+//	printStack();
 }
 void execute_funcenter	(struct instruction* ins){
 	printf("funcenter!! \n" );
 	struct avm_memcell* func = avm_translate_operand(ins->result , &ax);
 	assert(func);
-	assert(pc == func->data.funcVal);
+	printf("pc is %d and funcval address  is %d\n",pc, userFuncs[func->data.funcVal]->address );
+	assert(pc == userFuncs[func->data.funcVal]->address );
 
 	totalActuals = 0;
 
-	struct userfunc* funcInfo = avm_getfuncinfo(pc);
+//	struct userfunc* funcInfo = avm_getfuncinfo(userFuncs[func->data.funcVal]->address );
+//	assert(funcInfo);
+	printf("in funcenter top is %d and function size is %d\n", top, userFuncs[func->data.funcVal]->localSize);
 	topsp=top;
-	top = top - funcInfo->localSize;
+	top = top - userFuncs[func->data.funcVal]->localSize;
 
 }
 void execute_funcexit	(struct instruction* ins){
 
 	unsigned oldTop = top;
-
+	printf("funcexit get %d\n", topsp  AVM_SAVEDPC_OFFSET);
 	top = avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
 	pc 	= avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
 	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
@@ -805,7 +866,7 @@ void execute_jump	(struct instruction* ins){
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
 	executionFinished = 1;
-  	printf("\nError: %s ",msg);
+  	printf("Error: %s\n",msg);
 }
 void avm_warning(char* msg ){
 	 printf("\nWarning: %s ",msg);
@@ -1076,7 +1137,7 @@ void add_consts_userfuncs(char * userfunc,unsigned int address, unsigned int loc
 		totalUserFuncs++;
 	}
 
-	char* enum_toString_opCodes_v(vmopcode sym) {
+char* enum_toString_opCodes_v(vmopcode sym) {
 		switch (sym) {
 			case 0:
 					return "assign";
