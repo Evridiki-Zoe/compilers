@@ -259,4 +259,5 @@ void add_consts_num(double number);
 void add_consts_libfuncs(char * libfunc);
 void add_consts_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs );
 
+char* enum_toString_opCodes_v(vmopcode sym);
 ///----------------------------------

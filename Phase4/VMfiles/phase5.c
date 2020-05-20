@@ -174,7 +174,6 @@ double div_impl(double x, double y){
 	}else  return (double)x/y;
 }
 double mod_impl(double x, double y){
-	printf("--------------irtha\n" );
 	if(y == 0){
 		avm_error("Mod by zero!" );
 		executionFinished=1;
@@ -194,16 +193,15 @@ void execute_cycle	(void){
 			executionFinished = 1;
 			return;
 	} else {
-		//printf("else \n");
+		printf("else \n");
 
 
 		assert(pc < AVM_ENDING_PC);
 
 
 		struct instruction* instr = malloc(sizeof(struct instruction));
-		instr = code[pc];
-		printf("now running ins(%d) \n", code[pc]->opcode);
-		printf("instr type %d \n",instr->opcode);
+			instr = code[pc];
+		printf("now running ins(%s) %d \n", enum_toString_opCodes_v(code[pc]->opcode), instr->opcode);
 
 		assert(instr->opcode>=0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
 		if (instr->srcLine) currLine = instr->srcLine; //todo mallon ??
@@ -212,8 +210,9 @@ void execute_cycle	(void){
 
 	//	printf("instr type %d\n",instr->opcode);
 		(*executeFuncs[instr->opcode]) (instr);
-
+printf("amesws meta to execute\n" );
 		if (pc == oldPC) { // an DEN  htan jump
+			printf("den htan jump\n" );
 			++pc;
 		}
 	}
@@ -270,7 +269,7 @@ struct avm_table* avm_tablenew(){
 //----------------------------------------------------------
 
 void avm_setelem(struct avm_table* table , struct avm_memcell* index , struct avm_memcell* data){
-	
+
 }
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
@@ -284,7 +283,7 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 	avm_memcellclear(lv);
 
 	memcpy(lv,rv,sizeof(struct avm_memcell));
-
+printf("lv in avm assign is %d \n", lv->data.bool );
 	if (lv->type == string_m) {
 		lv->data.strVal = strdup(rv->data.strVal);
 	} else if (lv->type == table_m) {
@@ -293,6 +292,7 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 }
 
 void avm_callsaveenviroment(void){
+	printf("call save env\n" );
 	avm_push_envvalue(totalActuals);
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top+totalActuals + 2);
@@ -300,13 +300,15 @@ void avm_callsaveenviroment(void){
 }
 
 void avm_dec_top (void){
+	printf("dec top(%d)\n", top );
 	if (!top) {
-		avm_error("Stack overflow");
+		avm_error("Stack overflow\n");
 		executionFinished=1;
 	} else --top;
 }
 
 void avm_push_envvalue (unsigned val) {
+	printf("push env val(%d) at top(%d)\n", val,top);
 	stack[top].type =number_m;
 	stack[top].data.numVal =val;
 	avm_dec_top();
@@ -434,9 +436,11 @@ void execute_assign (struct instruction* ins){
 
 	struct avm_memcell*	lv = avm_translate_operand(ins->result , NULL);
 	struct avm_memcell*	rv = avm_translate_operand(ins->arg1 , &ax);
-
+printf("in assign after translate rv %d\n",  rv->data.bool );
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
 	avm_assign(lv,rv);
+	printf("in assign after avmassign %d kai rv %d\n", lv->data.bool, rv->data.bool );
+
 }
 
 void execute_add 	(struct instruction* ins) { execute_arithmetic(ins);	} //?? }
@@ -450,6 +454,7 @@ void execute_and 	(struct instruction* ins) {}//XXXXXXXXXXXX NO USE
 void execute_or 	(struct instruction* ins){}//XXXXXXXXXXXX NO USE
 void execute_not 	(struct instruction* ins){}//XXXXXXXXXXXX NO USE
 
+//oles oi jump if kati exoun sto value to jump label, bazoume -1
 void execute_jeq	(struct instruction* ins){
 		assert(ins->result->type == label_a);
 		printf("arxh jeq\n" );
@@ -483,7 +488,6 @@ void execute_jeq	(struct instruction* ins){
 					printf("result is %d\n",result );
 					}
 			if( rv1->type == string_m &&  rv2->type == string_m ){
-				//MPOREI TODO ?? ston intermediate to "a" == 3 pernaei alla edw thewrhtika prepei na bgazei illegal
 					printf("JEQ 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
 
 				  if(strcmp(rv1->data.strVal,rv2->data.strVal) == 0 ) result = 1;
@@ -498,16 +502,20 @@ void execute_jeq	(struct instruction* ins){
 				else result = 0;
 				printf("result is %d\n",result );
 			}
-			if( rv1->type == userfunc_m){
-				// todo den to xw ftiaksei giati petaei seg sthn call tha to dw meta
-				printf("JEQ 2 libfuncs %d   kai %d \n", rv1->data.funcVal,  rv2->data.funcVal );
+			if( rv1->type == userfunc_m && rv2->type == userfunc_m){
+				printf("JEQ 2 userfuncs %s  kai %s \n", userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id );
+				if(strcmp(userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id) == 0) result = 1;
+				else result = 0;
+				printf("result is %d\n",result );
+
 			}
 
 		}
 
-		if(!executionFinished && result )
-				pc = ins->result->val;
-
+		if(!executionFinished && result ){
+				pc = ins->result->val-1;
+				printf("if result is 1, pc is %d\n\n",pc  );
+			}
 }
 
 
@@ -659,18 +667,26 @@ void execute_jgt(struct instruction* ins){
 			pc = ins->result->val;
 }
 
+//to quad call exei sto arg1 -> val to label quad pou theloume na paei opote vazoume val-1!!!
 void execute_call		(struct instruction* ins){
-
-		struct avm_memcell* func = avm_translate_operand(ins->result , &ax);
+unsigned oldpc = pc;
+		struct avm_memcell* func = avm_translate_operand(ins->arg1 , &ax);
 		assert(func);
 		avm_callsaveenviroment();
-
 		switch (func->type) {
 			case userfunc_m: {
 
-				pc = func->data.funcVal;
+				if(oldpc == func->data.funcVal ) pc = func->data.funcVal; // otan h sunarthsh den einai orismenh to call exei ws value to idio to call-quad
+				else 		pc = func->data.funcVal-1; // otan einai orismenh TO CALL exei sto label to jump
+
+				printf("user func call pc %d ending %d\n", pc,AVM_ENDING_PC);
 				assert(pc < AVM_ENDING_PC);
-				assert(code[pc]->opcode == funcenter_v);
+				if (code[pc]->opcode != funcenter_v){
+					  //funcenter_v is funcstart
+					  //an den einai orismenh h sunarthsh prepei na petaksei error
+					  printf("Undefined user function %s!\n", userFuncs[func->data.funcVal]->id);
+						executionFinished =1;
+					}
 				break;
 			}
 			case string_m:		avm_calllibfunc(func->data.strVal); break;
@@ -694,6 +710,7 @@ void execute_pusharg	(struct instruction* ins){
 	avm_dec_top();
 }
 void execute_funcenter	(struct instruction* ins){
+	printf("funcenter!! \n" );
 	struct avm_memcell* func = avm_translate_operand(ins->result , &ax);
 	assert(func);
 	assert(pc == func->data.funcVal);
@@ -780,7 +797,10 @@ void execute_tablesetelem	(struct instruction* ins){
 }
 
 void execute_nop	(struct instruction* ins){}
-void execute_jump	(struct instruction* ins){ pc = ins->result->val; printf("%d %d \n", ins->result->val , pc );}
+void execute_jump	(struct instruction* ins){
+	  // to jump quad exei sto value to label poy kanei jump, prepei na einai -1
+		pc = ins->result->val -1; printf("jumping to %d \n", pc );
+	}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
@@ -863,7 +883,7 @@ void read_binfile(){
 
 				fread(&totaluserF, sizeof(unsigned int), 1, fp);
 				//printf("\ntotal userfuncs is %d \n", totaluserF);
-				userFuncs = malloc(sizeof(struct userfunc)* totallibF);
+				userFuncs = malloc(sizeof(struct userfunc)* totaluserF);
 
 	 	    	for(i=0; i<totaluserF; i++){
 	 							unsigned int len, addr, localsize;
@@ -1005,9 +1025,9 @@ void printStack(){
 
 		printf("stack[%d]", i);
 		switch (stack[i].type) {
-			case number_m:	printf("%.2f\n", stack[i].data.numVal); break;
+			case number_m:	printf(" n %.2f\n", stack[i].data.numVal); break;
 			case string_m:	printf("%s\n", stack[i].data.strVal );	break;
-			case bool_m:	printf("%c\n", stack[i].data.bool);	break;
+			case bool_m:	if(stack[i].data.bool) printf(" true \n"); else printf(" false \n"); 	break;
 			case lib_func_m:printf("%s\n",stack[i].data.libfuncVal);break;
 			case userfunc_m:printf("%.1u\n", stack[i].data.funcVal);break;
 			case undef_m:	printf("undef\n" ); break;
@@ -1054,4 +1074,62 @@ void add_consts_userfuncs(char * userfunc,unsigned int address, unsigned int loc
 
 		userFuncs[totalUserFuncs]  = newnode;
 		totalUserFuncs++;
+	}
+
+	char* enum_toString_opCodes_v(vmopcode sym) {
+		switch (sym) {
+			case 0:
+					return "assign";
+			case 1:
+					return "add";
+			case 2:
+					return "sub";
+			case 3:
+					return "mul";
+		    case 4:
+					return "div";
+			case 5:
+					return "mod";
+			case 6:
+					return "uminus";
+			case 7:
+					return "and";
+			case 8:
+					return "or";
+			case 9:
+					return "not";
+			case 10:
+					return "if_eq";
+			case 11:
+					return "if_not_eq";
+			case 12:
+					return "if_lesseq";
+			case 13:
+					return "if_greatereq";
+			case 14:
+					return "if_less";
+		    case 15:
+					return "if_greater";
+			case 16:
+					return "call";
+			case 17:
+					return "param";
+			case 18:
+					return "funcstart";
+			case 19:
+					return "funcend";
+			case 20:
+					return "tablecreate";
+			case 21:
+					return "tablegetelem";
+			case 22:
+					return "table_setelem";
+			case 23:
+					return "nop_v";
+			case 24:
+					return "jump";
+			default:
+					return "not compatible type";
+
+		}
 	}
