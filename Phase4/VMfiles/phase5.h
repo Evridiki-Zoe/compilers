@@ -53,14 +53,15 @@ struct avm_memcell {
 struct avm_table{
 		struct avm_memcell* data;
 		struct avm_table* next;
-		union	{
-			double	numVal;
-			char*	strVal;
-			unsigned char	bool;
-			struct avm_table*		tableVal;
-			unsigned		funcVal;
-			char*			libfuncVal;
-		} index;
+		char* index;
+		// union	{
+		// 	double	numVal;
+		// 	char*	strVal;
+		// 	unsigned char	bool;
+		// 	struct avm_table*		tableVal;
+		// 	unsigned		funcVal;
+		// 	char*			libfuncVal;
+		// } index;
 };
 
 struct avm_memcell stack[1024];
@@ -209,7 +210,8 @@ void memclear_table(struct avm_memcell* m);
 void avm_tablecrefcounter(struct avm_table* m);
 void avm_tableincrefcounter(struct avm_table* m);
 struct avm_table* avm_tablenew();
-void avm_setelem(struct avm_table* table , struct avm_memcell* index , struct avm_memcell* data);
+void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data);
+struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index );
 
 void avm_warning(char* msg );
 

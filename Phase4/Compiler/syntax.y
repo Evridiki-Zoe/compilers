@@ -212,7 +212,7 @@ expr :
 
 	 if($1->type == tableitem_e){
 		 struct expr* tempexp = new_expr(tableitem_e,newnode,NULL,0,"",'\0',NULL);
-		 emit(tablegetelem,$1->index,$1,tempexp,yylineno,0);
+		 emit(tablegetelem,$1,$1->index,tempexp,yylineno,0);
 
 	 }else{
 		 $$ = new_expr(arithmeticexp_e,newnode,NULL,0,"",'\0',NULL); //TODO mporei na mhn thelei arithmeticexp edw
@@ -696,7 +696,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
                         tmp_index->next = NULL;
 
                         struct expr*  returned_exp = new_expr(tableitem_e,tmp_index,$1,0,"",'\0',NULL);
-                        $$ = returned_exp;
+                        $$ = $1;
                    }else{
 							            emit(assign,$4,NULL,$1,yylineno,0);
 
@@ -932,7 +932,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
 	                     tmp_index->next = NULL;
                         //adespoto symbol pou den prepei na mpei sto hash!
 
-                        struct expr* tmp_expr_index = new_expr(const_num_e,tmp_index,NULL,i,"",'\0',NULL);
+                        struct expr* tmp_expr_index = new_expr(conststring_e,tmp_index,NULL,0,name,'\0',NULL);
 
                         struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
 

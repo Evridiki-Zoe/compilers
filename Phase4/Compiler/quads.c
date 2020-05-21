@@ -277,6 +277,7 @@ struct expr* emit_iftable_item(struct expr* exp){
      	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 //mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
+			printf("edoo\n" );
 			return result;
 		}
 }

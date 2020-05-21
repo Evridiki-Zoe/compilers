@@ -257,16 +257,50 @@ struct avm_table* avm_tablenew(){
 	printf("dsfndsoifnsd\n" );
 	tmp->data= malloc(sizeof(struct avm_memcell));
 	tmp->data->type=undef_m;
-	tmp->index.numVal=0;
+	tmp->index = malloc(sizeof(struct avm_memcell));
+	tmp->index=NULL;
 	tmp->next=NULL;
+	printf("eeeee\n" );
 
 	return tmp;
 }
 
 //----------------------------------------------------------
+struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
+	struct avm_table* tmp = table;
+	printf("psaxno gia %s\n",index );
+	while (tmp) {
+		if (strcmp(tmp->index,index)==0) {
+			return tmp->data;
+		}
+		tmp = tmp->next;
+	}
+	return  NULL;
 
-void avm_setelem(struct avm_table* table , struct avm_memcell* index , struct avm_memcell* data){
+}
+void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
+	struct avm_table* tmp=table;
+	if (table->data->type == undef_m) {
+		tmp->index = index;
+		tmp->data= data;
+		return;
+	}
 
+	while (tmp) {
+		printf("geia\n");
+		if (strcmp(tmp->index,index)==0) {
+
+			tmp->data= data;
+			return;
+		}
+		tmp = tmp->next;
+	}
+
+	tmp = malloc(sizeof(struct avm_table));
+	tmp->index = index;
+	tmp->data= data;
+	tmp->next = table->next;
+	table->next = tmp;
 }
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
@@ -362,6 +396,7 @@ struct userfunc* avm_getfuncinfo(unsigned address){
 			return NULL;
 		}
 */
+return NULL;
 }
 //--------------------------------------
 
@@ -863,6 +898,7 @@ void execute_tablegetelem	(struct instruction* ins){
 
 	struct avm_memcell* lv = avm_translate_operand(ins->result, (struct avm_memcell*)0);
 	struct avm_memcell* t = avm_translate_operand(ins->arg1, (struct avm_memcell*)0);
+	printf("lalalal\n" );
 	struct avm_memcell* i = avm_translate_operand(ins->arg2, &ax);
 
 	//assert(lv && &stack[N - 1] >= lv && &stack[top] < lv || lv == &retval);// TODO N
@@ -877,9 +913,12 @@ void execute_tablegetelem	(struct instruction* ins){
 
 	}
 	else{
-			struct avm_memcell* content;// = avm_tablegetelem(t->data.tableVal, i ); //todo
+
+			struct avm_memcell* content= avm_tablegetelem(t->data.tableVal, i->data.strVal );
 			if(content){
+				printf("\n\nKAPPA\n" );
 				avm_assign(lv,content);
+				printf("\n\nKAPPA\n" );
 			}
 			else{
 					char * ts = avm_tostring(t);
@@ -905,7 +944,7 @@ void execute_tablesetelem	(struct instruction* ins){
 
 		if(t->type != table_m)		avm_error("illegal use of variable as a table! \n");
 		else {
-			avm_setelem(t->data.tableVal, i, c); //todo
+			avm_setelem(t->data.tableVal, i->data.strVal, c); //todo
 		}
 }
 
@@ -1143,16 +1182,17 @@ void printStack(){
 			case lib_func_m:printf("%s\n",stack[i].data.libfuncVal);break;
 			case userfunc_m:printf("%.1u\n", stack[i].data.funcVal);break;
 			case undef_m:	printf("undef\n" ); break;
+			case nil_m:		printf("nilllllll\n" );break;
 			case table_m:{
 				struct avm_table* tmp = stack[i].data.tableVal;
 				while (tmp) {
-					printf("index : %.2f\t data type: %d",tmp->index.numVal,tmp->data->type );
+					printf("index : %s\t data : %.2f\t",tmp->index,tmp->data->data.numVal );
 					tmp=tmp->next;
 				}
 				printf("\n" );
 				break;
 			}
-			default: printf("ekanes malakia\n");
+			default: printf("ekanes malakia %d\n", stack[i].type);
 		}
 	}
 }
