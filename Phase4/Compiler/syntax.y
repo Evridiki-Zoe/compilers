@@ -920,7 +920,8 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                   struct expr* tmp = $2;
                   int i = 0;
 
-                  while(tmp->sym!= NULL) {
+                  while(tmp!= NULL) {
+                        printf("table %d %s", i, tmp->sym->value.var->name);
                         char* name =malloc(5*sizeof(char));
                         sprintf(name,"%d",i);
                         //to index:: ena symbol (oxi sto hash), me onoma to index tou stoixeiou
@@ -931,9 +932,11 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
 	                     tmp_index->next = NULL;
                         //adespoto symbol pou den prepei na mpei sto hash!
 
-                        struct expr* tmp_expr_index = new_expr(newtable_e,tmp_index,NULL,0,"",'\0',NULL);
+                        struct expr* tmp_expr_index = new_expr(const_num_e,tmp_index,NULL,i,"",'\0',NULL);
 
                         struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
+
+
                         struct expr* temp_elem = new_expr(var_e,tmp_symbol,NULL,0,"",'\0',NULL);
 
                         emit(table_setelem,tmp_expr_index ,tmp , temp_elem,yylineno,0);
@@ -961,6 +964,13 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                     struct expr* tmp_table = new_expr(newtable_e,newnode,NULL,0,"",'\0',NULL);
 
                     $$ = tmp_table;// epistrefw pros ta panw olo to table
+
+                    int i = 0;
+                    while(tmp->sym!= NULL) {
+                          printf("indexed table %d kai index(%s) val(%s)", i, tmp->index->sym->value.var->name, tmp->sym->value.var->name);
+                          tmp = tmp->next;
+                          i++;
+                    }
             }
             ;
 
@@ -980,8 +990,9 @@ elist_for_table   : expr multi_exprs_for_table  {
                 newnode->next = NULL;
 
                 struct expr* temp_elem = new_expr(tableitem_e,newnode,NULL,0,"",'\0',$2);
-
-                $$ = temp_elem;
+                $1->next= $2;
+//new_expr(tableitem_e,$1->sym,$1->index,0,"",'\0',$2);
+                $$ = $1;
         }
         | /*emty*/ {
           struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
@@ -1006,13 +1017,13 @@ multi_exprs_for_table 	:  COMMA expr  multi_exprs_for_table  {
 
                              struct expr* temp_elem = new_expr(tableitem_e,newnode,NULL,0,"",'\0',$3);
                              // bazw sto next to epomeno stoixeio
-
-                             $$ = temp_elem; //pernaw to neo expression me to next, sto $$
+                             $2->next = $3;
+                             $$ = $2; //pernaw to neo expression me to next, sto $$
 
                         }
                       	|  /*empty*/ {
                               struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
-                              $$ = temp_elem;
+                              $$ = NULL;//temp_elem;
                       }
                     	;
 
@@ -1024,6 +1035,8 @@ indexed     : indexedelem  multi_indexedelem {
                 printf(RED "indexed:: indexedelement multi\n" RESET);
                 struct expr* expr_with_next = new_expr(tableitem_e,$1->sym,$1->index,0,"",'\0',$2);
                 $$ = expr_with_next;
+
+
                 }
             ;
 
