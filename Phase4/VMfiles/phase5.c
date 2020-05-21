@@ -208,7 +208,6 @@ void execute_cycle	(void){
 
 	//	printf("instr type %d\n",instr->opcode);
 		(*executeFuncs[instr->opcode]) (instr);
-printf("amesws meta to execute\n" );
 		if (pc == oldPC) { // an DEN  htan jump
 			printf("den htan jump\n" );
 			++pc;
@@ -299,7 +298,7 @@ void avm_callsaveenviroment(void){
 
 void avm_dec_top (void){
 	printf("dec top(%d)\n", top );
-	if (top >1024 ) { // na ginei max  
+	if (top >1024 ) { // na ginei max
 		avm_error("Stack overflow\n");
 		executionFinished=1;
 	} else ++top;
@@ -514,7 +513,6 @@ void execute_jeq	(struct instruction* ins){
 		struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
 
 		unsigned char result = 0;
-		printf("lalala\n");
 
 		if (rv1->type == undef_m || rv2->type == undef_m) {
 				avm_error("undef involved in equality\n");
@@ -565,7 +563,7 @@ void execute_jeq	(struct instruction* ins){
 		}
 
 		if(!executionFinished && result ){
-				pc = ins->result->val-1;
+   			execute_jump(ins);
 				printf("if result is 1, pc is %d\n\n",pc  );
 			}
 }
@@ -593,12 +591,41 @@ void execute_jne	(struct instruction* ins){
 			avm_error("illegal types in jeq!\n");
 	}
 	else{
-		// TODO Equality check with Dispaching for rv1
-		//+++++++
+		if( rv1->type == number_m &&  rv2->type == number_m ){
+				printf("JNE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
+				if(rv1->data.numVal != rv2->data.numVal ) result = 1;
+				else result = 0;
+
+				printf("result is %d\n",result );
+				}
+		if( rv1->type == string_m &&  rv2->type == string_m ){
+				printf("JNE 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
+
+				if(strcmp(rv1->data.strVal,rv2->data.strVal) == 0 ) result = 0;
+				else result = 1;
+
+				printf("result is %d\n",result );
+		}
+		if( rv1->type == lib_func_m &&  rv2->type == lib_func_m ){
+			printf("JNE 2 lib funcs  %s kai %s \n", rv1->data.libfuncVal,  rv2->data.libfuncVal );
+
+			if(strcmp( rv1->data.libfuncVal,  rv2->data.libfuncVal ) == 0 ) result = 0;
+			else result = 1;
+			printf("result is %d\n",result );
+		}
+		if( rv1->type == userfunc_m && rv2->type == userfunc_m){
+			printf("JNE 2 userfuncs %s  kai %s \n", userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id );
+			if(strcmp(userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id) == 0) result = 0;
+			else result = 1;
+			printf("result is %d\n",result );
+
+		}
+
 	}
 
 	if(!executionFinished && result )
-			pc = ins->result->val;
+			execute_jump(ins);
 }
 
 void execute_jle	(struct instruction* ins){
@@ -622,12 +649,18 @@ void execute_jle	(struct instruction* ins){
 			avm_error("illegal types in jeq!\n");
 	}
 	else{
-		// TODO Equality check with Dispaching for rv1
-		//+++++++
+		if( rv1->type == number_m &&  rv2->type == number_m ){
+				printf("JLE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
+				if(rv1->data.numVal <= rv2->data.numVal ) result = 1;
+				else result = 0;
+
+				printf("result is %d\n",result );
+				}
 	}
 
 	if(!executionFinished && result )
-			pc = ins->result->val;
+			execute_jump(ins);
 }
 
 void execute_jge	(struct instruction* ins){
@@ -652,12 +685,18 @@ void execute_jge	(struct instruction* ins){
 			avm_error("illegal types in jeq!\n");
 	}
 	else{
-		// TODO Equality check with Dispaching for rv1
-		//+++++++
+		if( rv1->type == number_m &&  rv2->type == number_m ){
+				printf("JGE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
+				if(rv1->data.numVal >= rv2->data.numVal ) result = 1;
+				else result = 0;
+
+				printf("result is %d\n",result );
+			}
 	}
 
 	if(!executionFinished && result )
-			pc = ins->result->val;
+			execute_jump(ins);
 }
 
 void execute_jlt	(struct instruction* ins){
@@ -682,12 +721,18 @@ void execute_jlt	(struct instruction* ins){
 			avm_error("illegal types in jeq!\n");
 	}
 	else{
-		// TODO Equality check with Dispaching for rv1
-		//+++++++
+		if( rv1->type == number_m &&  rv2->type == number_m ){
+				printf("JLT 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
+				if(rv1->data.numVal < rv2->data.numVal ) result = 1;
+				else result = 0;
+
+				printf("result is %d\n",result );
+			}
 	}
 
 	if(!executionFinished && result )
-			pc = ins->result->val;
+			execute_jump(ins);
 }
 
 void execute_jgt(struct instruction* ins){
@@ -711,12 +756,18 @@ void execute_jgt(struct instruction* ins){
 			avm_error("illegal types in jeq!\n");
 	}
 	else{
-		// TODO Equality check with Dispaching for rv1
-		//+++++++
+		if( rv1->type == number_m &&  rv2->type == number_m ){
+				printf("JGT 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
+				if(rv1->data.numVal > rv2->data.numVal ) result = 1;
+				else result = 0;
+
+				printf("result is %d\n",result );
+			}
 	}
 
 	if(!executionFinished && result )
-			pc = ins->result->val;
+			execute_jump(ins);
 }
 
 //to quad call exei sto arg1 -> val to label quad pou theloume na paei opote vazoume val-1!!!
@@ -767,6 +818,7 @@ void execute_pusharg	(struct instruction* ins){
 //	printf("stack after push arg\n" );
 //	printStack();
 }
+
 void execute_funcenter	(struct instruction* ins){
 	printf("funcenter!! \n" );
 	struct avm_memcell* func = avm_translate_operand(ins->result , &ax);
@@ -865,7 +917,7 @@ void execute_jump	(struct instruction* ins){
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
 void avm_error(char *msg){
-	executionFinished = 1;
+	  executionFinished = 1;
   	printf("Error: %s\n",msg);
 }
 void avm_warning(char* msg ){
@@ -877,7 +929,6 @@ char* avm_tostring(struct avm_memcell* cell){
 	assert(cell->type >= 0 && cell->type <= undef_m);
 	return (*tostringFuncs[cell->type])(cell);
 }
-
 
 
 char* number_tostring (struct avm_memcell* cell){return NULL;}
