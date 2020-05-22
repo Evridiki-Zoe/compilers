@@ -115,8 +115,16 @@ void generate_CALL(struct quad *quad) {
 		quad->taddress = 	instrNo;
 		struct instruction* t=malloc(sizeof(struct instruction));
 		t->opcode =  call_v;
+		unsigned res;
+		if((res=searchFunctionTable(quad->arg1))>=0){
+			printf("%d\n",res );
+			t->arg1 = malloc(sizeof(struct vmarg));
+			t->arg1->type = userfunc_a;
+			t->arg1->val  = res;
+		}else {
+			exit(0);
+		}
 
-		t->arg1 = make_operand(quad->arg1);
 		emitIns(t);
 }
 
@@ -170,8 +178,10 @@ void generate_FUNCEND(struct quad *quad)		{
   //backpatch(f->return_list, instrNo);
   quad->taddress = instrNo;
   struct instruction* t = malloc(sizeof(struct instruction));;
-  t->opcode = funcexit_v;
-  t->result = make_operand(quad->arg1);
+
+  t->result = malloc(sizeof(struct vmarg));
+  t->result-> type = userfunc_a;
+  t->result->val = 0;
   emitIns(t);
 
 
@@ -396,7 +406,7 @@ struct vmarg* make_operand(struct expr* expr){
 
 		case programfunc_e : {
 			arg->type = userfunc_a;
-			arg->val = add_rval_userfuncs(expr->sym->value.func->name,instrNo,expr->sym->value.func->totalVars,expr->sym->value.func->totalArgs);
+			arg->val = add_rval_userfuncs(expr->sym->value.func->name,instrNo,expr->sym->value.func->totalVars,expr->sym->value.func->totalArgs,expr->sym->value.func->scope);
 			break;
 		}
 		case libfunc_e : {
@@ -452,7 +462,7 @@ unsigned add_rval_libfuncs(char * libfunc){
 }
 
 /* Isws xreiazetai check to onoma gia kopia */
-unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs ){
+unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs,unsigned scope ){
 
 	if(totalUserFuncs == maxsize_userfunc ){
 
@@ -465,6 +475,7 @@ unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int l
 	newnode->address = address;
 	newnode->localSize = localsize;
 	newnode->totalargs =  totalargs;
+	newnode->scope = scope;
 	newnode->id = malloc(sizeof(char) * strlen(userfunc));
 	strcpy(newnode->id, userfunc);
 
@@ -676,4 +687,21 @@ printf("edw? \n" );
 
 					}
 				fclose(fp);
+}
+
+
+
+unsigned searchFunctionTable(struct expr* expr){
+	int i;
+	printf("edooo\n" );
+	for ( i = 0; i < totalUserFuncs; i++) {
+		printf("->>>>> %s %s\n", userFuncs[i]->id, expr->sym->value.func->name);
+		if (userFuncs[i]->scope == expr->sym->value.func->scope && (strcmp(userFuncs[i]->id , expr->sym->value.func->name) ==0 )) {
+			printf("\n\n\n\n\nse vrika pousti %d\n\n\n\n\n\n\n", i );
+			return i;
+		}
+
+	}
+	return -1;
+
 }

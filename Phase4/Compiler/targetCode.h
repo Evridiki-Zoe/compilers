@@ -57,6 +57,7 @@ struct userfunc {
 	unsigned int 	address;
 	unsigned int 	localSize;
 	unsigned int 	totalargs;
+	unsigned int 	scope;
 	char* 			id;
 
 };
@@ -75,7 +76,7 @@ unsigned	totalUserFuncs;
 unsigned add_rval_string(char * str);
 unsigned add_rval_num(double number);
 unsigned add_rval_libfuncs(char * libfunc);
-unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs );
+unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int localsize,unsigned int totalargs,unsigned scope );
 
 struct vmarg* make_operand(struct expr* expr);
 void printInstructions();
@@ -133,3 +134,6 @@ void patch_incomplete_jump();
 int  create_bin();
 
 void read_binfile();
+
+
+unsigned searchFunctionTable(struct expr* exp);

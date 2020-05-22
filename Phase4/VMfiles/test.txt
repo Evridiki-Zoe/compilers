@@ -2,6 +2,17 @@
 
 
 
-function a(x,y,k,l){}
-z=21;
-a(1,"kappa",z++ ,true);
+
+function factorial( n) {
+   //base case
+   if(n == 0) {
+      return 1;
+   } else {
+      return n * factorial(n-1);
+   }
+}
+
+
+
+
+factorial(2);

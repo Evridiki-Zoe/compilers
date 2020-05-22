@@ -99,8 +99,8 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a:	printf("erxomai gia to %d\n",arg->val ); return &stack[arg->val];
-		case local_a:	return &stack[topsp - arg->val];
-		case formal_a:	return &stack[topsp+AVM_STACKENV_SIZE + 1 + arg->val];
+		case local_a:	return &stack[topsp + arg->val];
+		case formal_a:	return &stack[topsp - AVM_STACKENV_SIZE - 1 - arg->val];
 
 		case retval_a:	return &retval;
 
@@ -324,11 +324,14 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 }
 
 void avm_callsaveenviroment(void){
-	printf("call save env:: totalActuals(%d), pc+1(%d), top+totalActuals+2(%d), topsp(%d)\n",totalActuals, pc+1, (top+totalActuals + 2), topsp );
+	//printf("call save env:: totalActuals(%d), pc+1(%d), top+totalActuals+2(%d), topsp(%d)\n",totalActuals, pc+1, (top+totalActuals + 2), topsp );
 	avm_push_envvalue(totalActuals);
 	avm_push_envvalue(pc+1);
-	avm_push_envvalue(top+totalActuals + 2);
+	avm_push_envvalue(top-totalActuals - 2);
 	avm_push_envvalue(topsp);
+	printf("\n\n\n\n" );
+	printStack();
+	printf("\n\n\n\n" );
 }
 
 void avm_dec_top (void){
@@ -341,7 +344,7 @@ void avm_dec_top (void){
 
 void avm_push_envvalue (unsigned val) {
 	printf("push env val(%d) at top(%d)\n", val,top);
-
+	stack[top] = *(struct avm_memcell*)malloc(sizeof(struct avm_memcell));
 	stack[top].type =number_m;
 	stack[top].data.numVal =val;
 	avm_dec_top();
@@ -386,19 +389,7 @@ struct avm_memcell* avm_getactual(unsigned i){
 }
 
 struct userfunc* avm_getfuncinfo(unsigned address){
-/*		printf("generate info of userfunction(%d)\n", address );
-		struct userfunc* ufunc = malloc(sizeof(struct userfunc));
-		int i = 0;
-		while(i< totalUserFuncs){
-			if(userFuncs[i]->address == address){
-		 			ufunc = userFuncs[i];
-					return ufunc;
-			}
-			else{ i++; }
-			return NULL;
-		}
-*/
-return NULL;
+		return userFuncs[address];
 }
 //--------------------------------------
 
@@ -809,15 +800,19 @@ void execute_jgt(struct instruction* ins){
 
 //to quad call exei sto arg1 -> val to label quad pou theloume na paei opote vazoume val-1!!!
 void execute_call		(struct instruction* ins){
-unsigned oldpc = pc;
+		unsigned oldpc = pc;
 		struct avm_memcell* func = avm_translate_operand(ins->arg1 , &ax);
 		assert(func);
 		avm_callsaveenviroment();
+
+
 		switch (func->type) {
 			case userfunc_m: {
 
-				if(oldpc == func->data.funcVal ) pc = func->data.funcVal; // otan h sunarthsh den einai orismenh to call exei ws value to idio to call-quad
-				else 		pc = func->data.funcVal-1; // otan einai orismenh TO CALL exei sto label to jump
+				struct userfunc* tmpFunc = avm_getfuncinfo(func->data.funcVal);
+				printf("\n\n\n\n\n\nkalooooooooooo %d\n\n\n\n\n\n\n",tmpFunc->address );
+
+				pc = tmpFunc->address;
 
 				printf("user func call pc %d ending %d\n", pc,AVM_ENDING_PC);
 				assert(pc < AVM_ENDING_PC);
@@ -870,7 +865,8 @@ void execute_funcenter	(struct instruction* ins){
 //	assert(funcInfo);
 	printf("in funcenter top is %d and function size is %d\n", top, userFuncs[func->data.funcVal]->localSize);
 	topsp=top;
-	top = top - userFuncs[func->data.funcVal]->localSize;
+	top = top + userFuncs[func->data.funcVal]->localSize;
+	printf("\n\n\n\nEDO TO TOP %d\n\n\n\n",top );
 
 }
 void execute_funcexit	(struct instruction* ins){
@@ -882,7 +878,7 @@ void execute_funcexit	(struct instruction* ins){
 	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
 
 	while (++oldTop <= top) {
-		avm_memcellclear(&stack[oldTop]);
+		//avm_memcellclear(&stack[oldTop]);
 	}
 }
 
@@ -1175,7 +1171,7 @@ void read_binfile(){
 
 void printStack(){
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 100; i++) {
 
 		printf("stack[%d]", i);
 		switch (stack[i].type) {
