@@ -133,7 +133,8 @@ void generate_GETRETVAL(struct quad *quad) {
 		struct instruction* t=malloc(sizeof(struct instruction));
 		t->opcode = assign_v;
 		t->result = make_operand(quad->res);
-
+		t->arg1 = malloc(sizeof(struct vmarg));
+		t->arg1->type = retval_a;
 		emitIns(t);
 }
 
@@ -159,26 +160,27 @@ void generate_RET(struct quad *quad)			{
     struct instruction* t = malloc(sizeof(struct instruction));
     t->opcode = assign_v;
     //make_retvaloperand(&t->result);
+	t->result	= malloc(sizeof(struct vmarg));
+	t->result->type = 10;
+    t->arg1 = make_operand(quad->res);
 
-    t->result = make_operand(quad->res);
-	//	emitIns(t);
-    struct symbol_table_binding* f = malloc( sizeof(struct symbol_table_binding *));
+		emitIns(t);
+    //struct symbol_table_binding* f = malloc( sizeof(struct symbol_table_binding *));
     //f = top(funcstack);
     //append(f->return_list, instrNo);
-    t->opcode = jump_v;
+    //t->opcode = jump_v;
     //reset_operand(&t->arg1);
     //reset_operand(&t->arg2);
-    t->result->type = label_a;
-    emitIns(t);
+    //t->result->type = label_a;
+    //emitIns(t);
 
 }
 void generate_FUNCEND(struct quad *quad)		{
   struct symbol_table_binding* f =malloc( sizeof(struct symbol_table_binding *));
-  //f = pop(funcstack);
-  //backpatch(f->return_list, instrNo);
+
   quad->taddress = instrNo;
   struct instruction* t = malloc(sizeof(struct instruction));;
-
+  t->opcode = funcexit_v;
   t->result = malloc(sizeof(struct vmarg));
   t->result-> type = userfunc_a;
   t->result->val = 0;

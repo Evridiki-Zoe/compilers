@@ -96,6 +96,7 @@ struct instruction**  code = NULL;
 
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
+	printf("fgnsdfdsfsd\n" );
 	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a:	printf("erxomai gia to %d\n",arg->val ); return &stack[arg->val];
@@ -232,9 +233,12 @@ void avm_memcellclear(struct avm_memcell* m){
 	if (m->type != undef_m) {
 		memclear_func_t f=memclearFuncs[m->type];
 		if (f) {
+			printf("\n\nedoooooo\n\n" );
 			(*f)(m);
 			m->type = undef_m;
+
 		}
+		m->type = undef_m;
 	}
 
 
@@ -312,10 +316,10 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 
 	if (rv->type == undef_m) avm_warning("Assigning from 'undef' content!");
 
-	avm_memcellclear(lv);
+	//avm_memcellclear(lv);
 
 	memcpy(lv,rv,sizeof(struct avm_memcell));
-
+	printf("\n\n%f %f\n\n",lv->data.numVal , rv->data.numVal );
 	if (lv->type == string_m) {
 		lv->data.strVal = strdup(rv->data.strVal);
 	} else if (lv->type == table_m) {
@@ -329,7 +333,7 @@ void avm_callsaveenviroment(void){
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top-totalActuals - 2);
 	avm_push_envvalue(topsp);
-	printStack();
+
 }
 
 void avm_dec_top (void){
@@ -512,10 +516,11 @@ void execute_assign (struct instruction* ins){
 
 	struct avm_memcell*	lv = avm_translate_operand(ins->result , NULL);
 	struct avm_memcell*	rv = avm_translate_operand(ins->arg1 , &ax);
-printf("in assign after translate rv %d\n",  rv->data.bool );
+
+//printf("in assign after translate rv %d\n",  rv->data.bool );
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
 	avm_assign(lv,rv);
-	printf("in assign after avmassign %d kai rv %d\n", lv->data.bool, rv->data.bool );
+	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
 
 }
 
@@ -866,12 +871,15 @@ void execute_funcenter	(struct instruction* ins){
 void execute_funcexit	(struct instruction* ins){
 
 	unsigned oldTop = top;
-	printf("funcexit get %d\n", topsp  AVM_SAVEDPC_OFFSET);
-	top = avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
+
+	top = avm_get_envvalue	(topsp  AVM_SAVEDTOP_OFFSET);
 	pc 	= avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
 	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
+	printf("\n\n\n\n%d %d %d \n\n\n",top,pc,topsp );
 
-	while (++oldTop <= top) {
+	while (--oldTop >= top) {
+
+
 		avm_memcellclear(&stack[oldTop]);
 	}
 }
@@ -909,9 +917,9 @@ void execute_tablegetelem	(struct instruction* ins){
 
 			struct avm_memcell* content= avm_tablegetelem(t->data.tableVal, i->data.strVal );
 			if(content){
-				printf("\n\nKAPPA\n" );
+
 				avm_assign(lv,content);
-				printf("\n\nKAPPA\n" );
+
 			}
 			else{
 					char * ts = avm_tostring(t);

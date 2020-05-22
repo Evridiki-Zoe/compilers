@@ -1,18 +1,12 @@
 
 
+x=1;
+
+function fack(n){
+	if(n==1) return 1;
+	else return  n* fack(n-1);
 
 
-
-function factorial( n) {
-   //base case
-   if(n == 0) {
-      return 1;
-   } else {
-      return n * factorial(n-1);
-   }
 }
+x =fack(4);
 
-
-
-
-factorial(2);
