@@ -162,7 +162,7 @@ double	consts_getnumber(unsigned index){return numConsts[index];} //TODO
 char*	consts_getstring(unsigned index){return stringConsts[index];}
 char*	libfuncs_getused(unsigned index){return namedLibfuncs[index];}
 
-double add_impl(double x, double y){printf("\n\nadd %f %f \n\n\n",x,y ); return x+y;}
+double add_impl(double x, double y){return x+y;}
 double sub_impl(double x, double y){return x-y;}
 double mul_impl(double x, double y){return x*y;}
 double div_impl(double x, double y){
@@ -329,9 +329,7 @@ void avm_callsaveenviroment(void){
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top-totalActuals - 2);
 	avm_push_envvalue(topsp);
-	printf("\n\n\n\n" );
 	printStack();
-	printf("\n\n\n\n" );
 }
 
 void avm_dec_top (void){
@@ -502,7 +500,6 @@ void execute_arithmetic(struct instruction* instr){
 				//avm_memcellclear(lv);
 				lv->type = number_m;
 				lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
-				printf("\n\n\n\n\n%f %f\n\n\n\n\n\n",rv1->data.numVal, rv2->data.numVal );
 
 				printf("after arithmetic lv num is %f\n", lv->data.numVal );
 
@@ -810,8 +807,6 @@ void execute_call		(struct instruction* ins){
 			case userfunc_m: {
 
 				struct userfunc* tmpFunc = avm_getfuncinfo(func->data.funcVal);
-				printf("\n\n\n\n\n\nkalooooooooooo %d\n\n\n\n\n\n\n",tmpFunc->address );
-
 				pc = tmpFunc->address;
 
 				printf("user func call pc %d ending %d\n", pc,AVM_ENDING_PC);
@@ -866,7 +861,6 @@ void execute_funcenter	(struct instruction* ins){
 	printf("in funcenter top is %d and function size is %d\n", top, userFuncs[func->data.funcVal]->localSize);
 	topsp=top;
 	top = top + userFuncs[func->data.funcVal]->localSize;
-	printf("\n\n\n\nEDO TO TOP %d\n\n\n\n",top );
 
 }
 void execute_funcexit	(struct instruction* ins){
@@ -878,7 +872,7 @@ void execute_funcexit	(struct instruction* ins){
 	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
 
 	while (++oldTop <= top) {
-		//avm_memcellclear(&stack[oldTop]);
+		avm_memcellclear(&stack[oldTop]);
 	}
 }
 
