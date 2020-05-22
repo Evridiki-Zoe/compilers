@@ -148,12 +148,13 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 
 void avm_initstack(){
 	//gia ta globals
-	topsp = globals;
+	top = globals;
 	int i;
-	for ( i = 0; i < 50; i++) {
+	for ( i = 0; i < globals; i++) {
 		stack[i] =*(struct avm_memcell*) malloc(sizeof(struct avm_memcell));
 		stack[i].type = undef_m;
 	}
+
 
 }
 
@@ -161,7 +162,7 @@ double	consts_getnumber(unsigned index){return numConsts[index];} //TODO
 char*	consts_getstring(unsigned index){return stringConsts[index];}
 char*	libfuncs_getused(unsigned index){return namedLibfuncs[index];}
 
-double add_impl(double x, double y){return x+y;}
+double add_impl(double x, double y){printf("\n\nadd %f %f \n\n\n",x,y ); return x+y;}
 double sub_impl(double x, double y){return x-y;}
 double mul_impl(double x, double y){return x*y;}
 double div_impl(double x, double y){
@@ -340,6 +341,7 @@ void avm_dec_top (void){
 
 void avm_push_envvalue (unsigned val) {
 	printf("push env val(%d) at top(%d)\n", val,top);
+
 	stack[top].type =number_m;
 	stack[top].data.numVal =val;
 	avm_dec_top();
@@ -492,7 +494,6 @@ double libfunc_sin(double rad){
 
 void execute_arithmetic(struct instruction* instr){
 	  	struct avm_memcell* lv = avm_translate_operand(instr->result, NULL);
-		lv->data.numVal=43423;
 		struct avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
 		printf("geiaaa , insopcode = %d\n",instr->opcode );
@@ -510,6 +511,7 @@ void execute_arithmetic(struct instruction* instr){
 				//avm_memcellclear(lv);
 				lv->type = number_m;
 				lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+				printf("\n\n\n\n\n%f %f\n\n\n\n\n\n",rv1->data.numVal, rv2->data.numVal );
 
 				printf("after arithmetic lv num is %f\n", lv->data.numVal );
 
@@ -847,11 +849,12 @@ void execute_pusharg	(struct instruction* ins){
 	struct avm_memcell* arg = avm_translate_operand(ins->arg1,&ax);
 	assert(arg);
 	//printf("arg is %d\n", arg->type );
+	stack[top] = *(struct avm_memcell*) malloc(sizeof(struct avm_memcell));
 	avm_assign(&stack[top],arg);
 	++totalActuals;
 	avm_dec_top();
-//	printf("stack after push arg\n" );
-//	printStack();
+	// printf("stack after push arg\n" );
+	// printStack();
 }
 
 void execute_funcenter	(struct instruction* ins){

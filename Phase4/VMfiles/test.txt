@@ -1,7 +1,7 @@
 
 
 
-x = [{"kappa":2}];
 
-
-x.kappa=100;
+function a(x,y,k,l){}
+z=21;
+a(1,"kappa",z++ ,true);
