@@ -799,6 +799,7 @@ call   : call L_PARENTHES elist R_PARENTHES {
 
 				printf(RED "call:: call (elist)\n" RESET);
 
+        //printf("1) make call type %d\n", $3->type);
         $$ = make_call($1, $3);
 
  			}
@@ -812,12 +813,12 @@ call   : call L_PARENTHES elist R_PARENTHES {
                 $2->elist = t ;
 
           }
-
+       //   printf("2) make call type %d\n", $2->elist->type);
           $$ = make_call($1, $2->elist);
 				}
        | L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES {
 		   			printf(RED "call:: (funcdef)(elist)\n" RESET);
-
+//            printf("3) make call type %d\n", $3->type);
           $$ = make_call($2, $5);
 
   			}
@@ -835,6 +836,7 @@ callsuffix : normcall { printf(RED"callsuffix:: (elist)\n"RESET);
 normcall : L_PARENTHES elist R_PARENTHES  {
               $$ = malloc(sizeof(struct call));
               $$->elist = $2;
+//              $$->elist->type = $2->type;
               $$->method = 0;
               $$->name = NULL;
 
@@ -843,8 +845,8 @@ normcall : L_PARENTHES elist R_PARENTHES  {
 
 methodcall : DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES { printf(RED "methodcall\n" RESET);
                 $$ = malloc(sizeof(struct call));
-
                 $$->elist = $4;
+//              $$->elist->type = $2->type;
                 $$->method = 1;
                 $$->name = $2;
            }
@@ -863,8 +865,10 @@ elist : expr multi_exprs {
           newnode->next = NULL;
 
           struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$2);
-          $$ = temp_elem;
 
+
+          $$ = $1;
+          $$->next = $2; ///edw
 		  if (exprflag) {
 			 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -897,12 +901,15 @@ multi_exprs	:  COMMA expr multi_exprs {
 
           struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$3);
           // bazw sto next to epomeno stoixeio
-          $$ = temp_elem; //pernaw to neo expression me to next, sto $$
+
+
+          $$ = $2;
+          $$->next = $3; ///edw
 	}
       |  /*empty*/ { printf(RED "multi exprsessions: empty\n" RESET);
                   args = 0; //mallon eixe ksexastei ayto
                   struct expr* temp_elem = new_expr(var_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
-                  $$ = temp_elem;
+                  $$ = NULL;
       }
       ;
 
