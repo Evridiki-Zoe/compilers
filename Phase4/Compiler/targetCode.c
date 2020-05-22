@@ -693,11 +693,8 @@ printf("edw? \n" );
 
 unsigned searchFunctionTable(struct expr* expr){
 	int i;
-	printf("edooo\n" );
 	for ( i = 0; i < totalUserFuncs; i++) {
-		printf("->>>>> %s %s\n", userFuncs[i]->id, expr->sym->value.func->name);
 		if (userFuncs[i]->scope == expr->sym->value.func->scope && (strcmp(userFuncs[i]->id , expr->sym->value.func->name) ==0 )) {
-			printf("\n\n\n\n\nse vrika pousti %d\n\n\n\n\n\n\n", i );
 			return i;
 		}
 
