@@ -115,15 +115,33 @@ void generate_CALL(struct quad *quad) {
 		quad->taddress = 	instrNo;
 		struct instruction* t=malloc(sizeof(struct instruction));
 		t->opcode =  call_v;
-		unsigned res;
-		if((res=searchFunctionTable(quad->arg1))>=0){
-			printf("%d\n",res );
-			t->arg1 = malloc(sizeof(struct vmarg));
-			t->arg1->type = userfunc_a;
-			t->arg1->val  = res;
-		}else {
-			exit(0);
+		int res;
+
+		if (quad->arg1->type == programfunc_e) {
+
+					res=searchFunctionTable(quad->arg1);
+					if(res>=0){
+						printf("userfunc->>>>%d\n",res );
+						t->arg1 = malloc(sizeof(struct vmarg));
+						t->arg1->type = userfunc_a;
+						t->arg1->val  = res;
+					}else {
+						exit(0);
+					}
+		} else if(quad->arg1->type == libfunc_e){
+					res = searchLibFunc(quad->arg1);
+					if(res>=0){
+						printf("libfunc->>>>%d\n",res );
+						t->arg1 = malloc(sizeof(struct vmarg));
+						t->arg1->type = libfunc_a;
+						t->arg1->val  = res;
+					}else {
+						exit(0);
+					}
+
 		}
+
+
 
 		emitIns(t);
 }
@@ -412,6 +430,7 @@ struct vmarg* make_operand(struct expr* expr){
 			break;
 		}
 		case libfunc_e : {
+			printf("\n\n\n\nirtha\n\n\n\n" );
 			arg->type= libfunc_a;
 			arg->val = add_rval_libfuncs(expr->sym->value.func->name);
 			break;
@@ -702,5 +721,22 @@ unsigned searchFunctionTable(struct expr* expr){
 
 	}
 	return -1;
+
+}
+
+unsigned searchLibFunc(struct expr* expr){
+	int i;
+	for ( i = 0; i < totalNamedLibfuncs; i++) {
+		if (strcmp(namedLibfuncs[i] , expr->sym->value.func->name)==0) {
+			printf("se vrika\n" );
+			return i;
+		}
+	}
+
+	return add_rval_libfuncs(expr->sym->value.func->name);
+
+
+
+
 
 }

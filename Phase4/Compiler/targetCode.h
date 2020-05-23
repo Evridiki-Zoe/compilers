@@ -137,3 +137,4 @@ void read_binfile();
 
 
 unsigned searchFunctionTable(struct expr* exp);
+unsigned searchLibFunc(struct expr* expr);

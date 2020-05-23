@@ -1,11 +1,15 @@
 
 
 
-x = [1,2,3];
-x[1]=100;
 
+x =10;
+function a(){}
+a();
+print (x);
 
-
+cos(x);
+sin(x);
+print(x+1);
 
 /*
 

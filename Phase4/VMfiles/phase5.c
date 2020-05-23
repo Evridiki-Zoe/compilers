@@ -43,6 +43,21 @@ execute_func_t executeFuncs[] = {
 
 };
 
+library_funcs_t executelibFuncs[] = {
+	libfunc_print,
+	libfunc_input,
+	libfunc_objectmemberkeys,
+	libfunc_objecttotalmembers,
+	libfunc_objectcopy,
+	libfunc_totalarguments,
+	libfunc_argument,
+	libfunc_typeof,
+	libfunc_strtonum,
+	libfunc_sqrt,
+	libfunc_cos,
+	libfunc_sin
+};
+
 char* typeStrings[] = {
 		"number",
 		"string",
@@ -96,10 +111,10 @@ struct instruction**  code = NULL;
 
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
-	printf("fgnsdfdsfsd\n" );
-	 printf("type of vmarg %d\n",arg->type );
+
+//	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
-		case global_a:	printf("erxomai gia to %d\n",arg->val ); return &stack[arg->val];
+		case global_a: return &stack[arg->val];
 		case local_a:	return &stack[topsp + arg->val];
 		case formal_a:	return &stack[topsp - AVM_STACKENV_SIZE - 1 - arg->val];
 
@@ -185,15 +200,15 @@ double mod_impl(double x, double y){
 void execute_cycle	(void){
 
 	if (executionFinished) {
-		printf("if \n");
+
 		return;
 	} else if (pc >= AVM_ENDING_PC) {
-		printf("else if \n");
+
 
 			executionFinished = 1;
 			return;
 	} else {
-		printf("else \n");
+
 
 
 		assert(pc < AVM_ENDING_PC);
@@ -211,7 +226,7 @@ void execute_cycle	(void){
 	//	printf("instr type %d\n",instr->opcode);
 		(*executeFuncs[instr->opcode]) (instr);
 		if (pc == oldPC) { // an DEN  htan jump
-			printf("den htan jump\n" );
+
 			++pc;
 		}
 	}
@@ -233,7 +248,7 @@ void avm_memcellclear(struct avm_memcell* m){
 	if (m->type != undef_m) {
 		memclear_func_t f=memclearFuncs[m->type];
 		if (f) {
-			printf("\n\nedoooooo\n\n" );
+
 			(*f)(m);
 			m->type = undef_m;
 
@@ -319,7 +334,7 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 	//avm_memcellclear(lv);
 
 	memcpy(lv,rv,sizeof(struct avm_memcell));
-	printf("\n\n%f %f\n\n",lv->data.numVal , rv->data.numVal );
+
 	if (lv->type == string_m) {
 		lv->data.strVal = strdup(rv->data.strVal);
 	} else if (lv->type == table_m) {
@@ -328,7 +343,7 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 }
 
 void avm_callsaveenviroment(void){
-	//printf("call save env:: totalActuals(%d), pc+1(%d), top+totalActuals+2(%d), topsp(%d)\n",totalActuals, pc+1, (top+totalActuals + 2), topsp );
+	printf("call save env:: totalActuals(%d), pc+1(%d), top+totalActuals+2(%d), topsp(%d)\n",totalActuals, pc+1, (top+totalActuals + 2), topsp );
 	avm_push_envvalue(totalActuals);
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top-totalActuals - 2);
@@ -337,7 +352,7 @@ void avm_callsaveenviroment(void){
 }
 
 void avm_dec_top (void){
-	printf("dec top(%d)\n", top );
+
 	if (top >1024 ) { // na ginei max
 		avm_error("Stack overflow\n");
 		executionFinished=1;
@@ -345,7 +360,6 @@ void avm_dec_top (void){
 }
 
 void avm_push_envvalue (unsigned val) {
-	printf("push env val(%d) at top(%d)\n", val,top);
 	stack[top] = *(struct avm_memcell*)malloc(sizeof(struct avm_memcell));
 	stack[top].type =number_m;
 	stack[top].data.numVal =val;
@@ -355,7 +369,7 @@ void avm_push_envvalue (unsigned val) {
 unsigned avm_get_envvalue(unsigned i){
 	assert(stack[i].type == number_m);
 	unsigned val = (unsigned) stack[i].data.numVal;
-  printf("env val is %d\n", val);
+
 	assert(stack[i].data.numVal == ((double) val)); // wtf?? gia poio logo afou egine molis twra
 	return val;
 }
@@ -363,31 +377,91 @@ unsigned avm_get_envvalue(unsigned i){
 
 
 void avm_calllibfunc(char* id){
-	library_funcs_t f = avm_getlibraryfunc(id);
-	if (!f) {
-		char* msg="";
-		sprintf(msg,"unsupported lib func '%s' called!",id );
-		avm_error(msg);
-		executionFinished = 1;
-	} else {
-		topsp = top;
-		totalActuals = 0;
-		(*f)();
-		if (!executionFinished) {
-			execute_funcexit(NULL);
+	// printf("\n\n\n\nirtha\n" );
+	// library_funcs_t f = avm_getlibraryfunc(id);
+	// printf("dss\n" );
+	// if (!f) {
+	// 	printf("ddddddd %s\n",id );
+	// 	char* msg="";
+	// 	sprintf(msg,"unsupported lib func '%s' called!",id );
+	// 	avm_error(msg);
+	// 	executionFinished = 1;
+	// } else {
+	// 	printf("kasss\n" );
+	// 	topsp = top;
+	// 	totalActuals = 0;
+	// 	(*f)();
+	// 	printf("fdsfsd\n" );
+	// 	if (!executionFinished) {
+	// 		execute_funcexit(NULL);
+	// 	}
+	// }
+	topsp = top;
+	char* name;
+	int i;
+	for ( i = 0; i < totalNamedLibfuncs; i++) {
+
+		if (strcmp(namedLibfuncs[i],id)==0) {
+
+			name = malloc(sizeof(char)*strlen(namedLibfuncs[i]));
+			strcpy(name,namedLibfuncs[i]);
+
+
 		}
 	}
+
+	if (strcmp("print",name)==0) libfunc_print();
+	else if (strcmp("input",name)==0) libfunc_input();
+	else if (strcmp("objectmemberkeys",name)==0) libfunc_objectmemberkeys();
+	else if (strcmp("objecttotalmembers",name)==0) libfunc_objecttotalmembers();
+	else if (strcmp("objectcopy",name)==0) libfunc_objectcopy();
+	else { printf("lathos onoma i den iparki\n" );}
+
+
+	// switch (name) {
+	// 	case "print":	libfunc_print(); break;
+	// 	case "input":	libfunc_input(); break;
+	// 	case "objectmemberkeys": libfunc_objectmemberkeys(); break;
+	// 	case "objecttotalmembers": libfunc_objecttotalmembers(); break;
+	// 	case "objectcopy" :			libfunc_objectcopy(); break;
+	// 	case "totalarguments" : 	libfunc_totalarguments(); break;
+	// 	case "argument"		:		libfunc_argument();	break;
+	// 	case "typeof"		:		libfunc_typeof();	break;
+	// 	case default: printf("eisai vlakas \n" );
+	// }
+
+
+
 }
 
-library_funcs_t avm_getlibraryfunc (char* id){return NULL;} //TODO
+library_funcs_t avm_getlibraryfunc (char* id){
+	// int i;
+	// char* name;
+	//
+	//
+	// for ( i = 0; i < totalNamedLibfuncs; i++) {
+	//
+	// 	if (strcmp(namedLibfuncs[i],id)==0) {
+	//
+	// 		name = malloc(sizeof(char)*strlen(namedLibfuncs[i]));
+	// 		printf("%s %s\n",id , namedLibfuncs[i] );
+	// 		strcpy(name,namedLibfuncs[i]);
+	//
+	//
+	// 	}
+	// }
+	 return 0;
+}
 
 unsigned avm_totalactuals(void) {
-	return avm_get_envvalue(topsp + AVM_NUMACTUALS_OFFSET);
+
+	return avm_get_envvalue(topsp   AVM_NUMACTUALS_OFFSET );
+
 }
 
 struct avm_memcell* avm_getactual(unsigned i){
 	assert(i<avm_totalactuals());
-	return &stack[topsp + AVM_STACKENV_SIZE + 1 + i];
+	return &stack[topsp - AVM_STACKENV_SIZE  - i -1];
 }
 
 struct userfunc* avm_getfuncinfo(unsigned address){
@@ -398,32 +472,36 @@ struct userfunc* avm_getfuncinfo(unsigned address){
 
 
 //------------------libfuncs----------------
-void libfunc_print(void){
+void libfunc_print(){
 	unsigned n = avm_totalactuals();
+
+
 	unsigned i=0;
+
 	for (; i < n; i++) {
+
 		char* s = avm_tostring(avm_getactual(i));
-		puts(s);
+
+		printf("%s",s);
 		free(s);
 	}
+	printf("\n" );
 }
 
-void  libfunc_typeof(){
-
-		unsigned n = avm_totalactuals();
-
-		if(n != 1) avm_error("libfunc typeof:: error ");
-		else{
-
-			//to return a result we set the retval register
-			avm_memcellclear(&retval);
-			retval.type = string_m;
-			retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
-		}
+void libfunc_input(){
 
 }
 
-void avm_registerlibfunc (char* id , library_funcs_t addr){} // TODO
+void libfunc_objectmemberkeys(){
+
+}
+void libfunc_objecttotalmembers(){
+
+}
+
+void libfunc_objectcopy(){
+
+}
 
 void libfunc_totalarguments(void){
 
@@ -441,45 +519,70 @@ void libfunc_totalarguments(void){
 
 }
 
+void libfunc_argument(){
+
+}
+
+void  libfunc_typeof(){
+
+		unsigned n = avm_totalactuals();
+
+		if(n != 1) avm_error("libfunc typeof:: error ");
+		else{
+
+			//to return a result we set the retval register
+			avm_memcellclear(&retval);
+			retval.type = string_m;
+			retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
+		}
+
+}
+
+
+
+
+
 //TODO oles oi lib func theloun allages
 
-double libfunc_strtonum(char *str){
+void libfunc_strtonum(){
 	//todo to nil
-	double tonum = atoi(str);
+//	double tonum = atoi(str);
 	//if(atoi(str) == 0) avm_error("cannot convert string to number! \n" );
 	//else
-	return tonum;
+//	return tonum;
 
 }
 
 //thelei check gia -1, ekei pou kaleitai!!!
-double libfunc_sqrt(double num ){
+void libfunc_sqrt(){
 /*	unsigned n = avm_totalactuals();
 
 	if(n != 1) avm_error("libfunc sqrt: error arguments");
 	else{
 */
-			if(num < 0 ) {
-					avm_error("Cannot calculate sqrt of subzero number!\n");
-					return -1;
-			}
-			return 	sqrt(num);
-//	}
+// 			if(num < 0 ) {
+// 					avm_error("Cannot calculate sqrt of subzero number!\n");
+// 					return -1;
+// 			}
+// 			return 	sqrt(num);
+// //	}
 }
 
-double libfunc_cos(double rad ){
+void libfunc_cos( ){
 	// Converting to radian
-	rad = (rad * 3.14159265) / 180;
-	return cos(rad);
+	//rad = (rad * 3.14159265) / 180;
+//	return cos(rad);
 
 }
 
-double libfunc_sin(double rad){
+void libfunc_sin( ){
 	// Converting to radian
-	rad = (rad * 3.14159265) / 180;
-	return sin(rad);
+//	rad = (rad * 3.14159265) / 180;
+	//return sin(rad);
 
 }
+
+void avm_registerlibfunc (char* id , library_funcs_t addr){} // TODO
 
 //------------------------------------------
 
@@ -489,7 +592,7 @@ void execute_arithmetic(struct instruction* instr){
 	  	struct avm_memcell* lv = avm_translate_operand(instr->result, NULL);
 		struct avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
-		printf("geiaaa , insopcode = %d\n",instr->opcode );
+
 		//assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); ?? slide 25 to exei alliws
 		assert(rv1 && rv2);
 		if( rv1->type != number_m  || rv2->type != number_m ){
@@ -497,15 +600,14 @@ void execute_arithmetic(struct instruction* instr){
 				executionFinished = 1;
 		}
 		else{
-				printf("irtha\n" );
+
 
 				arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_v];
-				printf("code %d\n",instr->opcode );
+
 				//avm_memcellclear(lv);
 				lv->type = number_m;
 				lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
 
-				printf("after arithmetic lv num is %f\n", lv->data.numVal );
 
 		}
 }
@@ -520,7 +622,7 @@ void execute_assign (struct instruction* ins){
 //printf("in assign after translate rv %d\n",  rv->data.bool );
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
 	avm_assign(lv,rv);
-	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
+//	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
 
 }
 
@@ -971,9 +1073,19 @@ char* avm_tostring(struct avm_memcell* cell){
 }
 
 
-char* number_tostring (struct avm_memcell* cell){return NULL;}
-char* string_tostring (struct avm_memcell* cell){return NULL;}
-char* bool_tostring (struct avm_memcell* cell){return NULL;}
+char* number_tostring (struct avm_memcell* cell){
+
+		char* str=malloc(sizeof(char)*6);
+    	sprintf(str,"%.2f",cell->data.numVal );
+		return str;
+	}
+char* string_tostring (struct avm_memcell* cell){return cell->data.strVal;}
+char* bool_tostring (struct avm_memcell* cell){
+	char* str=malloc(sizeof(char)*6);
+	if (cell->data.bool) strcpy(str , "true");
+	else strcpy(str , "false");
+	return str;
+}
 char* table_tostring (struct avm_memcell* cell){return NULL;}
 char* userfunc_tostring (struct avm_memcell* cell){return NULL;}
 char* libfunc_tostring (struct avm_memcell* cell){return NULL;}
