@@ -110,34 +110,35 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 
 			reg->type = number_m;
 			reg->data.numVal = consts_getnumber(arg->val);
-
 			return reg;
 		}
 
 		case string_a:	{
-		//	reg= malloc(sizeof(struct avm_memcell));
+			reg= malloc(sizeof(struct avm_memcell));
 			reg->type = string_m;
 			reg->data.strVal = strdup(consts_getstring(arg->val));
 			return reg;
 		}
 
 		case bool_a:	{
-		//	reg= malloc(sizeof(struct avm_memcell));
+			reg= malloc(sizeof(struct avm_memcell));
 			reg->type = bool_m;
 			reg->data.bool = arg->val;
 			return reg;
 		}
 
-		case nil_a : reg->type = nil_m; return reg;
-
+		case nil_a : {
+			reg= malloc(sizeof(struct avm_memcell));
+			reg->type = nil_m; return reg;
+		}
 		case userfunc_a : {
-		//	reg= malloc(sizeof(struct avm_memcell));
+			reg= malloc(sizeof(struct avm_memcell));
 			reg->type = userfunc_m;
 			reg->data.funcVal = arg->val;
 			return reg;
 		}
 		case libfunc_a : {
-		//	reg= malloc(sizeof(struct avm_memcell));
+	   	reg= malloc(sizeof(struct avm_memcell));
 			reg->type = lib_func_m;
 			reg->data.libfuncVal = libfuncs_getused(arg->val);
 			return reg;
@@ -275,9 +276,12 @@ struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 	struct avm_table* tmp = table;
 	printf("psaxno gia %s\n",index );
 	while (tmp) {
-		if (strcmp(tmp->index,index)==0) {
-			return tmp->data;
-		}
+		if(tmp->index){
+
+			if (strcmp(tmp->index,index)==0) {
+				return tmp->data;
+			}
+	}
 		tmp = tmp->next;
 	}
 	return  NULL;
@@ -292,13 +296,15 @@ void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* dat
 	}
 
 	while (tmp) {
-		printf("geia\n");
-		if (strcmp(tmp->index,index)==0) {
+		printf("geia %s\n", tmp->index);
+		if(tmp->index){
+			if (strcmp(tmp->index,index)==0) {
 
-			tmp->data= data;
-			return;
-		}
-		tmp = tmp->next;
+				tmp->data= data;
+				return;
+			}
+	 }
+	tmp = tmp->next;
 	}
 
 	tmp = malloc(sizeof(struct avm_table));
@@ -1173,7 +1179,7 @@ void read_binfile(){
 
 void printStack(){
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 50; i++) {
 
 		printf("stack[%d]", i);
 		switch (stack[i].type) {
@@ -1187,8 +1193,21 @@ void printStack(){
 			case table_m:{
 				struct avm_table* tmp = stack[i].data.tableVal;
 				while (tmp) {
-					printf("index : %s\t data : %.2f\t",tmp->index,tmp->data->data.numVal );
-					tmp=tmp->next;
+ 					if(tmp->index!=NULL){
+
+					  printf(" index: %s data: ",tmp->index );
+						switch(tmp->data->type){
+							case number_m:	printf("%.2f,\t",tmp->data->data.numVal ); break;
+							case bool_m:    if(tmp->data->data.bool) printf("true,\t"); else printf("false,\t");	break;
+							case string_m:	printf("%s,\t",tmp->data->data.strVal );	break;
+							case lib_func_m: 	printf("%s,\t",tmp->data->data.libfuncVal ); break;
+							case userfunc_m:	printf("%1u,\t",tmp->data->data.funcVal ); break;
+							case nil_m:		printf("nil\t" );break;
+
+						}
+					}
+						tmp=tmp->next;
+
 				}
 				printf("\n" );
 				break;
