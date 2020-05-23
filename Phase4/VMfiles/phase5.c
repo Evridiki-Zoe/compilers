@@ -112,7 +112,7 @@ struct instruction**  code = NULL;
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
 
-//	 printf("type of vmarg %d\n",arg->type );
+	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a: return &stack[arg->val];
 		case local_a:	return &stack[topsp + arg->val];
@@ -125,6 +125,7 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 
 			reg->type = number_m;
 			reg->data.numVal = consts_getnumber(arg->val);
+
 			return reg;
 		}
 
@@ -302,10 +303,13 @@ struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 	return  NULL;
 
 }
+
 void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
 	struct avm_table* tmp=table;
+	printf("%s\n",index );
 	if (table->data->type == undef_m) {
-		tmp->index = index;
+	//	strcpy(tmp->index ,index);
+		tmp->index= index;
 		tmp->data= data;
 		return;
 	}
@@ -323,6 +327,7 @@ void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* dat
 	}
 
 	tmp = malloc(sizeof(struct avm_table));
+	//strcpy(tmp->index ,index);
 	tmp->index = index;
 	tmp->data= data;
 	tmp->next = table->next;
@@ -1305,9 +1310,11 @@ void printStack(){
 			case table_m:{
 				struct avm_table* tmp = stack[i].data.tableVal;
 				while (tmp) {
- 					if(tmp->index!=NULL){
 
-					  printf(" index: %s data: ",tmp->index );
+ 					if(tmp->index){
+
+
+					  //printf(" index: %s data: ",tmp->index );
 						switch(tmp->data->type){
 							case number_m:	printf("%.2f,\t",tmp->data->data.numVal ); break;
 							case bool_m:    if(tmp->data->data.bool) printf("true,\t"); else printf("false,\t");	break;

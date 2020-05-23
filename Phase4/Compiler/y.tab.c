@@ -603,11 +603,11 @@ static const yytype_uint16 yyrline[] =
      717,   721,   722,   725,   729,   734,   744,   750,   753,   759,
      777,   798,   806,   819,   827,   831,   836,   846,   855,   883,
      890,   909,   918,   956,   956,   987,  1004,  1012,  1031,  1040,
-    1050,  1057,  1064,  1064,  1121,  1121,  1124,  1124,  1124,  1140,
-    1143,  1152,  1165,  1166,  1174,  1175,  1176,  1179,  1190,  1203,
-    1203,  1204,  1207,  1207,  1208,  1211,  1211,  1225,  1233,  1252,
-    1260,  1263,  1263,  1263,  1287,  1287,  1287,  1302,  1303,  1307,
-    1326,  1332,  1351
+    1050,  1057,  1064,  1064,  1126,  1126,  1129,  1129,  1129,  1145,
+    1148,  1157,  1170,  1171,  1179,  1180,  1181,  1184,  1195,  1208,
+    1208,  1209,  1212,  1212,  1213,  1216,  1216,  1230,  1238,  1257,
+    1265,  1268,  1268,  1268,  1292,  1292,  1292,  1307,  1308,  1312,
+    1331,  1337,  1356
 };
 #endif
 
@@ -2926,6 +2926,11 @@ yyreduce:
 					   exprflag=0;
 					  patchLists(((yyvsp[(5) - (6)].expression)),(int)QuadNo-2,(int)QuadNo);
 				   }
+				   if ((yyvsp[(2) - (6)].expression)->type!=10) {
+					   (yyvsp[(2) - (6)].expression)->type = 10;
+    				   (yyvsp[(2) - (6)].expression)->strconst = malloc(sizeof(char)*5);
+    				   sprintf((yyvsp[(2) - (6)].expression)->strconst,"%f",(yyvsp[(2) - (6)].expression)->numconst);
+				   }
 
                   result = malloc(2 * sizeof(char));
                   sprintf(result, "_%d", rvalues);
@@ -2961,27 +2966,27 @@ yyreduce:
     break;
 
   case 84:
-#line 1121 "syntax.y"
+#line 1126 "syntax.y"
     { scope++; if(scope > maxScope) maxScope = scope; }
     break;
 
   case 85:
-#line 1121 "syntax.y"
+#line 1126 "syntax.y"
     {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
     break;
 
   case 86:
-#line 1124 "syntax.y"
+#line 1129 "syntax.y"
     {push_SP(tmpoffset); tmpoffset=0; insideFunc++;}
     break;
 
   case 87:
-#line 1124 "syntax.y"
+#line 1129 "syntax.y"
     {  (yyvsp[(2) - (6)].expression)->sym->value.func->totalArgs=tmpoffset; tmpoffset=0; make_not_accessible(scope+1);  push_E(exprflag); exprflag=0; }
     break;
 
   case 88:
-#line 1124 "syntax.y"
+#line 1129 "syntax.y"
     {
 			  make_accessible_again(scope+1);
 			  insideFunc--;
@@ -2999,12 +3004,12 @@ yyreduce:
     break;
 
   case 89:
-#line 1140 "syntax.y"
+#line 1145 "syntax.y"
     { emit(jump,NULL,NULL,NULL,yylineno,999); (yyval.intValue)=QuadNo-1; }
     break;
 
   case 90:
-#line 1143 "syntax.y"
+#line 1148 "syntax.y"
     {
 					tmpnode=malloc(sizeof(struct symbol_table_binding));
 					tmpnode= newFunction( (yyvsp[(1) - (1)].stringValue), yylineno, scope);
@@ -3017,7 +3022,7 @@ yyreduce:
     break;
 
   case 91:
-#line 1152 "syntax.y"
+#line 1157 "syntax.y"
     {
 					 result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++);
 					 tmpnode=malloc(sizeof(struct symbol_table_binding));
@@ -3033,12 +3038,12 @@ yyreduce:
     break;
 
   case 92:
-#line 1165 "syntax.y"
+#line 1170 "syntax.y"
     {		(yyval.expression)=(yyvsp[(1) - (1)].expression); 	}
     break;
 
   case 93:
-#line 1166 "syntax.y"
+#line 1171 "syntax.y"
     {
 				tmpnode=malloc(sizeof(struct symbol_table_binding));
 				tmpnode->value.var = malloc(sizeof(struct variable));
@@ -3050,22 +3055,22 @@ yyreduce:
     break;
 
   case 94:
-#line 1174 "syntax.y"
+#line 1179 "syntax.y"
     { (yyval.expression) = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
     break;
 
   case 95:
-#line 1175 "syntax.y"
+#line 1180 "syntax.y"
     { (yyval.expression) = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
     break;
 
   case 96:
-#line 1176 "syntax.y"
+#line 1181 "syntax.y"
     { (yyval.expression) = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL ); }
     break;
 
   case 97:
-#line 1179 "syntax.y"
+#line 1184 "syntax.y"
     {
      					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ((yyvsp[(1) - (1)].intValue)));
 
@@ -3080,7 +3085,7 @@ yyreduce:
     break;
 
   case 98:
-#line 1190 "syntax.y"
+#line 1195 "syntax.y"
     {
 			            result = malloc(50 * sizeof(char)); sprintf(result,"%f", ((yyvsp[(1) - (1)].floatValue)));
 			            struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
@@ -3095,27 +3100,27 @@ yyreduce:
     break;
 
   case 99:
-#line 1203 "syntax.y"
+#line 1208 "syntax.y"
     { argumentF( (yyvsp[(1) - (1)].stringValue), yylineno, (scope + 1)); }
     break;
 
   case 101:
-#line 1204 "syntax.y"
+#line 1209 "syntax.y"
     { printf(RED "idlist:: empty\n" RESET); }
     break;
 
   case 102:
-#line 1207 "syntax.y"
+#line 1212 "syntax.y"
     { argumentF(((yyvsp[(2) - (2)].stringValue)), yylineno, (scope+1)); }
     break;
 
   case 104:
-#line 1208 "syntax.y"
+#line 1213 "syntax.y"
     { printf(RED "multi_idlists:: empty\n" RESET); }
     break;
 
   case 105:
-#line 1211 "syntax.y"
+#line 1216 "syntax.y"
     {
 
 				emit(jump,NULL,NULL,NULL,yylineno,999); /*Sto telos tis else*/
@@ -3128,7 +3133,7 @@ yyreduce:
     break;
 
   case 106:
-#line 1219 "syntax.y"
+#line 1224 "syntax.y"
     {
 				//Pigenoume sto quad tis jump pano apo tin else kai kanoume patch to label sto quad kato apo tin
    			 	//teleftaia entoli toy stmt tis else !!!
@@ -3138,7 +3143,7 @@ yyreduce:
     break;
 
   case 107:
-#line 1225 "syntax.y"
+#line 1230 "syntax.y"
     {
 			 printf(RED "if(exprsession) stmt\n" RESET);
 			 //Pigenoume sto quad tis jump kai kanoume patch to label sto quad kato apo tin
@@ -3148,7 +3153,7 @@ yyreduce:
     break;
 
   case 108:
-#line 1233 "syntax.y"
+#line 1238 "syntax.y"
     {
 
 				if (exprflag) {
@@ -3170,7 +3175,7 @@ yyreduce:
     break;
 
   case 109:
-#line 1252 "syntax.y"
+#line 1257 "syntax.y"
     {
 					insideLoop--;
 					emit(jump,NULL,NULL,NULL,yylineno,(yyvsp[(1) - (3)].intValue)); //$1 quadno stin arxi tou sxpr tis while
@@ -3181,17 +3186,17 @@ yyreduce:
     break;
 
   case 110:
-#line 1260 "syntax.y"
+#line 1265 "syntax.y"
     {(yyval.intValue)=QuadNo+1;}
     break;
 
   case 111:
-#line 1263 "syntax.y"
+#line 1268 "syntax.y"
     { insideLoop++; }
     break;
 
   case 112:
-#line 1263 "syntax.y"
+#line 1268 "syntax.y"
     {
 
 						if (exprflag) {
@@ -3215,23 +3220,23 @@ yyreduce:
     break;
 
   case 113:
-#line 1283 "syntax.y"
+#line 1288 "syntax.y"
     {(yyval.intValue)=QuadNo-1;
             }
     break;
 
   case 114:
-#line 1287 "syntax.y"
+#line 1292 "syntax.y"
     { insideLoop++; push_E(exprflag); exprflag=0; }
     break;
 
   case 115:
-#line 1287 "syntax.y"
+#line 1292 "syntax.y"
     {exprflag=pop_E();}
     break;
 
   case 116:
-#line 1287 "syntax.y"
+#line 1292 "syntax.y"
     {
 
 				printf(RED "for(elist; expr;elist) stmt\n" RESET);
@@ -3247,17 +3252,17 @@ yyreduce:
     break;
 
   case 117:
-#line 1302 "syntax.y"
+#line 1307 "syntax.y"
     {printf(RED "for_elist:: \n" RESET); (yyval.intValue)=QuadNo;  }
     break;
 
   case 118:
-#line 1303 "syntax.y"
+#line 1308 "syntax.y"
     { printf(RED "for_elist:: empty\n" RESET); }
     break;
 
   case 119:
-#line 1307 "syntax.y"
+#line 1312 "syntax.y"
     {
 						if (exprflag) {
 						   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
@@ -3279,7 +3284,7 @@ yyreduce:
     break;
 
   case 120:
-#line 1326 "syntax.y"
+#line 1331 "syntax.y"
     {
 
                   emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
@@ -3288,7 +3293,7 @@ yyreduce:
     break;
 
   case 121:
-#line 1332 "syntax.y"
+#line 1337 "syntax.y"
     {
 				if (exprflag) {
 
@@ -3311,7 +3316,7 @@ yyreduce:
     break;
 
   case 122:
-#line 1351 "syntax.y"
+#line 1356 "syntax.y"
     {
                         printf(RED "return; \n" RESET);
                         emit(ret,NULL,NULL,NULL,yylineno,0);
@@ -3321,7 +3326,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 3325 "y.tab.c"
+#line 3330 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3535,6 +3540,6 @@ yyreturn:
 }
 
 
-#line 1358 "syntax.y"
+#line 1363 "syntax.y"
 
 

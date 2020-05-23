@@ -1,12 +1,12 @@
 
 
-x=1;
-
-function fack(n){
-	if(n==1) return 1;
-	else return  n* fack(n-1);
 
 
-}
-x =fack(4);
 
+
+
+
+
+b = [1,111,"1111"];
+
+a = [{0:222},{32:2222},{"df":"222"}];
