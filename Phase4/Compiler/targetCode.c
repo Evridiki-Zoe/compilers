@@ -430,7 +430,6 @@ struct vmarg* make_operand(struct expr* expr){
 			break;
 		}
 		case libfunc_e : {
-			printf("\n\n\n\nirtha\n\n\n\n" );
 			arg->type= libfunc_a;
 			arg->val = add_rval_libfuncs(expr->sym->value.func->name);
 			break;

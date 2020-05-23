@@ -753,7 +753,6 @@ member : lvalue DOT IDENTIFIER {
          | lvalue L_SBRACKET expr R_SBRACKET {
                 arrayFlag = 1;
                 printf(RED"member:: lvalue[expression]\n"RESET);
-
                 $$ = member_item($1, $3->sym->value.var->name);
          }
          | call DOT IDENTIFIER {
@@ -925,12 +924,12 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                   emit(tablecreate,NULL,NULL,tmp_table,yylineno,0);
 
                   struct expr* tmp = $2;
-                  int i = 0;
+                  double i = 0;
 
                   while(tmp!= NULL) {
-                        printf("table %d %s", i, tmp->sym->value.var->name);
+                        printf("table %f %s", i, tmp->sym->value.var->name);
                         char* name =malloc(5*sizeof(char));
-                        sprintf(name,"%d",i);
+                        sprintf(name,"%f",(double)i);
                         //to index:: ena symbol (oxi sto hash), me onoma to index tou stoixeiou
                       	struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
                         tmp_index->value.var = malloc(sizeof(struct variable));
@@ -1087,7 +1086,7 @@ indexedelem	  : L_CBRACKET expr  {
 				   if ($2->type!=10) {
 					   $2->type = 10;
     				   $2->strconst = malloc(sizeof(char)*5);
-    				   sprintf($2->strconst,"%.0f",$2->numconst);
+    				   sprintf($2->strconst,"%f",$2->numconst);
 				   }
 
                   result = malloc(2 * sizeof(char));
@@ -1182,13 +1181,14 @@ const    : number {		$$=$1; 	}
          ;
 
 number   : INTEGER 	{
-     					result = malloc(50 * sizeof(char)); sprintf(result,"%0.f", ($1));
+     					result = malloc(50 * sizeof(char)); sprintf(result,"%f", ($1));
 
     					struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
     					newnode->value.var = malloc(sizeof(struct variable));
     					newnode->value.var->name = malloc((strlen(result) + 1) * sizeof(char));
     					strcpy(newnode->value.var->name, result);
     					$$ = (struct expr *)malloc(sizeof(struct expr));
+
     					$$ = new_expr(const_num_e,newnode,NULL,($1),"",'\0',NULL);
 
 					}
