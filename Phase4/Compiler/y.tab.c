@@ -2929,7 +2929,7 @@ yyreduce:
 				   if ((yyvsp[(2) - (6)].expression)->type!=10) {
 					   (yyvsp[(2) - (6)].expression)->type = 10;
     				   (yyvsp[(2) - (6)].expression)->strconst = malloc(sizeof(char)*5);
-    				   sprintf((yyvsp[(2) - (6)].expression)->strconst,"%f",(yyvsp[(2) - (6)].expression)->numconst);
+    				   sprintf((yyvsp[(2) - (6)].expression)->strconst,"%.0f",(yyvsp[(2) - (6)].expression)->numconst);
 				   }
 
                   result = malloc(2 * sizeof(char));

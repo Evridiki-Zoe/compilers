@@ -1087,7 +1087,7 @@ indexedelem	  : L_CBRACKET expr  {
 				   if ($2->type!=10) {
 					   $2->type = 10;
     				   $2->strconst = malloc(sizeof(char)*5);
-    				   sprintf($2->strconst,"%f",$2->numconst);
+    				   sprintf($2->strconst,"%.0f",$2->numconst);
 				   }
 
                   result = malloc(2 * sizeof(char));
