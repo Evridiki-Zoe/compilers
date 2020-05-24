@@ -426,7 +426,11 @@ void avm_calllibfunc(char* id){
 	else if (strcmp("objectmemberkeys",name)==0) libfunc_objectmemberkeys();
 	else if (strcmp("objecttotalmembers",name)==0) libfunc_objecttotalmembers();
 	else if (strcmp("objectcopy",name)==0) libfunc_objectcopy();
+	else if (strcmp("sqrt",name)==0)libfunc_sqrt();
+	else if (strcmp("cos",name)==0) libfunc_cos();
+	else if (strcmp("sin",name)==0)libfunc_sin();
 	else { printf("lathos onoma i den iparki\n" );}
+
 
 // function exit, clear cells
 //wtf
@@ -565,30 +569,83 @@ void libfunc_strtonum(){
 
 //thelei check gia -1, ekei pou kaleitai!!!
 void libfunc_sqrt(){
-/*	unsigned n = avm_totalactuals();
+	double num;
+	unsigned n = avm_totalactuals();
 
 	if(n != 1) avm_error("libfunc sqrt: error arguments");
 	else{
-*/
-// 			if(num < 0 ) {
-// 					avm_error("Cannot calculate sqrt of subzero number!\n");
-// 					return -1;
-// 			}
-// 			return 	sqrt(num);
-// //	}
+		if(avm_getactual(0)->type == 0){
+				printf("sqrt lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
+				num = avm_getactual(0)->data.numVal;
+		}
+		else if(avm_getactual(0)->type == 3){
+			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			printf("sqrt lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+			num = tmp->data->data.numVal;
+		}
+		else{
+			avm_error("libfunc sqrt: error: not valid variable type!");
+			return;
+		}
+		if(num < 0 ) {
+				avm_error("Cannot calculate sqrt of subzero number!\n");
+				return;
+		}
+		printf("sqrt: %f\n", sqrt(num));
+	}
 }
 
 void libfunc_cos( ){
-	// Converting to radian
-	//rad = (rad * 3.14159265) / 180;
-//	return cos(rad);
+	double rad;
+	unsigned n = avm_totalactuals();
 
+	if(n != 1) avm_error("libfunc cos: error arguments");
+	else{
+		if(avm_getactual(0)->type == 0){
+				printf("cos lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
+				rad = avm_getactual(0)->data.numVal;
+		}
+		else if(avm_getactual(0)->type == 3){
+			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			printf("cos lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+			rad = tmp->data->data.numVal;
+		}
+		else{
+			avm_error("libfunc cos: error: not valid variable type!");
+			return;
+		}
+
+	// Converting to radian
+	  rad = (rad * 3.14159265) / 180;
+		printf("cos: %f\n", cos(rad));
+	}
 }
 
 void libfunc_sin( ){
+
+	double rad;
+	unsigned n = avm_totalactuals();
+
+	if(n != 1) avm_error("libfunc sin: error arguments");
+	else{
+		if(avm_getactual(0)->type == 0){
+				printf("sin lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
+				rad = avm_getactual(0)->data.numVal;
+		}
+		else if(avm_getactual(0)->type == 3){ //table
+			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			printf("sin lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+			rad = tmp->data->data.numVal;
+		}
+		else{
+			avm_error("libfunc sin: error: not valid variable type!");
+			return;
+		}
+
 	// Converting to radian
-//	rad = (rad * 3.14159265) / 180;
-	//return sin(rad);
+		rad = (rad * 3.14159265) / 180;
+		printf("sin: %f\n", sin(rad));
+	}
 
 }
 
