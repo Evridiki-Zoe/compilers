@@ -259,6 +259,7 @@ void libfunc_sin();
 
 void read_binfile();
 void printStack();
+void print_tables(struct avm_memcell);
 //-----------------tables retrieve----
 double* 	numConsts; //rvalue numbers
 unsigned	totalNumConsts; //total number of  numbers

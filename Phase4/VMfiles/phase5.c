@@ -1307,26 +1307,7 @@ void printStack(){
 			case undef_m:	printf("undef\n" ); break;
 			case nil_m:		printf("nilllllll\n" );break;
 			case table_m:{
-				struct avm_table* tmp = stack[i].data.tableVal;
-				while (tmp) {
-
- 					if(tmp->index){
-
-
-					  //printf(" index: %s data: ",tmp->index );
-						switch(tmp->data->type){
-							case number_m:	printf("%.2f,\t",tmp->data->data.numVal ); break;
-							case bool_m:    if(tmp->data->data.bool) printf("true,\t"); else printf("false,\t");	break;
-							case string_m:	printf("%s,\t",tmp->data->data.strVal );	break;
-							case lib_func_m: 	printf("%s,\t",tmp->data->data.libfuncVal ); break;
-							case userfunc_m:	printf("%1u,\t",tmp->data->data.funcVal ); break;
-							case nil_m:		printf("nil\t" );break;
-
-						}
-					}
-						tmp=tmp->next;
-
-				}
+				print_tables(stack[i]);
 				printf("\n" );
 				break;
 			}
@@ -1335,6 +1316,26 @@ void printStack(){
 	}
 }
 
+
+void print_tables(struct avm_memcell stack){
+	struct avm_table* tmp = stack.data.tableVal;
+	while (tmp) {
+		if(tmp->index){
+			//printf(" index: %s data: ",tmp->index );
+			switch(tmp->data->type){
+				case number_m:	printf("%.2f,\t",tmp->data->data.numVal ); break;
+				case bool_m:    if(tmp->data->data.bool) printf("true,\t"); else printf("false,\t");	break;
+				case string_m:	printf("%s,\t",tmp->data->data.strVal );	break;
+				case lib_func_m: 	printf("%s,\t",tmp->data->data.libfuncVal ); break;
+				case userfunc_m:	printf("%1u,\t",tmp->data->data.funcVal ); break;
+				case nil_m:		printf("nil\t" );break;
+				case table_m:	print_tables(*tmp->data); break;
+			}
+		}
+		tmp=tmp->next;
+
+	}
+}
 void add_consts_string(char * str){
 		stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 		strcpy(stringConsts[totalStringConsts] , str);
