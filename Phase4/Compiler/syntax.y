@@ -927,6 +927,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                   double i = 0;
 
                   while(tmp!= NULL) {
+                    if(tmp->sym ){
                         printf("table %f %s", i, tmp->sym->value.var->name);
                         char* name =malloc(5*sizeof(char));
                         sprintf(name,"%f",(double)i);
@@ -946,6 +947,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                         struct expr* temp_elem = new_expr(var_e,tmp_symbol,NULL,0,"",'\0',NULL);
 
                         emit(table_setelem,tmp_expr_index ,tmp , temp_elem,yylineno,0);
+                      }
                         tmp = tmp->next;
                         i++;
                   }
