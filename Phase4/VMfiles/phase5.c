@@ -416,9 +416,6 @@ void avm_calllibfunc(char* id){
 		if (strcmp(namedLibfuncs[i],id)==0) {
 			name = malloc(sizeof(char)*strlen(namedLibfuncs[i]));
 			strcpy(name,namedLibfuncs[i]);
-			printf("\neeee name is %s\n",name );
-
-
 		}
 	}
 
@@ -430,6 +427,9 @@ void avm_calllibfunc(char* id){
 	else if (strcmp("sqrt",name)==0)libfunc_sqrt();
 	else if (strcmp("cos",name)==0) libfunc_cos();
 	else if (strcmp("sin",name)==0)libfunc_sin();
+	else if (strcmp("strtonum",name)==0) libfunc_strtonum();
+	else if (strcmp("typeof",name)==0) libfunc_typeof();
+	else if (strcmp("totalarguments",name)==0)libfunc_totalarguments();
 	else { printf("lathos onoma i den iparki\n" );}
 
 
@@ -519,7 +519,7 @@ void libfunc_objectcopy(){
 }
 
 void libfunc_totalarguments(void){
-
+//TODO ? an kalesoume thn function me ligotera arguments apo osa exei h dhlwsh poia #args prepei na epistrepsei?
 	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
 	avm_memcellclear(&retval);
 
@@ -529,42 +529,80 @@ void libfunc_totalarguments(void){
 	}else {
 		retval.type = number_m;
 		retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
+		printf("totalarguments: %f\n",	retval.data.numVal );
 	}
 
 
 }
 
 void libfunc_argument(){
+	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
+	avm_memcellclear(&retval);
+
+	if (!p_topsp) {
+		avm_error("'libfunc arguments' called outside a function!");
+		retval.type=nil_m;
+	}else {
+		unsigned n = avm_totalactuals();
+		double num;
+
+		if(n != 1) avm_error("libfunc arguments:: error arguments");
+		else{
+				if(avm_getactual(0)->type == 0){ //num type
+						num = avm_getactual(0)->data.numVal;
+						retval.type = number_m;
+						//??? todo na pairnw to i argument mias sunarthshs
+						//retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
+						//printf("arguments: %f\n",	retval.data.strVal );
+				}
+				else{
+					avm_error("libfunc arguments:: argument must be of type number");
+				}
+			}
+	}
 
 }
 
 void  libfunc_typeof(){
-
+// den eimai sigourh gia to pws ginetai h klhsh typeof me functions
 		unsigned n = avm_totalactuals();
 
-		if(n != 1) avm_error("libfunc typeof:: error ");
+		if(n != 1) avm_error("libfunc typeof:: error arguments");
 		else{
 
 			//to return a result we set the retval register
 			avm_memcellclear(&retval);
 			retval.type = string_m;
 			retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
+			printf("typeof: %s\n", retval.data.strVal);
 		}
 
 }
 
-
-
-
-
 //TODO oles oi lib func theloun allages
 
 void libfunc_strtonum(){
-	//todo to nil
-//	double tonum = atoi(str);
-	//if(atoi(str) == 0) avm_error("cannot convert string to number! \n" );
-	//else
-//	return tonum;
+	double tonum;
+	char * str;
+	unsigned n = avm_totalactuals();
+
+	if(n != 1) avm_error("libfunc strtonum: error arguments");
+	else{
+		if(avm_getactual(0)->type == 1){ //str type
+				printf("str to  num lib func:(%d) (%s)\n",n, avm_getactual(0)->data.strVal );
+				str = avm_getactual(0)->data.strVal;
+		}
+		else{ //todo ??
+			// den kserw an px mas dinoun ena number an thelei na to epistrefoume opws einai
+			avm_error("libfunc strtonum: error: not valid variable type!");
+			return;
+		}
+	}
+	tonum = atoi(str);
+	printf("strtonum: %f\n", tonum);
+
+	//if(atoi(str) == 0) avm_error("cannot convert string to number! \n" ); //????? gamw
+	//todo to nil !!!
 
 }
 
@@ -1394,6 +1432,7 @@ void print_tables(struct avm_memcell stack){
 
 	}
 }
+
 void add_consts_string(char * str){
 		stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 		strcpy(stringConsts[totalStringConsts] , str);
