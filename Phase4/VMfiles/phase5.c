@@ -279,7 +279,7 @@ struct avm_table* avm_tablenew(){
 	printf("dsfndsoifnsd\n" );
 	tmp->data= malloc(sizeof(struct avm_memcell));
 	tmp->data->type=undef_m;
-	tmp->index = malloc(sizeof(struct avm_memcell));
+//	tmp->index = malloc(sizeof(struct avm_memcell));
 	tmp->index=NULL;
 	tmp->next=NULL;
 	printf("eeeee\n" );
@@ -306,32 +306,32 @@ struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 
 void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
 	struct avm_table* tmp=table;
-	printf("%s\n",index );
-	if (table->data->type == undef_m) {
-	//	strcpy(tmp->index ,index);
-		tmp->index= index;
-		tmp->data= data;
-		return;
-	}
-
-	while (tmp) {
-		printf("geia %s\n", tmp->index);
-		if(tmp->index){
-			if (strcmp(tmp->index,index)==0) {
-
-				tmp->data= data;
-				return;
-			}
-	 }
-	tmp = tmp->next;
-	}
-
-	tmp = malloc(sizeof(struct avm_table));
-	//strcpy(tmp->index ,index);
-	tmp->index = index;
+if (table->data->type == undef_m) {
+	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
+//	strcpy(tmp->index ,index);
+	tmp->index= index;
 	tmp->data= data;
-	tmp->next = table->next;
-	table->next = tmp;
+	return;
+}
+
+while (tmp) {
+	printf("geia %s\n", tmp->index);
+	if(tmp->index){
+		if (strcmp(tmp->index,index)==0) {
+			printf("hdh uparxon table index(%s) set elem %f\n", index, data->data.numVal);
+			tmp->data= data;
+			return;
+		}
+ }
+tmp = tmp->next;
+}
+printf("den uparxei to vazw sto telos (%s,%f)\n", index, data->data.numVal);
+tmp = malloc(sizeof(struct avm_table));
+//strcpy(tmp->index ,index);
+tmp->index = index;
+tmp->data= data;
+tmp->next = table->next;
+table->next = tmp;
 }
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
@@ -413,9 +413,9 @@ void avm_calllibfunc(char* id){
 	for ( i = 0; i < totalNamedLibfuncs; i++) {
 
 		if (strcmp(namedLibfuncs[i],id)==0) {
-
 			name = malloc(sizeof(char)*strlen(namedLibfuncs[i]));
 			strcpy(name,namedLibfuncs[i]);
+			printf("\neeee name is %s\n",name );
 
 
 		}
@@ -428,21 +428,19 @@ void avm_calllibfunc(char* id){
 	else if (strcmp("objectcopy",name)==0) libfunc_objectcopy();
 	else { printf("lathos onoma i den iparki\n" );}
 
+// function exit, clear cells
+//wtf
+/*	unsigned oldTop = top;
 
-	// switch (name) {
-	// 	case "print":	libfunc_print(); break;
-	// 	case "input":	libfunc_input(); break;
-	// 	case "objectmemberkeys": libfunc_objectmemberkeys(); break;
-	// 	case "objecttotalmembers": libfunc_objecttotalmembers(); break;
-	// 	case "objectcopy" :			libfunc_objectcopy(); break;
-	// 	case "totalarguments" : 	libfunc_totalarguments(); break;
-	// 	case "argument"		:		libfunc_argument();	break;
-	// 	case "typeof"		:		libfunc_typeof();	break;
-	// 	case default: printf("eisai vlakas \n" );
-	// }
+	top = avm_get_envvalue	(topsp  AVM_SAVEDTOP_OFFSET);
+	pc 	= avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
+	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
+	//printf("\n\n\n\n%d %d %d \n\n\n",top,pc,topsp );
 
-
-
+	while (--oldTop >= top) {
+		avm_memcellclear(&stack[oldTop]);
+	}
+*/
 }
 
 library_funcs_t avm_getlibraryfunc (char* id){
@@ -493,10 +491,11 @@ void libfunc_print(){
 
 		char* s = avm_tostring(avm_getactual(i));
 
-		printf("%s",s);
+		printf("PRINT: %s ",s);
 		free(s);
 	}
 	printf("\n" );
+
 }
 
 void libfunc_input(){
@@ -1056,7 +1055,7 @@ void execute_tablesetelem	(struct instruction* ins){
 		//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
 		assert(i && c);
 
-		if(t->type != table_m)		avm_error("illegal use of variable as a table! \n");
+		if(t->type != table_m)		avm_error("illegal use of variable as a table in setelem! \n");
 		else {
 			avm_setelem(t->data.tableVal, i->data.strVal, c); //todo
 		}
