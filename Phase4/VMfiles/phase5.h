@@ -241,16 +241,25 @@ void avm_calllibfunc(char* name);
 
 unsigned char avm_tobool(struct avm_memcell* m);
 
-void  libfunc_typeof();
-
+void libfunc_print();
+void libfunc_input();
+void libfunc_objectmemberkeys();
+void libfunc_objecttotalmembers();
+void libfunc_objectcopy();
 void libfunc_totalarguments(void);
-double libfunc_strtonum(char *str);
-double libfunc_sqrt(double rad);
-double libfunc_cos(double rad);
-double libfunc_sin(double rad);
+void libfunc_argument();
+void  libfunc_typeof();
+void libfunc_strtonum();
+void libfunc_sqrt();
+void libfunc_cos();
+void libfunc_sin();
+
+
+
 
 void read_binfile();
 void printStack();
+void print_tables(struct avm_memcell);
 //-----------------tables retrieve----
 double* 	numConsts; //rvalue numbers
 unsigned	totalNumConsts; //total number of  numbers
