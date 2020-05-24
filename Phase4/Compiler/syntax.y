@@ -1085,7 +1085,14 @@ indexedelem	  : L_CBRACKET expr  {
 					   exprflag=0;
 					  patchLists(($5),(int)QuadNo-2,(int)QuadNo);
 				   }
-				   if ($2->type!=10) {
+
+				   if ($2->type==9 || $2->type==5) {
+					   $2->type = 10;
+					   $2->strconst = malloc(sizeof(char)*5);
+					   if ($2->boolconst) strcpy($2->strconst , "true");
+					   else  strcpy($2->strconst , "false");
+
+				   }else  if ($2->type!=10) {
 					   $2->type = 10;
     				   $2->strconst = malloc(sizeof(char)*5);
     				   sprintf($2->strconst,"%f",$2->numconst);

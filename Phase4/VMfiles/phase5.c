@@ -400,13 +400,14 @@ void avm_calllibfunc(char* id){
 	// } else {
 	// 	printf("kasss\n" );
 	// 	topsp = top;
-	// 	totalActuals = 0;
+	//
 	// 	(*f)();
 	// 	printf("fdsfsd\n" );
 	// 	if (!executionFinished) {
 	// 		execute_funcexit(NULL);
 	// 	}
 	// }
+	totalActuals = 0;
 	topsp = top;
 	char* name;
 	int i;
