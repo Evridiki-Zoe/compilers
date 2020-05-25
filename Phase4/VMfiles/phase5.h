@@ -214,7 +214,7 @@ void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* dat
 struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index );
 
 void avm_warning(char* msg );
-
+void avm_newnode(struct avm_table** head, char* index, char* data);
 
 
 typedef void (*library_funcs_t)(void);

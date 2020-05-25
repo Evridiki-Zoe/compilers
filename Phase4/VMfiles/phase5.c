@@ -474,18 +474,157 @@ void libfunc_print(){
 }
 
 void libfunc_input(){
+	avm_memcellclear(&retval);
+	char* str = malloc(sizeof(char)*100);
 
+	printf( "Enter a value :");
+	fgets( str, 100, stdin );
+	strtok(str, "\n"); //gia na afairesw ton \n xarakthra pou bazei sto telos h fgets
+
+	printf( "\nYou entered: ");
+	puts( str );
+
+	if(strcmp(str, "true") == 0){
+		retval.type = bool_m;
+		retval.data.bool = 1;
+		printf("input: type: %d, value: true\n",retval.type);
+
+	}
+	else if(strcmp(str, "false") == 0 ){
+		retval.type = bool_m;
+		retval.data.bool = 0;
+		printf("input: type: %d, value: false\n",retval.type);
+	}
+	else if(strcmp(str, "nil") == 0 ){
+		retval.type = nil_m;
+		retval.data.strVal = "nil";
+		printf("input: type: %d, value: nil\n",retval.type);
+	}
+	else if(strncmp(str,"\"", 1) == 0 && str[strlen(str-1)] == '\"'){
+// 		printf("prwto %c, teleutaio %c\n",str[0], str[strlen(str-1)] );
+		printf("its a string\n" );
+		retval.type = string_m;
+		retval.data.strVal = str;
+		printf("input: type: %d, value: %s\n",retval.type, retval.data.strVal );
+	}
+	else if( atoi(str) != 0 ){
+		printf("number \n" );
+		retval.type = number_m;
+		retval.data.numVal = atoi(str);
+		printf("input: type: %d, value %f\n",retval.type, retval.data.numVal );
+	}
+	else{
+		printf("else\n" );
+
+	}
+
+}
+
+struct avm_table* table_objectkeys = NULL;
+
+void avm_newnode(struct avm_table** head, char* index, char* data){
+	struct avm_table* newnode = NULL, *last = NULL;
+	if(*head == NULL){
+		*head = malloc(sizeof(struct avm_table));
+		(*head)->index = index;
+		(*head)->data->data.strVal = malloc(100* sizeof(char));
+		(*head)->data->data.strVal= data;
+		(*head)->next = NULL;
+		return;
+	}
+	else{
+			newnode = malloc(sizeof(struct avm_table));
+			newnode->index = index;
+			newnode->data->data.strVal = malloc(100* sizeof(char));
+			newnode->data->data.strVal= data;
+			newnode->next = NULL;
+	}
+	last = *head;
+	while (last->next !=NULL) {
+		  printf("while %s\n",last->data->data.strVal );
+			last = last->next;
+	}
+	last->next = newnode;
+	return;
 }
 
 void libfunc_objectmemberkeys(){
 
-}
-void libfunc_objecttotalmembers(){
+	unsigned n = avm_totalactuals();
 
+	if(n != 1) avm_error("libfunc objectmemberkeys: error arguments");
+	else{
+		if(avm_getactual(0)->type == 3){ //table
+			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			int counter = 0;
+			while (tmp) {
+					if(tmp->index){
+						char* index = malloc(5*sizeof(char));
+						sprintf(index,"%d",counter);
+   					printf("objectmemberkeys lib func:(%d) (%s)\n",n, tmp->index);
+					  avm_newnode(&table_objectkeys, index,tmp->index );
+						counter++;
+					}
+				tmp = tmp->next;
+			}
+			while (table_objectkeys) {
+					printf("test new table: %s \n",table_objectkeys->data->data.strVal );
+					table_objectkeys = table_objectkeys->next;
+			}
+			printf("objectmemberkeys done!\n");
+		}
+		else{
+			avm_error("libfunc objectmemberkeys: error: not valid variable type!");
+			return;
+		}
+	}
+
+}
+
+void libfunc_objecttotalmembers(){
+	unsigned n = avm_totalactuals();
+
+	if(n != 1) avm_error("libfunc objecttotalmembers: error arguments");
+	else{
+		if(avm_getactual(0)->type == 3){ //table
+			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			int counter = 0;
+
+			while (tmp) {
+				if(tmp->index)	counter++;
+				tmp = tmp->next;
+
+			}
+			printf("objecttotalmembers: %d!\n", counter);
+		}
+		else{
+			avm_error("libfunc objecttotalmembers: error: not valid variable type!");
+			return;
+		}
+	}
 }
 
 void libfunc_objectcopy(){
+	unsigned n = avm_totalactuals();
 
+	if(n != 1) avm_error("libfunc objectcopy: error arguments");
+	else{
+		if(avm_getactual(0)->type == 3){ //table
+			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+
+			//gia test oti mphkan swsta
+			/*while (tmp) {
+				printf("objectcopy lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+				tmp = tmp->next;
+
+			}*/
+			printf("objectcopy done!\n");
+		}
+		else{
+			avm_error("libfunc objectcopy: error: not valid variable type!");
+			return;
+		}
+	}
 }
 
 void libfunc_totalarguments(void){
@@ -508,7 +647,7 @@ void libfunc_totalarguments(void){
 void libfunc_argument(){
 	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
 	avm_memcellclear(&retval);
-
+	int i;
 	if (!p_topsp) {
 		avm_error("'libfunc arguments' called outside a function!");
 		retval.type=nil_m;
@@ -519,11 +658,19 @@ void libfunc_argument(){
 		if(n != 1) avm_error("libfunc arguments:: error arguments");
 		else{
 				if(avm_getactual(0)->type == 0){ //num type
-						num = avm_getactual(0)->data.numVal;
+						i = avm_getactual(0)->data.numVal;
 						retval.type = number_m;
-						//??? todo na pairnw to i argument mias sunarthshs
-						//retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
-						//printf("arguments: %f\n",	retval.data.strVal );
+						double totalArgs = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
+						if(i < 0 || i > totalArgs) {
+						  	avm_error("number of argument you gave is bigger than total arguments of function\n");
+						}
+						else {
+							//retval.data.numVal = avm_get_envvalue(p_topsp - AVM_NUMACTUALS_OFFSET - i);
+						// 	printf("argument:: get %d at stack %d \n",i ,(p_topsp - AVM_NUMACTUALS_OFFSET - i));
+						//TODO den kserw se poia thesh
+						//???  na pairnw to i argument mias sunarthshs
+
+						}
 				}
 				else{
 					avm_error("libfunc arguments:: argument must be of type number");
@@ -1031,8 +1178,8 @@ void execute_pusharg	(struct instruction* ins){
 	avm_assign(&stack[top],arg);
 	++totalActuals;
 	avm_dec_top();
-	// printf("stack after push arg\n" );
-	// printStack();
+	 printf("stack after push arg\n" );
+	 printStack();
 }
 
 void execute_funcenter	(struct instruction* ins){
