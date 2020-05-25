@@ -388,64 +388,34 @@ unsigned avm_get_envvalue(unsigned i){
 
 
 void avm_calllibfunc(char* id){
-	// printf("\n\n\n\nirtha\n" );
-	// library_funcs_t f = avm_getlibraryfunc(id);
-	// printf("dss\n" );
-	// if (!f) {
-	// 	printf("ddddddd %s\n",id );
-	// 	char* msg="";
-	// 	sprintf(msg,"unsupported lib func '%s' called!",id );
-	// 	avm_error(msg);
-	// 	executionFinished = 1;
-	// } else {
-	// 	printf("kasss\n" );
-	// 	topsp = top;
-	//
-	// 	(*f)();
-	// 	printf("fdsfsd\n" );
-	// 	if (!executionFinished) {
-	// 		execute_funcexit(NULL);
-	// 	}
-	// }
 	totalActuals = 0;
 	topsp = top;
-	char* name;
-	int i;
-	for ( i = 0; i < totalNamedLibfuncs; i++) {
 
-		if (strcmp(namedLibfuncs[i],id)==0) {
-			name = malloc(sizeof(char)*strlen(namedLibfuncs[i]));
-			strcpy(name,namedLibfuncs[i]);
-		}
-	}
 
-	if (strcmp("print",name)==0) libfunc_print();
-	else if (strcmp("input",name)==0) libfunc_input();
-	else if (strcmp("objectmemberkeys",name)==0) libfunc_objectmemberkeys();
-	else if (strcmp("objecttotalmembers",name)==0) libfunc_objecttotalmembers();
-	else if (strcmp("objectcopy",name)==0) libfunc_objectcopy();
-	else if (strcmp("sqrt",name)==0)libfunc_sqrt();
-	else if (strcmp("cos",name)==0) libfunc_cos();
-	else if (strcmp("sin",name)==0)libfunc_sin();
-	else if (strcmp("strtonum",name)==0) libfunc_strtonum();
-	else if (strcmp("typeof",name)==0) libfunc_typeof();
-	else if (strcmp("totalarguments",name)==0)libfunc_totalarguments();
+	if (strcmp("print",id)==0) libfunc_print();
+	else if (strcmp("input",id)==0) libfunc_input();
+	else if (strcmp("objectmemberkeys",id)==0) libfunc_objectmemberkeys();
+	else if (strcmp("objecttotalmembers",id)==0) libfunc_objecttotalmembers();
+	else if (strcmp("objectcopy",id)==0) libfunc_objectcopy();
+	else if (strcmp("sqrt",id)==0)libfunc_sqrt();
+	else if (strcmp("cos",id)==0) libfunc_cos();
+	else if (strcmp("sin",id)==0)libfunc_sin();
+	else if (strcmp("strtonum",id)==0) libfunc_strtonum();
+	else if (strcmp("typeof",id)==0) libfunc_typeof();
+	else if (strcmp("totalarguments",id)==0)libfunc_totalarguments();
 	else { printf("lathos onoma i den iparki\n" );}
 
-
-// function exit, clear cells
-//wtf
-/*	unsigned oldTop = top;
+	unsigned oldTop = top;
 
 	top = avm_get_envvalue	(topsp  AVM_SAVEDTOP_OFFSET);
 	pc 	= avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
 	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
-	//printf("\n\n\n\n%d %d %d \n\n\n",top,pc,topsp );
+
 
 	while (--oldTop >= top) {
 		avm_memcellclear(&stack[oldTop]);
 	}
-*/
+
 }
 
 library_funcs_t avm_getlibraryfunc (char* id){
@@ -1029,20 +999,25 @@ void execute_call		(struct instruction* ins){
 					  //an den einai orismenh h sunarthsh prepei na petaksei error
 					  printf("Undefined user function %s!\n", userFuncs[func->data.funcVal]->id);
 						executionFinished =1;
+						exit(0);
 					}
 //					assert(code[pc]->opcode == funcenter_v);
 
 				break;
 			}
-			case string_m:		avm_calllibfunc(func->data.strVal); break;
+			case string_m:		printf("STRING\n" );avm_calllibfunc(func->data.strVal); break;
 			case lib_func_m:	avm_calllibfunc(func->data.libfuncVal); break;
+			case table_m:	{
 
+						switch (func->data.tableVal->data->type) {
+							case string_m:		printf("TABLE => STRING\n" );avm_calllibfunc(func->data.strVal); break;
+							case lib_func_m:	avm_calllibfunc(func->data.libfuncVal); break;
+							default: printf("\nTABLE TIPOTA\n");
+						}
+						break;
+			}
 			default : {
-				char* s = avm_tostring(func);
-				char* msg="";
-				sprintf(msg,"call: cannot bind '%s' to function!",s );
-				avm_error(msg);
-				free(s);
+				printf("lolkappa\n" );
 				executionFinished=1;
 			}
 			}
@@ -1167,9 +1142,11 @@ void execute_jump	(struct instruction* ins){
 void avm_error(char *msg){
 	  executionFinished = 1;
   	printf("Error: %s\n",msg);
+	exit(0);
 }
 void avm_warning(char* msg ){
 	 printf("\nWarning: %s ",msg);
+	 exit(0);
 }
 
 
@@ -1274,7 +1251,7 @@ void read_binfile(){
 	 	    }
 				fread(&totallibF, sizeof(unsigned int), 1, fp);
 				printf("\ntotal libfuncs is %d \n", totallibF);
-				namedLibfuncs=malloc(sizeof(char*)*totaluserF);
+				//namedLibfuncs=malloc(sizeof(char*)*totaluserF);
 				for(i=0; i<totallibF; i++){
 								unsigned int len;
 							  fread(&len,sizeof(unsigned int), 1, fp); //length of each string
@@ -1285,7 +1262,7 @@ void read_binfile(){
 									if(fread(&libF[i],sizeof(char ) , 1, fp)!= 1)
 										printf("Error reading file \n");
 								}
-								add_consts_libfuncs(libF);
+							//	add_consts_libfuncs(libF);
 
 								printf("size (%d) of libF: %s\n",len, libF );
 		    }
@@ -1370,7 +1347,7 @@ void read_binfile(){
 
 					printf("========lib funcs:============\n" );
 					j=0;
-					while (j< totalNamedLibfuncs) {
+					while (j< 12) {
 						 printf("%s \n", namedLibfuncs[j]);
 						j++;
 					}
@@ -1445,8 +1422,8 @@ void add_consts_num(double number){
 }
 
 void add_consts_libfuncs(char * libfunc){
-		namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
-		strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
+		namedLibfuncs[totalNamedLibfuncs] = malloc(sizeof(char) * strlen(libfunc));
+		namedLibfuncs[totalNamedLibfuncs] = strdup(libfunc);
 		totalNamedLibfuncs++;
 
 }

@@ -114,6 +114,7 @@ void generate_PARAM(struct quad *quad) {
 void generate_CALL(struct quad *quad) {
 		quad->taddress = 	instrNo;
 		struct instruction* t=malloc(sizeof(struct instruction));
+		t->arg1=make_operand(quad->arg1);
 		t->opcode =  call_v;
 		int res;
 
@@ -431,7 +432,7 @@ struct vmarg* make_operand(struct expr* expr){
 		}
 		case libfunc_e : {
 			arg->type= libfunc_a;
-			arg->val = add_rval_libfuncs(expr->sym->value.func->name);
+			arg->val = searchLibFunc(expr);
 			break;
 
 		}
@@ -476,7 +477,8 @@ unsigned add_rval_libfuncs(char * libfunc){
 	}
 
 	namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
-	strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
+	//strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
+	namedLibfuncs[totalNamedLibfuncs] = strdup(libfunc);
 	printf("libfunc: %s\n", namedLibfuncs[totalNamedLibfuncs] );
 	return totalNamedLibfuncs++;
 }
@@ -573,9 +575,9 @@ int create_bin(){
 
 	 	    }
 
-
-	 fwrite(&totalNamedLibfuncs,sizeof(unsigned int), 1, fp); //total lib functions
-	 for(i=0; i<totalNamedLibfuncs; i++){
+	unsigned totalLib=12;
+	 fwrite(&totalLib,sizeof(unsigned int), 1, fp); //total lib functions
+	 for(i=0; i<12; i++){
 					 unsigned int len = strlen(namedLibfuncs[i]);
 					 fwrite(&len,sizeof(unsigned int), 1, fp); //total strings
 					 fwrite(namedLibfuncs[i],sizeof(char)*len , 1, fp);
@@ -719,7 +721,7 @@ unsigned searchFunctionTable(struct expr* expr){
 		}
 
 	}
-	return -1;
+	return add_rval_userfuncs(expr->sym->value.func->name,instrNo,expr->sym->value.func->totalVars,expr->sym->value.func->totalArgs,expr->sym->value.func->scope);
 
 }
 
@@ -731,11 +733,5 @@ unsigned searchLibFunc(struct expr* expr){
 			return i;
 		}
 	}
-
-	return add_rval_libfuncs(expr->sym->value.func->name);
-
-
-
-
-
+	return -1;
 }

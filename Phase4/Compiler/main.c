@@ -60,11 +60,30 @@ int main(void) {
 	insert_hash_table("cos", 4 , 0, true, 0);
 	insert_hash_table("sin", 4 , 0, true, 0);
 
+
+
+
 	yyparse();
 
 	print_table();
 //	print_list_rvalues();
 	print_quads();
+
+	add_rval_libfuncs("print");
+	add_rval_libfuncs("input");
+	add_rval_libfuncs("objectmemberkeys");
+	add_rval_libfuncs("objecttotalmembers");
+	add_rval_libfuncs("objectcopy");
+	add_rval_libfuncs("totalarguments");
+	add_rval_libfuncs("argument");
+	add_rval_libfuncs("typeof");
+	add_rval_libfuncs("strtonum");
+	add_rval_libfuncs("sqrt");
+	add_rval_libfuncs("cos");
+	add_rval_libfuncs("sin");
+
+
+
 	generateIns();
 	patch_incomplete_jump();
 	printInstructions();
