@@ -506,57 +506,102 @@ void libfunc_print(){
 }
 
 void libfunc_input(){
+	avm_memcellclear(&retval);
+	char* str = malloc(sizeof(char)*100);
+
+	printf( "Enter a value :");
+	fgets( str, 100, stdin );
+	strtok(str, "\n"); //gia na afairesw ton \n xarakthra pou bazei sto telos h fgets
+
+	printf( "\nYou entered: ");
+	puts( str );
+
+	if(strcmp(str, "true") == 0){
+		retval.type = bool_m;
+		retval.data.bool = 1;
+		printf("input: type: %d, value: true\n",retval.type);
+
+	}
+	else if(strcmp(str, "false") == 0 ){
+		retval.type = bool_m;
+		retval.data.bool = 0;
+		printf("input: type: %d, value: false\n",retval.type);
+	}
+	else if(strcmp(str, "nil") == 0 ){
+		retval.type = nil_m;
+		retval.data.strVal = "nil";
+		printf("input: type: %d, value: nil\n",retval.type);
+	}
+	else if(strncmp(str,"\"", 1) == 0 && str[strlen(str-1)] == '\"'){
+// 		printf("prwto %c, teleutaio %c\n",str[0], str[strlen(str-1)] );
+		printf("its a string\n" );
+		retval.type = string_m;
+		retval.data.strVal = str;
+		printf("input: type: %d, value: %s\n",retval.type, retval.data.strVal );
+	}
+	else if( atoi(str) != 0 ){
+		printf("number \n" );
+		retval.type = number_m;
+		retval.data.numVal = atoi(str);
+		printf("input: type: %d, value %f\n",retval.type, retval.data.numVal );
+	}
+	else{
+		printf("else\n" );
+
+	}
 
 }
 
-struct avm_table* avm_newnode(char* index, char* data){
-	struct avm_table* newnode;
-	newnode = malloc(sizeof(struct avm_table));
-	newnode->index = index;
-	newnode->data->data.strVal = malloc(100* sizeof(char));
-	newnode->data->data.strVal= index;
-	newnode->next = NULL;
-	return newnode;
+struct avm_table* table_objectkeys = NULL;
+
+void avm_newnode(struct avm_table** head, char* index, char* data){
+	struct avm_table* newnode = NULL, *last = NULL;
+	if(*head == NULL){
+		*head = malloc(sizeof(struct avm_table));
+		(*head)->index = index;
+		(*head)->data->data.strVal = malloc(100* sizeof(char));
+		(*head)->data->data.strVal= data;
+		(*head)->next = NULL;
+		return;
+	}
+	else{
+			newnode = malloc(sizeof(struct avm_table));
+			newnode->index = index;
+			newnode->data->data.strVal = malloc(100* sizeof(char));
+			newnode->data->data.strVal= data;
+			newnode->next = NULL;
+	}
+	last = *head;
+	while (last->next !=NULL) {
+		  printf("while %s\n",last->data->data.strVal );
+			last = last->next;
+	}
+	last->next = newnode;
+	return;
 }
 
 void libfunc_objectmemberkeys(){
-	/*
+
 	unsigned n = avm_totalactuals();
 
 	if(n != 1) avm_error("libfunc objectmemberkeys: error arguments");
 	else{
 		if(avm_getactual(0)->type == 3){ //table
 			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
-			struct avm_table* newtable = malloc(sizeof(struct avm_table));
-			newtable = NULL;
-			struct avm_table* newnode;
 			int counter = 0;
-			//gia test oti mphkan swsta
 			while (tmp) {
 					if(tmp->index){
-						char* index = malloc(2*sizeof(char));
+						char* index = malloc(5*sizeof(char));
 						sprintf(index,"%d",counter);
    					printf("objectmemberkeys lib func:(%d) (%s)\n",n, tmp->index);
-
-						if(newtable->next == NULL )
-								newtable->next = avm_newnode(index,tmp->index );
-						else{
-						while(newtable->next ){
-							 printf("opws\n" );
-							 newtable = newtable->next;
-						}
-						printf("2\n" );
-						newtable->next = malloc(sizeof(struct avm_table));
-						newtable->next = avm_newnode(index,tmp->index );
-					}
+					  avm_newnode(&table_objectkeys, index,tmp->index );
 						counter++;
 					}
 				tmp = tmp->next;
 			}
-			struct avm_table* curr = newtable;
-			while(curr){
-							printf("objectmemberkeys lib func:(%s)\n", newtable->data->data.strVal);
-							curr = curr->next;
+			while (table_objectkeys) {
+					printf("test new table: %s \n",table_objectkeys->data->data.strVal );
+					table_objectkeys = table_objectkeys->next;
 			}
 			printf("objectmemberkeys done!\n");
 		}
@@ -565,7 +610,7 @@ void libfunc_objectmemberkeys(){
 			return;
 		}
 	}
-	*/
+
 }
 
 void libfunc_objecttotalmembers(){
