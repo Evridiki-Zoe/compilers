@@ -725,7 +725,11 @@ primary  : lvalue { printf(RED "primary:: lvalue \n" RESET); $$=$1;
 lvalue   : IDENTIFIER {
 						tmpnode=malloc(sizeof(struct symbol_table_binding));
 						tmpnode= insertVar( yylval.stringValue, yylineno, scope);
-						$$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);   }
+            if(tmpnode->symbol_type == 3) $$=new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
+						else if(tmpnode->symbol_type == 4) $$=new_expr(3,tmpnode,NULL,0,"",'\0',NULL);
+            else $$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+          
+            }
          | LOCAL IDENTIFIER {
 						printf(RED "lvalue:: local identifier\n" RESET);
 						tmpnode=malloc(sizeof(struct symbol_table_binding));
