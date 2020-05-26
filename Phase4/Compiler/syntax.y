@@ -579,7 +579,7 @@ term  : L_PARENTHES {
 
              			 emit(assign,temp_expr,NULL,tmpexpr,yylineno,0);
           				 emit(add,temp_expr,tmp_one,temp_expr,yylineno,0);
-          				 emit(table_setelem,$1->index,temp_expr,temp_expr->index,yylineno,0);
+          				 emit(table_setelem,$1->index,temp_expr,$1,yylineno,0);
 
                    $$ = tmpexpr;
           		  } else {
@@ -728,7 +728,7 @@ lvalue   : IDENTIFIER {
             if(tmpnode->symbol_type == 3) $$=new_expr(2,tmpnode,NULL,0,"",'\0',NULL);
 						else if(tmpnode->symbol_type == 4) $$=new_expr(3,tmpnode,NULL,0,"",'\0',NULL);
             else $$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
-          
+
             }
          | LOCAL IDENTIFIER {
 						printf(RED "lvalue:: local identifier\n" RESET);

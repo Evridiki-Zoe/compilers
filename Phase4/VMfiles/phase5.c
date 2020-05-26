@@ -320,6 +320,7 @@ while (tmp) {
 		if (strcmp(tmp->index,index)==0) {
 			printf("hdh uparxon table index(%s) set elem %f\n", index, data->data.numVal);
 			tmp->data= data;
+			printf("%f\n",tmp->data->data.numVal);
 			return;
 		}
  }
@@ -342,14 +343,14 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 
 	if (rv->type == undef_m) avm_warning("Assigning from 'undef' content!");
 
-	//avm_memcellclear(lv);
+	avm_memcellclear(lv);
 
 	memcpy(lv,rv,sizeof(struct avm_memcell));
 
 	if (lv->type == string_m) {
 		lv->data.strVal = strdup(rv->data.strVal);
 	} else if (lv->type == table_m) {
-		avm_tableincrefcounter(lv->data.tableVal);
+	//	avm_tableincrefcounter(lv->data.tableVal);
 	}
 }
 
@@ -403,6 +404,7 @@ void avm_calllibfunc(char* id){
 	else if (strcmp("strtonum",id)==0) libfunc_strtonum();
 	else if (strcmp("typeof",id)==0) libfunc_typeof();
 	else if (strcmp("totalarguments",id)==0)libfunc_totalarguments();
+	else if(strcmp("argument",id)==0)libfunc_argument();
 	else { printf("lathos onoma i den iparki\n" );}
 
 	unsigned oldTop = top;
@@ -646,6 +648,7 @@ void libfunc_totalarguments(void){
 
 void libfunc_argument(){
 	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
+	printf("p_topsp = %u\n",p_topsp );
 	avm_memcellclear(&retval);
 	int i;
 	if (!p_topsp) {
@@ -659,16 +662,18 @@ void libfunc_argument(){
 		else{
 				if(avm_getactual(0)->type == 0){ //num type
 						i = avm_getactual(0)->data.numVal;
+						printf("i =%d\n",i );
+						printf("kappa %d\n",p_topsp -4 - i );
 						retval.type = number_m;
 						double totalArgs = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
 						if(i < 0 || i > totalArgs) {
 						  	avm_error("number of argument you gave is bigger than total arguments of function\n");
 						}
 						else {
-							//retval.data.numVal = avm_get_envvalue(p_topsp - AVM_NUMACTUALS_OFFSET - i);
-						// 	printf("argument:: get %d at stack %d \n",i ,(p_topsp - AVM_NUMACTUALS_OFFSET - i));
-						//TODO den kserw se poia thesh
-						//???  na pairnw to i argument mias sunarthshs
+			
+							retval.data.numVal = avm_get_envvalue(p_topsp -4 - i);
+						 	printf("argument:: get %d at stack %d \n",i ,(p_topsp  AVM_NUMACTUALS_OFFSET - i));
+
 
 						}
 				}
@@ -813,13 +818,15 @@ void avm_registerlibfunc (char* id , library_funcs_t addr){} // TODO
 
 void execute_arithmetic(struct instruction* instr){
 	  	struct avm_memcell* lv = avm_translate_operand(instr->result, NULL);
+
 		struct avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
 
 		//assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); ?? slide 25 to exei alliws
 		assert(rv1 && rv2);
 		if( rv1->type != number_m  || rv2->type != number_m ){
-				avm_error("arithmetic ex:: not a number! \n");
+				printf("arithmetic ex:: not a number!%d %d \n",rv1->type,rv2->type);
+				exit(0);
 				executionFinished = 1;
 		}
 		else{

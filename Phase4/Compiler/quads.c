@@ -275,6 +275,7 @@ struct expr* emit_iftable_item(struct expr* exp){
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
      	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
+			printf("pernao apo edo\n\n\n\n\n" );
 //mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
 			return result;
@@ -362,18 +363,18 @@ struct expr* make_call (struct expr* lv, struct expr* elist) {
 			 struct expr* func = emit_iftable_item(lv);
 
 
-			 	 if( strcmp(func->sym->value.var->name, "print") == 0 || strcmp(func->sym->value.var->name, "input") == 0 || strcmp(func->sym->value.var->name, "objectmemberkeys") == 0 || strcmp(func->sym->value.var->name, "objectcopy") == 0 \
-			              || strcmp(func->sym->value.var->name, "objectdef") == 0 || strcmp(func->sym->value.var->name, "objecttotalmembers") == 0|| strcmp(func->sym->value.var->name, "totalarguments") == 0 \
-			              || strcmp(func->sym->value.var->name, "argument") == 0 || strcmp(func->sym->value.var->name, "typeof") == 0 || strcmp(func->sym->value.var->name, "strtonum") == 0 \
-			              || strcmp(func->sym->value.var->name, "sqrt") == 0 || strcmp(func->sym->value.var->name, "cos") == 0 || strcmp(func->sym->value.var->name, "sin") == 0 ) {
-
-			                func->type = 3;
-			              }
-			              else{
-
-			                func->type = 2;
-
-			              }
+			 	 // if( strcmp(func->sym->value.var->name, "print") == 0 || strcmp(func->sym->value.var->name, "input") == 0 || strcmp(func->sym->value.var->name, "objectmemberkeys") == 0 || strcmp(func->sym->value.var->name, "objectcopy") == 0 \
+			     //          || strcmp(func->sym->value.var->name, "objectdef") == 0 || strcmp(func->sym->value.var->name, "objecttotalmembers") == 0|| strcmp(func->sym->value.var->name, "totalarguments") == 0 \
+			     //          || strcmp(func->sym->value.var->name, "argument") == 0 || strcmp(func->sym->value.var->name, "typeof") == 0 || strcmp(func->sym->value.var->name, "strtonum") == 0 \
+			     //          || strcmp(func->sym->value.var->name, "sqrt") == 0 || strcmp(func->sym->value.var->name, "cos") == 0 || strcmp(func->sym->value.var->name, "sin") == 0 ) {
+				 //
+			     //            func->type = 3;
+			     //          }
+			     //          else{
+				 //
+			     //            func->type = 2;
+				 //
+			     //          }
 
 			 /*ftiaxnw ena reversed list mesa se ena stack*/
 			 struct expr* reversed_stack[20];
