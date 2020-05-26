@@ -1,10 +1,10 @@
 
 
 
-x=0;
-function a(b,x,c){::x=argument(1);}
+function a(b,c){print(argument(0));}
 
 
-a(555,666,777);
-print(x);
+a(9999,33333);
+
+
 

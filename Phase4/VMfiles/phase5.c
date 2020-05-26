@@ -311,6 +311,7 @@ if (table->data->type == undef_m) {
 //	strcpy(tmp->index ,index);
 	tmp->index= index;
 	tmp->data= data;
+
 	return;
 }
 
@@ -661,7 +662,7 @@ void libfunc_argument(){
 		if(n != 1) avm_error("libfunc arguments:: error arguments");
 		else{
 				if(avm_getactual(0)->type == 0){ //num type
-						i = avm_getactual(0)->data.numVal;
+						i = avm_getactual(0)->data.numVal+1;
 						printf("i =%d\n",i );
 						printf("kappa %d\n",p_topsp -4 - i );
 						retval.type = number_m;
@@ -670,7 +671,7 @@ void libfunc_argument(){
 						  	avm_error("number of argument you gave is bigger than total arguments of function\n");
 						}
 						else {
-			
+
 							retval.data.numVal = avm_get_envvalue(p_topsp -4 - i);
 						 	printf("argument:: get %d at stack %d \n",i ,(p_topsp  AVM_NUMACTUALS_OFFSET - i));
 
@@ -1186,7 +1187,7 @@ void execute_pusharg	(struct instruction* ins){
 	++totalActuals;
 	avm_dec_top();
 	 printf("stack after push arg\n" );
-	 printStack();
+
 }
 
 void execute_funcenter	(struct instruction* ins){
@@ -1243,8 +1244,8 @@ void execute_tablegetelem	(struct instruction* ins){
 	//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
 	assert(i);
 
-	avm_memcellclear(lv);
-	lv->type = nil_m; //default val
+	//avm_memcellclear(lv);
+	//lv->type = nil_m; //default val
 
 	if(t->type != table_m ){
 		avm_error("illegal use of variable as a table! \n");
@@ -1277,12 +1278,12 @@ void execute_tablesetelem	(struct instruction* ins){
 		struct avm_memcell* i = avm_translate_operand(ins->arg1, &ax);
 		struct avm_memcell* c = avm_translate_operand(ins->arg2, &bx);
 
-		//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
+
 		assert(i && c);
 
 		if(t->type != table_m)		avm_error("illegal use of variable as a table in setelem! \n");
 		else {
-			avm_setelem(t->data.tableVal, i->data.strVal, c); //todo
+			avm_setelem(t->data.tableVal, i->data.strVal, c);
 		}
 }
 
