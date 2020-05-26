@@ -534,20 +534,12 @@ term  : L_PARENTHES {
             check_for_funcname($2->sym->value.var->name);
 
             if($2->type == 1){
+			  	$$= member_item($2, $2->sym->value.var->name);
+			  	//new expr for number 1
+			  	struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 
-			   struct expr* tmp_expr = new_expr(tableitem_e,$2->index->sym,NULL,0,"",'\0',NULL);
-
-			  $$= member_item($2, $2->sym->value.var->name);
-
-			  result =malloc(5*sizeof(char));
-			  sprintf(result,"_%d",rvalues++);
-			  tmpnode =insertVar(result,yylineno,scope);
-			  tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-			  //new expr for number 1
-			  struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-
-			emit(add,$$,tmp_one,$$,yylineno,0);
-        	emit(table_setelem,tmp_expr,$$,$$->index,yylineno,0);
+				emit(add,$$,tmp_one,$$,yylineno,0);
+        		emit(table_setelem,$2->index,$$,$2,yylineno,0);
         } else{
                   result =malloc(5*sizeof(char));
                   sprintf(result,"_%d",rvalues++);
@@ -599,22 +591,14 @@ term  : L_PARENTHES {
           check_for_funcname($2->sym->value.var->name);
   				printf(RED "--lvalue\n" RESET);
 
-          if($2->type == 1){
+				if($2->type == 1){
+	  			  $$= member_item($2, $2->sym->value.var->name);
+	  			  //new expr for number 1
+	  			  struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 
-              struct expr* tmp_expr = new_expr(tableitem_e,$2->index->sym,NULL,0,"",'\0',NULL);
-              $$= member_item($2, $2->sym->value.var->name);
-
-              result =malloc(5*sizeof(char));
-              sprintf(result,"_%d",rvalues++);
-              tmpnode =insertVar(result,yylineno,scope);
-              tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-              //new expr for number 1
-              struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-
-              emit(sub,$$,tmp_one,$$,yylineno,0);
-              emit(table_setelem,tmp_expr,$$,$$->index,yylineno,0);
-
-          } else{
+	  			  emit(sub,$$,tmp_one,$$,yylineno,0);
+	  			  emit(table_setelem,$2->index,$$,$2,yylineno,0);
+	  	  } else{
       				result =malloc(5*sizeof(char));
       			  sprintf(result,"_%d",rvalues++);
 
@@ -650,7 +634,7 @@ term  : L_PARENTHES {
 
          			 emit(assign,temp_expr,NULL,tmpexpr,yylineno,0);
       				 emit(sub,temp_expr,tmp_one,temp_expr,yylineno,0);
-      				 emit(table_setelem,$1->index,temp_expr,temp_expr->index,yylineno,0);
+      				 emit(table_setelem,$1->index,temp_expr,$1,yylineno,0);
 
                $$ = tmpexpr;
       		  }else{

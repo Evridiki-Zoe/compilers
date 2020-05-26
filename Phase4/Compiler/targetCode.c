@@ -107,7 +107,6 @@ void generate_PARAM(struct quad *quad) {
 		t->opcode = pusharg_v;
 
 		t->arg1 = make_operand(quad->res);
-		printf("fsad\n" );
 	  emitIns(t);
 }
 
@@ -122,7 +121,6 @@ void generate_CALL(struct quad *quad) {
 
 					res=searchFunctionTable(quad->arg1);
 					if(res>=0){
-						printf("userfunc->>>>%d\n",res );
 						t->arg1 = malloc(sizeof(struct vmarg));
 						t->arg1->type = userfunc_a;
 						t->arg1->val  = res;
@@ -132,7 +130,6 @@ void generate_CALL(struct quad *quad) {
 		} else if(quad->arg1->type == libfunc_e){
 					res = searchLibFunc(quad->arg1);
 					if(res>=0){
-						printf("libfunc->>>>%d\n",res );
 						t->arg1 = malloc(sizeof(struct vmarg));
 						t->arg1->type = libfunc_a;
 						t->arg1->val  = res;
@@ -427,7 +424,7 @@ struct vmarg* make_operand(struct expr* expr){
 
 		case programfunc_e : {
 			arg->type = userfunc_a;
-			arg->val = add_rval_userfuncs(expr->sym->value.func->name,instrNo,expr->sym->value.func->totalVars,expr->sym->value.func->totalArgs,expr->sym->value.func->scope);
+			arg->val = searchFunctionTable( expr);
 			break;
 		}
 		case libfunc_e : {
@@ -648,7 +645,7 @@ void read_binfile(){
 							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
 							printf("size (%d)  ",len );
-printf("edw? \n" );
+
 							if(fread(&str,sizeof(char )*len , 1, fp)!= 1)
 								printf("Error reading file \n");
 							printf("str: %s\n",str );
@@ -729,7 +726,6 @@ unsigned searchLibFunc(struct expr* expr){
 	int i;
 	for ( i = 0; i < totalNamedLibfuncs; i++) {
 		if (strcmp(namedLibfuncs[i] , expr->sym->value.func->name)==0) {
-			printf("se vrika\n" );
 			return i;
 		}
 	}

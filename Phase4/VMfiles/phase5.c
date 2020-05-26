@@ -264,7 +264,7 @@ void avm_tablecrefcounter(struct avm_table* m){}	//TODO
 
 void memclear_string(struct avm_memcell* m){
 	assert(m->data.strVal);
-	free(m->data.strVal);
+	//free(m->data.strVal);
 
 }
 void memclear_table(struct avm_memcell* m){
@@ -276,13 +276,12 @@ void avm_tableincrefcounter(struct avm_table* m){} //TODO
 
 struct avm_table* avm_tablenew(){
 	struct avm_table* tmp = malloc(sizeof(struct avm_table));
-	printf("dsfndsoifnsd\n" );
+
 	tmp->data= malloc(sizeof(struct avm_memcell));
 	tmp->data->type=undef_m;
 //	tmp->index = malloc(sizeof(struct avm_memcell));
 	tmp->index=NULL;
 	tmp->next=NULL;
-	printf("eeeee\n" );
 
 	return tmp;
 }
@@ -1280,11 +1279,11 @@ void execute_tablesetelem	(struct instruction* ins){
 
 
 		assert(i && c);
-
+		printf("%d\n", t->type );
 		if(t->type != table_m)		avm_error("illegal use of variable as a table in setelem! \n");
 		else {
 			avm_setelem(t->data.tableVal, i->data.strVal, c);
-			
+
 		}
 }
 
