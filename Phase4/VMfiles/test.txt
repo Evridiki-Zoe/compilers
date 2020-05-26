@@ -1,14 +1,10 @@
 
 
+function a(){}
 
 
+t=[1,"das",true,[1,2,true,cos],a,print,nil];
 
+//print(b);
+print(t);
 
-
-t = [100,50,30];
-
-t[0]++;
-//++t[0];
-
---t[1];
-//s=t[1]--;

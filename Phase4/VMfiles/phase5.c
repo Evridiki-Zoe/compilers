@@ -343,7 +343,7 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 
 	if (rv->type == undef_m) avm_warning("Assigning from 'undef' content!");
 
-	avm_memcellclear(lv);
+	//avm_memcellclear(lv);
 
 	memcpy(lv,rv,sizeof(struct avm_memcell));
 
@@ -1324,12 +1324,54 @@ char* bool_tostring (struct avm_memcell* cell){
 	else strcpy(str , "false");
 	return str;
 }
-char* table_tostring (struct avm_memcell* cell){return NULL;}
-char* userfunc_tostring (struct avm_memcell* cell){return NULL;}
-char* libfunc_tostring (struct avm_memcell* cell){return NULL;}
-char* nil_tostring (struct avm_memcell* cell){return NULL;}
-char* undef_tostring (struct avm_memcell* cell){return NULL;}
 
+char* userfunc_tostring (struct avm_memcell* cell){
+
+	char* str=malloc(sizeof(char*)*20);
+	sprintf(str,"user function: %u",userFuncs[cell->data.funcVal]->address);
+	return str;
+}
+char* libfunc_tostring (struct avm_memcell* cell){
+
+	char* str = malloc(sizeof(char)*strlen(cell->data.libfuncVal)+18);
+	sprintf(str,"library function: %s",cell->data.libfuncVal);
+	return str;
+
+}
+char* nil_tostring (struct avm_memcell* cell){char* str=malloc(sizeof(char*)*3); str = strdup("nil"); return str;}
+char* undef_tostring (struct avm_memcell* cell){char* str=malloc(sizeof(char*)*5); str = strdup("undef"); return str;}
+
+char* table_tostring (struct avm_memcell* cell){
+	char* str=malloc(sizeof(char));
+	str = strdup("[");
+	struct avm_table* tmp = cell->data.tableVal;
+
+	while (tmp) {
+
+		char* elemdata;
+		switch (tmp->data->type) {
+			case  	number_m: 	elemdata=number_tostring(tmp->data); break;
+			case	string_m:	elemdata=string_tostring(tmp->data); break;
+			case 	bool_m	:	elemdata=bool_tostring(tmp->data); break;
+			case	table_m	:	elemdata=table_tostring(tmp->data); break;
+			case	userfunc_m	:	elemdata=userfunc_tostring(tmp->data); break;
+			case	lib_func_m	:	elemdata=libfunc_tostring(tmp->data); break;
+			case	nil_m	:	elemdata=nil_tostring(tmp->data); break;
+			case	undef_m	:	elemdata=undef_tostring(tmp->data); break;
+		}
+		char* index=malloc(sizeof(char)*strlen(tmp->index));
+		index = strdup(tmp->index);
+
+		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 12);
+		sprintf(whole,"{ \"%s\" : %s } , ",index,elemdata);
+
+		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole) );
+		strcat(str,whole);
+		tmp=tmp->next;
+	}
+	str[strlen(str)-2]=*strdup("]");
+
+	return str;}
 
 unsigned char avm_tobool(struct avm_memcell* m){
 		assert(m->type >= 0 && m->type < undef_m);
