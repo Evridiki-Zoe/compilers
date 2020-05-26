@@ -1284,6 +1284,7 @@ void execute_tablesetelem	(struct instruction* ins){
 		if(t->type != table_m)		avm_error("illegal use of variable as a table in setelem! \n");
 		else {
 			avm_setelem(t->data.tableVal, i->data.strVal, c);
+			
 		}
 }
 
