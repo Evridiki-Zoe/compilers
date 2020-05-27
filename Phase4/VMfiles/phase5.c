@@ -289,6 +289,7 @@ struct avm_table* avm_tablenew(){
 //----------------------------------------------------------
 struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 	struct avm_table* tmp = table;
+	//printStack();
 	printf("psaxno gia %s\n",index );
 	while (tmp) {
 		if(tmp->index){
@@ -299,17 +300,21 @@ struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 	}
 		tmp = tmp->next;
 	}
+	printf("nullll\n" );
 	return  NULL;
 
 }
 
 void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
 	struct avm_table* tmp=table;
+	struct avm_memcell* tmpdata;
+	//tmpdata.data
+	memcpy(tmpdata, data, sizeof(struct avm_memcell));
 if (table->data->type == undef_m) {
 	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
 //	strcpy(tmp->index ,index);
 	tmp->index= index;
-	tmp->data= data;
+	tmp->data= tmpdata;
 
 	return;
 }
@@ -319,7 +324,7 @@ while (tmp) {
 	if(tmp->index){
 		if (strcmp(tmp->index,index)==0) {
 			printf("hdh uparxon table index(%s) set elem %f\n", index, data->data.numVal);
-			tmp->data= data;
+			tmp->data= tmpdata;
 			printf("%f\n",tmp->data->data.numVal);
 			return;
 		}
@@ -330,21 +335,21 @@ printf("den uparxei to vazw sto telos (%s,%f)\n", index, data->data.numVal);
 tmp = malloc(sizeof(struct avm_table));
 //strcpy(tmp->index ,index);
 tmp->index = index;
-tmp->data= data;
+tmp->data= tmpdata;
 tmp->next = table->next;
 table->next = tmp;
 }
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 	if (lv == rv) return;
-	printf("avm assign\n" );
+
+	printf("avm assign types(%d,)\n", rv->type);
 
 	if (lv->type == table_m && rv->type == table_m && lv->data.tableVal == rv->data.tableVal ) return;
 
 	if (rv->type == undef_m) avm_warning("Assigning from 'undef' content!");
 
 	//avm_memcellclear(lv);
-
 	memcpy(lv,rv,sizeof(struct avm_memcell));
 
 	if (lv->type == string_m) {
@@ -405,7 +410,7 @@ void avm_calllibfunc(char* id){
 	else if (strcmp("typeof",id)==0) libfunc_typeof();
 	else if (strcmp("totalarguments",id)==0)libfunc_totalarguments();
 	else if(strcmp("argument",id)==0)libfunc_argument();
-	else { printf("lathos onoma i den iparki\n" );}
+	else { printf("lathos onoma i den iparki %s \n", id );}
 
 	unsigned oldTop = top;
 
