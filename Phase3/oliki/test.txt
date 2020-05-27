@@ -1,4 +1,4 @@
-ispatchTable = [ {1: (function (x){ print("first ", x);})},
+dispatchTable = [ {1: (function (x){ print("first ", x);})},
                   {2: (function (x){ print("second ", x);})},
                   {3: (function (x){ print("third ", x);})},
                   {4: (function (x){ print("fourth ", x);})}

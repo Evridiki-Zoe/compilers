@@ -322,7 +322,7 @@ expr  :
       }
       |  expr EQUAL expr {
 
-      
+
             if( ($1)->type == 1 && ($3)->type == 11 ){ //table and nil ok
             }
             else if(oneIsVar($1, $3)) {
@@ -449,7 +449,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
           			   	tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
             		//new expr for number 1
                         struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-            		
+
                         	emit(add,$2,tmp_one,$2,yylineno,0);
             			emit(assign,$2,NULL,tmpexpr,yylineno,0);
                     $$ = tmpexpr;
@@ -546,7 +546,7 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
             			 tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
             			   //new expr for number 1
             			 struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
-            			   
+
                                  emit(assign,$1,NULL,tmpexpr,yylineno,0);
             			   emit(add,$1,tmp_one,$1,yylineno,0);
             	   			$$ = tmpexpr;
@@ -562,7 +562,7 @@ assignmexpr   : lvalue { if(!arrayFlag && ref)   check_for_funcname($1->sym->val
 
                    if($1->type == tableitem_e){
 
-                        
+
                         emit(table_setelem,$1->index,$4,$1,yylineno,0);
 
                         struct symbol_table_binding *tmp_index = malloc(sizeof(struct symbol_table_binding));
@@ -677,7 +677,7 @@ call   : call L_PARENTHES elist R_PARENTHES {
 
  	}
        | lvalue callsuffix {
-		
+
           $1 = emit_iftable_item($1);
           if ($2->method ){
                 struct expr* t = $1;
@@ -747,7 +747,7 @@ elist : expr multi_exprs {
       ;
 
 multi_exprs	:  COMMA expr multi_exprs {
-	      args++; 
+	      args++;
 
           struct symbol_table_binding *newnode = malloc(sizeof(struct symbol_table_binding));
           newnode->value.var = malloc(sizeof(struct variable));
@@ -976,7 +976,7 @@ funcname : IDENTIFIER {
 					 free(result);
 					 $$=tmpexpr;
 		 }
-=
+
 const    : number {		$$=$1;	}
          | STRING 	{
 				tmpnode=malloc(sizeof(struct symbol_table_binding));

@@ -307,11 +307,13 @@ struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 
 void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
 	struct avm_table* tmp=table;
-	struct avm_memcell* tmpdata;
-	//tmpdata.data
+	struct avm_memcell* tmpdata=malloc(sizeof(struct avm_memcell));
+
 	memcpy(tmpdata, data, sizeof(struct avm_memcell));
+
+
 if (table->data->type == undef_m) {
-	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
+//	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
 //	strcpy(tmp->index ,index);
 	tmp->index= index;
 	tmp->data= tmpdata;
@@ -320,18 +322,14 @@ if (table->data->type == undef_m) {
 }
 
 while (tmp) {
-	printf("geia %s\n", tmp->index);
 	if(tmp->index){
 		if (strcmp(tmp->index,index)==0) {
-			printf("hdh uparxon table index(%s) set elem %f\n", index, data->data.numVal);
 			tmp->data= tmpdata;
-			printf("%f\n",tmp->data->data.numVal);
 			return;
 		}
  }
 tmp = tmp->next;
 }
-printf("den uparxei to vazw sto telos (%s,%f)\n", index, data->data.numVal);
 tmp = malloc(sizeof(struct avm_table));
 //strcpy(tmp->index ,index);
 tmp->index = index;
@@ -344,6 +342,9 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 	if (lv == rv) return;
 
 	printf("avm assign types(%d,)\n", rv->type);
+
+
+
 
 	if (lv->type == table_m && rv->type == table_m && lv->data.tableVal == rv->data.tableVal ) return;
 
@@ -426,21 +427,7 @@ void avm_calllibfunc(char* id){
 }
 
 library_funcs_t avm_getlibraryfunc (char* id){
-	// int i;
-	// char* name;
-	//
-	//
-	// for ( i = 0; i < totalNamedLibfuncs; i++) {
-	//
-	// 	if (strcmp(namedLibfuncs[i],id)==0) {
-	//
-	// 		name = malloc(sizeof(char)*strlen(namedLibfuncs[i]));
-	// 		printf("%s %s\n",id , namedLibfuncs[i] );
-	// 		strcpy(name,namedLibfuncs[i]);
-	//
-	//
-	// 	}
-	// }
+
 	 return 0;
 }
 
@@ -521,7 +508,6 @@ void libfunc_input(){
 		printf("input: type: %d, value %f\n",retval.type, retval.data.numVal );
 	}
 	else{
-		printf("else\n" );
 
 	}
 
@@ -854,10 +840,10 @@ void execute_assign (struct instruction* ins){
 	struct avm_memcell*	lv = avm_translate_operand(ins->result , NULL);
 	struct avm_memcell*	rv = avm_translate_operand(ins->arg1 , &ax);
 
-//printf("in assign after translate rv %d\n",  rv->data.bool );
+
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
 	avm_assign(lv,rv);
-//	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
+	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
 
 }
 
@@ -1177,6 +1163,7 @@ void execute_call		(struct instruction* ins){
 			}
 			default : {
 				printf("Error: This is not a function, type: %d\n", func->type);
+				exit(0);
 				executionFinished=1;
 			}
 			}
@@ -1285,7 +1272,7 @@ void execute_tablesetelem	(struct instruction* ins){
 
 		assert(i && c);
 		printf("%d\n", t->type );
-		if(t->type != table_m)		avm_error("illegal use of variable as a table in setelem! \n");
+		if(t->type != table_m)	{	avm_error("illegal use of variable as a table in setelem! \n"); exit(0);}
 		else {
 			avm_setelem(t->data.tableVal, i->data.strVal, c);
 
@@ -1349,7 +1336,7 @@ char* table_tostring (struct avm_memcell* cell){
 	str = strdup("[");
 	struct avm_table* tmp = cell->data.tableVal;
 	while (tmp) {
-
+		if (tmp->index==NULL) return strdup("[ ]");
 		char* elemdata;
 		switch (tmp->data->type) {
 			case  	number_m: 	elemdata=number_tostring(tmp->data); break;
