@@ -465,9 +465,9 @@ void libfunc_print(){
 	unsigned i=0;
 
 	for (; i < n; i++) {
-
-		char* s = avm_tostring(avm_getactual(i));
-
+		char* s = malloc(sizeof(char)*10);
+		s = avm_tostring(avm_getactual(i));
+//strcpy(s, avm_tostring(avm_getactual(i)));
 		printf("PRINT: %s ",s);
 		free(s);
 	}
@@ -1171,7 +1171,7 @@ void execute_call		(struct instruction* ins){
 						break;
 			}
 			default : {
-				printf("lolkappa\n" );
+				printf("Error: This is not a function, type: %d\n", func->type);
 				executionFinished=1;
 			}
 			}
@@ -1297,11 +1297,9 @@ void execute_jump	(struct instruction* ins){
 void avm_error(char *msg){
 	  executionFinished = 1;
   	printf("Error: %s\n",msg);
-	exit(0);
 }
 void avm_warning(char* msg ){
 	 printf("\nWarning: %s ",msg);
-	 exit(0);
 }
 
 
@@ -1345,7 +1343,6 @@ char* table_tostring (struct avm_memcell* cell){
 	char* str=malloc(sizeof(char));
 	str = strdup("[");
 	struct avm_table* tmp = cell->data.tableVal;
-
 	while (tmp) {
 
 		char* elemdata;
@@ -1365,13 +1362,13 @@ char* table_tostring (struct avm_memcell* cell){
 		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 12);
 		sprintf(whole,"{ \"%s\" : %s } , ",index,elemdata);
 
-		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole) );
+		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole)+1 ); // fixes error 3
 		strcat(str,whole);
 		tmp=tmp->next;
 	}
 	str[strlen(str)-2]=*strdup("]");
-
-	return str;}
+	return str;
+}
 
 unsigned char avm_tobool(struct avm_memcell* m){
 		assert(m->type >= 0 && m->type < undef_m);
