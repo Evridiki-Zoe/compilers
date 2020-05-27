@@ -310,6 +310,7 @@ expr :
    			 emit(jump,NULL,NULL,NULL,yylineno,999); // jump assing false
 			 addTruelist(($2),(int)QuadNo-2);
 			 addFalselist(($2),(int)QuadNo-1);
+       exprflag = 1;
   		  }
 
 		   $$ = smallFunc(boolexp_e);
