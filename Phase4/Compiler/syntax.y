@@ -303,30 +303,29 @@ expr :
 			printf(RED "NOT expression\n" RESET);
 
 			struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
-			struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",1,NULL );
+			struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
 			if (!$2->apotimimeno) {
   			  emit(if_eq,$2,true_expr,NULL,yylineno,999);//ass true an true h methepomeno gia pollapla and (?)
    			 emit(jump,NULL,NULL,NULL,yylineno,999); // jump assing false
 			 addTruelist(($2),(int)QuadNo-2);
 			 addFalselist(($2),(int)QuadNo-1);
-       exprflag = 1;
+       		exprflag = 1;
   		  }
 
 		   $$ = smallFunc(boolexp_e);
 		   notLists($2,$$);
 
 		  $$->apotimimeno=1;
-		if(exprflag == 1) {
+		if (exprflag) {
 
 			emit(assign,true_expr,NULL,$$,yylineno,0);
 			emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
 			emit(assign,false_expr,NULL,$$,yylineno,0);
-
+			exprflag=0;
 			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
-		}
 
-		exprflag = 1;
+		}else exprflag = 1;
 
 //			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
 
@@ -502,14 +501,14 @@ term  : L_PARENTHES {
 } expr R_PARENTHES { printf(RED " (expression) \n" RESET);
 
           $$ = $3;
-		  if(exprflag == 1) {
+		  if (exprflag == 1) {
 			  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
   			emit(assign,true_expr,NULL,$$,yylineno,0);
   			emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
   			emit(assign,false_expr,NULL,$$,yylineno,0);
-
+			exprflag=0;
   			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
   		}
 
@@ -521,7 +520,7 @@ term  : L_PARENTHES {
 
             printf(RED " - expression \n" RESET);
             result =malloc(5*sizeof(char));
-            sprintf(result,"_%d",rvalues);
+            sprintf(result,"_%d",rvalues++);
             tmpnode = malloc(sizeof(struct symbol_table_binding));
             tmpnode =insertVar(result,yylineno,scope);
             tmpexpr=malloc(sizeof(struct expr));
@@ -645,7 +644,7 @@ term  : L_PARENTHES {
       			 struct expr* tmp_one = new_expr(const_num_e,number_one,NULL,1,"",'\0',NULL);
 
       			emit(assign,$1,NULL,tmpexpr,yylineno,0);
-      			emit(add,$1,tmp_one,$1,yylineno,0);
+      			emit(sub,$1,tmp_one,$1,yylineno,0);
       	   			$$ = tmpexpr;
       		  }
 

@@ -1,22 +1,56 @@
-ispatchTable = [ {1: (function (x){ print("first ", x);})},
-                  {2: (function (x){ print("second ", x);})},
-                  {3: (function (x){ print("third ", x);})},
-                  {4: (function (x){ print("fourth ", x);})}
-                ];
+/*
+    Test file for the final phase of HY-340: Languages & Compilers
+    Computer science dpt, University of Crete, Greece
 
-for(i=1; i<= 4; ++i)
-        dispatchTable[i]("hello\n");
+    Expected Output:
+    1.000
+	e is FALSE!
+	5.000
+	7.000
+*/
 
-//
+sp = " ";
+nl = "\n";
 
-table = [{"table1" : [{1: (function (x){ print("table1_1 ", x);})},
-                      {2: (function (x){ print("table1_2 ", x);})},
-                      {3: (function (x){ print("table1_3 ", x);})}
-                     ]
-         },
-         {"table2" : [{1: (function (x){ print("table2_1 ", x);})},
-                      {2: (function (x){ print("table2_2 ", x);})},
-                      {3: (function (x){ print("table2_3 ", x);})}
-                     ]
-         }
-        ];
+a = 1;
+
+b = 2;
+
+c = 3;
+
+d = 6;
+
+g = 7;
+
+if (b < c) {
+        d = 1;
+}
+else {
+        d = 0;
+}
+
+print(d, nl);
+
+e = not a == b;
+
+if (e)
+        print("e is TRUE!", nl);
+else
+        print("e is FALSE!", nl);
+
+if (c >= d or b != 1) {
+        f = c + b;
+        print(f, nl);
+}
+
+if (e and b < 1)
+        if (a == d)
+                g = 1;
+        else {
+                g = 2;
+                if (d <= f or b < f)
+                        g = 3;
+        }
+
+print(g, nl);
+

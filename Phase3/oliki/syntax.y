@@ -398,13 +398,14 @@ term  : L_PARENTHES expr R_PARENTHES { printf(RED " (expression) \n" RESET);
       | MINUS expr %prec UMINUS  {
             printf(RED " - expression \n" RESET);
             result =malloc(5*sizeof(char));
-            sprintf(result,"_%d",rvalues);
+            sprintf(result,"_%d",rvalues++);
             tmpnode = malloc(sizeof(struct symbol_table_binding));
             tmpnode =insertVar(result,yylineno,scope);
             tmpexpr=malloc(sizeof(struct expr));
             tmpexpr = new_expr(0,tmpnode,NULL,0,"",'\0',NULL);
-            emit(uminus,$2,NULL,tmpexpr,yylineno,0);
-            $$ = tmpexpr;
+			$$ = smallFunc(0);;
+            emit(uminus,$2,NULL,$$,yylineno,0);
+
    	}
       | NOT expr {
                   printf(RED "NOT expression\n" RESET);

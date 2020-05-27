@@ -139,6 +139,7 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 		case bool_a:	{
 			reg= malloc(sizeof(struct avm_memcell));
 			reg->type = bool_m;
+			
 			reg->data.bool = arg->val;
 			return reg;
 		}
@@ -182,13 +183,15 @@ char*	libfuncs_getused(unsigned index){return namedLibfuncs[index];}
 
 double add_impl(double x, double y){return x+y;}
 double sub_impl(double x, double y){return x-y;}
-double mul_impl(double x, double y){return x*y;}
+double mul_impl(double x, double y){return (double)(x*y);}
 double div_impl(double x, double y){
 	if(y == 0){
 		avm_error("Division by zero!" );
 		executionFinished=1;
 		return 0;
-	}else  return (double)x/y;
+	}else {
+	 return (double)x/y;
+ }
 }
 double mod_impl(double x, double y){
 	if(y == 0){
@@ -1157,7 +1160,26 @@ void execute_call		(struct instruction* ins){
 						switch (func->data.tableVal->data->type) {
 							case string_m:		printf("TABLE => STRING\n" );avm_calllibfunc(func->data.strVal); break;
 							case lib_func_m:	avm_calllibfunc(func->data.libfuncVal); break;
-							default: printf("\nTABLE TIPOTA\n");
+							case userfunc_m:	{
+								struct userfunc* tmpFunc = avm_getfuncinfo(func->data.tableVal->data->data.funcVal);
+								pc = tmpFunc->address;
+								printf("%d\n",func->data.tableVal->data->data.funcVal );
+
+								printf("user func call pc %d ending %d\n", pc,AVM_ENDING_PC);
+								assert(pc < AVM_ENDING_PC);
+								if (code[pc]->opcode != funcenter_v){
+									  //funcenter_v is funcstart
+									  //an den einai orismenh h sunarthsh prepei na petaksei error
+									  printf("Undefined user function %s!\n", userFuncs[func->data.tableVal->data->data.funcVal]->id);
+										executionFinished =1;
+										exit(0);
+									}
+				//					assert(code[pc]->opcode == funcenter_v);
+
+								break;
+
+							}
+							default: printf("\nTABLE TIPOTA %d\n",func->data.tableVal->data->type);
 						}
 						break;
 			}
@@ -1310,7 +1332,8 @@ char* number_tostring (struct avm_memcell* cell){
 char* string_tostring (struct avm_memcell* cell){return cell->data.strVal;}
 char* bool_tostring (struct avm_memcell* cell){
 	char* str=malloc(sizeof(char)*6);
-	if (cell->data.bool) strcpy(str , "true");
+
+	if ((int)cell->data.bool==1) strcpy(str , "true");
 	else strcpy(str , "false");
 	return str;
 }
