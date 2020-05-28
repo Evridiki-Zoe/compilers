@@ -116,8 +116,15 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 	switch (arg->type) {
 		case global_a: return &stack[arg->val];
 		case local_a:	return &stack[topsp + arg->val];
-		case formal_a:	return &stack[topsp - AVM_STACKENV_SIZE - 1 - arg->val];
-
+		case formal_a: {
+			printf("AVM_NUMACTUALS_OFFSET %f \n",stack[topsp AVM_NUMACTUALS_OFFSET].data.numVal );
+			if (arg->val > stack[topsp AVM_NUMACTUALS_OFFSET].data.numVal) {
+				printf("This argument was not pushed in stack. \n" );
+				executionFinished=1;
+				exit(0);
+			}
+			return &stack[topsp - AVM_STACKENV_SIZE - 1 - arg->val];
+		}
 		case retval_a:	return &retval;
 
 		case number_a:	{
@@ -139,7 +146,6 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 		case bool_a:	{
 			reg= malloc(sizeof(struct avm_memcell));
 			reg->type = bool_m;
-			
 			reg->data.bool = arg->val;
 			return reg;
 		}
@@ -625,7 +631,7 @@ void libfunc_objectcopy(){
 
 void libfunc_totalarguments(void){
 //TODO ? an kalesoume thn function me ligotera arguments apo osa exei h dhlwsh poia #args prepei na epistrepsei?
-	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
+	unsigned p_topsp = avm_get_envvalue(topsp   AVM_SAVEDTOPSP_OFFSET);
 	avm_memcellclear(&retval);
 
 	if (!p_topsp) {
@@ -633,7 +639,7 @@ void libfunc_totalarguments(void){
 		retval.type=nil_m;
 	}else {
 		retval.type = number_m;
-		retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
+		retval.data.numVal = avm_get_envvalue(p_topsp  AVM_NUMACTUALS_OFFSET);
 		printf("totalarguments: %f\n",	retval.data.numVal );
 	}
 
@@ -1250,7 +1256,7 @@ void execute_tablegetelem	(struct instruction* ins){
 
 	struct avm_memcell* lv = avm_translate_operand(ins->result, (struct avm_memcell*)0);
 	struct avm_memcell* t = avm_translate_operand(ins->arg1, (struct avm_memcell*)0);
-	printf("lalalal\n" );
+
 	struct avm_memcell* i = avm_translate_operand(ins->arg2, &ax);
 
 	//assert(lv && &stack[N - 1] >= lv && &stack[top] < lv || lv == &retval);// TODO N
@@ -1265,8 +1271,17 @@ void execute_tablegetelem	(struct instruction* ins){
 
 	}
 	else{
+		char* res=malloc(5);
 
-			struct avm_memcell* content= avm_tablegetelem(t->data.tableVal, i->data.strVal );
+		switch (i->type) {
+
+			case number_m:	sprintf(res , "%f",i->data.numVal); break;
+			case string_m:	res=strdup(i->data.strVal); break;
+			default : 	res=strdup(i->data.strVal); break;
+		}
+
+
+			struct avm_memcell* content= avm_tablegetelem(t->data.tableVal, res );
 			if(content){
 
 				avm_assign(lv,content);
@@ -1294,10 +1309,22 @@ void execute_tablesetelem	(struct instruction* ins){
 
 		assert(i && c);
 		printf("%d\n", t->type );
+		printf("dssss\n" );
 		if(t->type != table_m)	{	avm_error("illegal use of variable as a table in setelem! \n"); exit(0);}
 		else {
-			avm_setelem(t->data.tableVal, i->data.strVal, c);
 
+			char* res=malloc(5);
+
+			switch (i->type) {
+
+				case number_m: printf("fddd\n" );printf("->>%f\n",i->data.numVal ); sprintf(res , "%f",i->data.numVal); break;
+				case string_m:	res=strdup(i->data.strVal); break;
+				default : 	res=strdup(i->data.strVal); break;
+			}
+
+			printf("\n\n\nres =%s \n\n\n",res );
+			avm_setelem(t->data.tableVal, res, c);
+			printStack();
 		}
 }
 

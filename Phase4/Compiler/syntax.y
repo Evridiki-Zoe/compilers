@@ -741,7 +741,10 @@ member : lvalue DOT IDENTIFIER {
          | lvalue L_SBRACKET expr R_SBRACKET {
                 arrayFlag = 1;
                 printf(RED"member:: lvalue[expression]\n"RESET);
-                $$ = member_item($1, $3->sym->value.var->name);
+				
+				$1 = emit_iftable_item($1);
+				$$ = new_expr(tableitem_e,$1->sym,$3,0,"",'\0',NULL);
+
          }
          | call DOT IDENTIFIER {
 
@@ -1071,49 +1074,8 @@ indexedelem	  : L_CBRACKET expr  {
 					  patchLists(($5),(int)QuadNo-2,(int)QuadNo);
 				   }
 
-				   if ($2->type==9 || $2->type==5) {
-					   $2->type = 10;
-					   $2->strconst = malloc(sizeof(char)*5);
-					   if ($2->boolconst) strcpy($2->strconst , "true");
-					   else  strcpy($2->strconst , "false");
-
-				   }else  if ($2->type!=10) {
-					   $2->type = 10;
-    				   $2->strconst = malloc(sizeof(char)*5);
-    				   sprintf($2->strconst,"%f",$2->numconst);
-				   }
-
 				   $5->index=$2;
 				   $$=$5;
-                  // result = malloc(2 * sizeof(char));
-                  // sprintf(result, "_%d", rvalues);
-                  // struct symbol_table_binding* tmp_symbol=  insertVar(result ,  yylineno , scope);
-                  // struct expr* temp_elem = new_expr(tableitem_e,tmp_symbol,NULL,0,"",'\0',NULL);
- 			  	  // emit(table_setelem,$2,$5,temp_elem,yylineno,0);
-				  //
-                  // //adespoto symbol pou den prepei na mpei sto hash!
-                  // struct symbol_table_binding *newnode1 = malloc(sizeof(struct symbol_table_binding));
-                  // newnode1->value.var = malloc(sizeof(struct variable));
-                  // newnode1->value.var->name = malloc((strlen($2->sym->value.var->name) + 1) * sizeof(char));
-                  // strcpy(newnode1->value.var->name, $2->sym->value.var->name);
-                  // newnode1->value.var->line = yylineno;
-                  // newnode1->symbol_type = 1;
-                  // newnode1->value.var->scope = scope;
-                  // newnode1->next = NULL;
-				  //
-                  // struct symbol_table_binding *newnode2 = malloc(sizeof(struct symbol_table_binding));
-                  // newnode2->value.var = malloc(sizeof(struct variable));
-                  // newnode2->value.var->name = malloc((strlen($5->sym->value.var->name) + 1) * sizeof(char));
-                  // strcpy(newnode2->value.var->name, $5->sym->value.var->name);
-                  // newnode2->value.var->line = yylineno;
-                  // newnode2->symbol_type = 1;
-                  // newnode2->value.var->scope = scope;
-                  // newnode2->next = NULL;
-				  //
-                  // struct expr* expr_for_symbol2 = new_expr(tableitem_e,newnode2,NULL,0,"",'\0',NULL);
-				  //
-                  // struct expr* new_elem_withboth = new_expr(tableitem_e,newnode1,expr_for_symbol2,0,"",'\0',NULL);
-                  // $$ = new_elem_withboth;
 
               }
               ;
