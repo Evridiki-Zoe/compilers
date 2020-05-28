@@ -1,9 +1,21 @@
+a = 1;
 
-t = [{"fdsfsdhiufdsbifusdbfuis":4},{5:2}];
+b = 2;
 
+c = 3;
 
-k="fdsfsdhiufdsbifusdbfuis";
+print(a,b,c);
 
-t[k]=100;
+d = b < c;
 
-print(t);
+e = not a == b;
+
+f = c >= d or b != 1;
+
+print(d,e,f);
+
+f = e >= d and c != b or not (c > a);
+
+f = not f;
+
+print(f);

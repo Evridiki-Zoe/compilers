@@ -55,7 +55,7 @@ int argumentF(char *name, int line, int scope) {
 	table->pinakas[lastActiveFunc]->value.func->args_list = newArg;
 
 	insert_hash_table(newArg->name, 2, line, true, scope);
-
+	tmpoffset++;
 	return 0;
 }
 
@@ -218,7 +218,7 @@ struct symbol_table_binding* insert_hash_table(char *name, symtype sym_type, int
 		newnode->symbol_type = sym_type;
 		newnode->value.var->scope = scope;
 		//offsetthings
-		newnode->value.var->offset = tmpoffset++;
+		newnode->value.var->offset = tmpoffset;
 		if (sym_type==2) newnode->scope_space=formal_arg;
 		else if(insideFunc) newnode->scope_space=function_loc;
 		else newnode->scope_space=program_var;
@@ -361,13 +361,16 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 	if (name[0]=='_') {
 		curr = table->pinakas[hash];
 		while (curr) {
-			if(strcmp(name, curr->value.var->name) == 0  && curr->value.var->scope == scope) {
+			if(strcmp(name, curr->value.var->name) == 0  && curr->value.var->scope == scope && (curr->active!=0)) {
+
 				return curr;
+
 			}
 			curr = curr->next;
 		}
-
-		return insert_hash_table(name, flag, 0, true, scope);
+		struct symbol_table_binding* kappa= insert_hash_table(name, flag, 0, true, scope);
+		tmpoffset++;
+		return kappa;
 	}
 
 
@@ -389,6 +392,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 
 		//	printf("Reference to formal argument\n");
 			ref = 0;
+
 			return curr;
 		}
 		curr = curr->next;
@@ -405,6 +409,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 					}
 				}
 		//	printf("Reference to accessible var in another scope\n");
+
 			return curr;
 		}
 		curr = curr->next;
@@ -416,6 +421,7 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 //		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
 		if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
 		//	printf("Reference to accessible var in another scope\n");
+
 			return curr;
 		}
 		curr = curr->next;
@@ -431,42 +437,9 @@ struct symbol_table_binding* insertVar(char* name , int line , int scope){
 		curr = curr->next;
 	}
 
-// 	while(curr){
-// //		printf("name %s active %d  , type %d , line %d \n",curr->value.var->name , curr->active ,curr->symbol_type ,curr->value.var->line  );
-// 		if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->symbol_type == flag && curr->value.var->scope == scope) {
-//
-// //			 printf("Reference to local var\n" );
-// 			ref = 0;
-// 			return 0;
-// 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true && curr->symbol_type == 2 ) {
-//
-// //			printf("Reference to formal argument\n");
-// 			ref = 0;
-// 			return 0;
-// 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 0 && curr->active == true  && curr->value.var->scope != 0  ) {
-//
-// 				if(tmp != NULL) {
-// 					if(tmp->value.func->scope < scope && tmp->value.func->scope >= curr->value.var->scope && curr->value.var->scope != 0) {
-// 						printf("Cannot access \"%s\" defined in line: %d from line: %d\n", curr->value.var->name, curr->value.var->line, yylineno );
-// 						exit(EXIT_FAILURE);
-// 					}
-// 				}
-//
-// //			printf("Reference to accessible var in another scope\n");
-// 			return 0;
-// 		}  else if(strcmp(name, curr->value.var->name) == 0 && curr->accessible == 1 && curr->active == true  && curr->value.var->scope != 0 ) {
-// //			printf("Reference to accessible var in another scope\n");
-// 			return 0;
-//
-// 		} else if(strcmp(name, curr->value.var->name) == 0 && curr->active == true && curr->value.var->scope == 0) {
-// //			printf("Reference to global var\n");
-//
-// 			return 0;
-// 		}
-//
-// 		curr = curr->next;
-// 	}
+
 	curr =insert_hash_table(name, flag, line, true, scope);
+	tmpoffset++;
 	return curr;
 }
 
@@ -504,7 +477,9 @@ struct symbol_table_binding* localVar(char* name, int line, int scope){
     	curr = curr->next;
     }
 	ref = 0;
+
 	curr =insert_hash_table(name, flag, line, true, scope);
+	tmpoffset++;
 	return curr;
 }
 

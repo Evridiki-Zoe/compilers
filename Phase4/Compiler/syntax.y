@@ -725,8 +725,9 @@ lvalue   : IDENTIFIER {
                   printf("\"%s\" undeclared, (first use here), line: %d\n", $2, yylineno);
                   exit(EXIT_FAILURE);
             }
-
-		        $$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
+			if (tmpnode->symbol_type==user) $$=new_expr(programfunc_e,tmpnode,NULL,0,"",'\0',NULL);
+			else if (tmpnode->symbol_type==library) $$=new_expr(libfunc_e,tmpnode,NULL,0,"",'\0',NULL);
+		    else   $$=new_expr(var_e,tmpnode,NULL,0,"",'\0',NULL);
 
             printf( RED "lvalue:: doublecolon\n" RESET);}
          | member { printf(RED "lvalue:: member %s type %d\n" RESET, $1->sym->value.var->name, $1->type);
@@ -741,7 +742,7 @@ member : lvalue DOT IDENTIFIER {
          | lvalue L_SBRACKET expr R_SBRACKET {
                 arrayFlag = 1;
                 printf(RED"member:: lvalue[expression]\n"RESET);
-				
+
 				$1 = emit_iftable_item($1);
 				$$ = new_expr(tableitem_e,$1->sym,$3,0,"",'\0',NULL);
 

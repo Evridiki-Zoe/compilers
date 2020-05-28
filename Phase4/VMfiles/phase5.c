@@ -115,7 +115,7 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a: return &stack[arg->val];
-		case local_a:	return &stack[topsp + arg->val];
+		case local_a:	printf("\n\n\nperno local %f\n\n\n",stack[topsp + arg->val].data.numVal );return &stack[topsp + arg->val];
 		case formal_a: {
 			printf("AVM_NUMACTUALS_OFFSET %f \n",stack[topsp AVM_NUMACTUALS_OFFSET].data.numVal );
 			if (arg->val > stack[topsp AVM_NUMACTUALS_OFFSET].data.numVal) {
@@ -123,6 +123,7 @@ struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell
 				executionFinished=1;
 				exit(0);
 			}
+			printf("%d\n",topsp - AVM_STACKENV_SIZE - 1 - arg->val );
 			return &stack[topsp - AVM_STACKENV_SIZE - 1 - arg->val];
 		}
 		case retval_a:	return &retval;
@@ -473,7 +474,7 @@ void libfunc_print(){
 		free(s);
 	}
 	printf("\n" );
-
+	printStack();
 }
 
 void libfunc_input(){
@@ -921,7 +922,13 @@ void execute_jeq	(struct instruction* ins){
 				printf("result is %d\n",result );
 
 			}
+			if( rv1->type == table_m && rv2->type == table_m){
+				printf("JEQ 2 table  \n");
+				//TODO result = table_equal(rv1,rv2);
+				printf("result is %d\n",result );
 
+			}
+			printf("\n\n->>>%d %d\n\n",rv1->type , rv2->type );
 		}
 
 		if(!executionFinished && result ){
@@ -1324,7 +1331,7 @@ void execute_tablesetelem	(struct instruction* ins){
 
 			printf("\n\n\nres =%s \n\n\n",res );
 			avm_setelem(t->data.tableVal, res, c);
-			printStack();
+
 		}
 }
 
@@ -1603,8 +1610,8 @@ void read_binfile(){
 
 
 void printStack(){
-
-	for (int i = 0; i < 50; i++) {
+	int i;
+	for ( i = 0; i < 50; i++) {
 
 		printf("stack[%d]", i);
 		switch (stack[i].type) {
