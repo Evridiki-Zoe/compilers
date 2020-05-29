@@ -495,7 +495,7 @@ unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int l
 	newnode->localSize = localsize;
 	newnode->totalargs =  totalargs;
 	newnode->scope = scope;
-	newnode->id = malloc(sizeof(char) * strlen(userfunc));
+	newnode->id = malloc(sizeof(char) * strlen(userfunc)+1);
 	strcpy(newnode->id, userfunc);
 
 	userFuncs[totalUserFuncs]  = newnode;

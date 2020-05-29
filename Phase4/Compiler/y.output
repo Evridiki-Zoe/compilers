@@ -4,12 +4,12 @@ Grammar
 
     1 program: multi_stmts
 
-    2 @1: /* empty */
+    2 $@1: %empty
 
-    3 @2: /* empty */
+    3 $@2: %empty
 
-    4 multi_stmts: @1 stmt @2 multi_stmts
-    5            | /* empty */
+    4 multi_stmts: $@1 stmt $@2 multi_stmts
+    5            | %empty
 
     6 stmt: expr SEMICOLON
     7     | ifstmt
@@ -26,17 +26,17 @@ Grammar
    17     | boolResexpr
    18     | arexpr
 
-   19 @3: /* empty */
+   19 $@3: %empty
 
-   20 expr: expr AND @3 epsilon expr
+   20 expr: expr AND $@3 epsilon expr
 
-   21 @4: /* empty */
+   21 $@4: %empty
 
-   22 expr: expr OR @4 epsilon expr
+   22 expr: expr OR $@4 epsilon expr
    23     | NOT expr
    24     | term
 
-   25 epsilon: /* empty */
+   25 epsilon: %empty
 
    26 arexpr: expr PLUS expr
    27       | expr MINUS expr
@@ -51,9 +51,9 @@ Grammar
    35            | expr EQUAL expr
    36            | expr NEQUAL expr
 
-   37 @5: /* empty */
+   37 $@5: %empty
 
-   38 term: L_PARENTHES @5 expr R_PARENTHES
+   38 term: L_PARENTHES $@5 expr R_PARENTHES
    39     | MINUS expr
    40     | PPLUS lvalue
    41     | lvalue PPLUS
@@ -61,9 +61,9 @@ Grammar
    43     | lvalue MMINUS
    44     | primary
 
-   45 @6: /* empty */
+   45 $@6: %empty
 
-   46 assignmexpr: lvalue @6 EQ expr
+   46 assignmexpr: lvalue $@6 EQ expr
 
    47 primary: lvalue
    48        | call
@@ -93,43 +93,43 @@ Grammar
    66 methodcall: DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES
 
    67 elist: expr multi_exprs
-   68      | /* empty */
+   68      | %empty
 
    69 multi_exprs: COMMA expr multi_exprs
-   70            | /* empty */
+   70            | %empty
 
    71 objectdef: L_SBRACKET elist_for_table R_SBRACKET
    72          | L_SBRACKET indexed R_SBRACKET
 
    73 elist_for_table: expr multi_exprs_for_table
-   74                | /* empty */
+   74                | %empty
 
    75 multi_exprs_for_table: COMMA expr multi_exprs_for_table
-   76                      | /* empty */
+   76                      | %empty
 
    77 indexed: indexedelem multi_indexedelem
 
    78 multi_indexedelem: COMMA indexedelem multi_indexedelem
-   79                  | /* empty */
+   79                  | %empty
 
-   80 @7: /* empty */
+   80 $@7: %empty
 
-   81 indexedelem: L_CBRACKET expr @7 COLON expr R_CBRACKET
+   81 indexedelem: L_CBRACKET expr $@7 COLON expr R_CBRACKET
 
-   82 @8: /* empty */
+   82 $@8: %empty
 
-   83 block: L_CBRACKET @8 multi_stmts R_CBRACKET
+   83 block: L_CBRACKET $@8 multi_stmts R_CBRACKET
 
-   84 @9: /* empty */
+   84 $@9: %empty
 
-   85 @10: /* empty */
+   85 $@10: %empty
 
-   86 funcdef: funcstart funcname L_PARENTHES @9 idlist R_PARENTHES @10 block
+   86 funcdef: funcstart funcname L_PARENTHES $@9 idlist R_PARENTHES $@10 block
 
    87 funcstart: FUNCTION
 
    88 funcname: IDENTIFIER
-   89         | /* empty */
+   89         | %empty
 
    90 const: number
    91      | STRING
@@ -140,19 +140,19 @@ Grammar
    95 number: INTEGER
    96       | FLOAT
 
-   97 @11: /* empty */
+   97 $@11: %empty
 
-   98 idlist: IDENTIFIER @11 multi_id
-   99       | /* empty */
+   98 idlist: IDENTIFIER $@11 multi_id
+   99       | %empty
 
-  100 @12: /* empty */
+  100 $@12: %empty
 
-  101 multi_id: COMMA IDENTIFIER @12 multi_id
-  102         | /* empty */
+  101 multi_id: COMMA IDENTIFIER $@12 multi_id
+  102         | %empty
 
-  103 @13: /* empty */
+  103 $@13: %empty
 
-  104 ifstmt: if_start R_PARENTHES stmt ELSE @13 stmt
+  104 ifstmt: if_start R_PARENTHES stmt ELSE $@13 stmt
   105       | if_start R_PARENTHES stmt
 
   106 if_start: IF L_PARENTHES expr
@@ -161,20 +161,20 @@ Grammar
 
   108 whilestart: WHILE
 
-  109 @14: /* empty */
+  109 $@14: %empty
 
-  110 @15: /* empty */
+  110 $@15: %empty
 
-  111 whilecond: L_PARENTHES @14 expr @15 R_PARENTHES
+  111 whilecond: L_PARENTHES $@14 expr $@15 R_PARENTHES
 
-  112 @16: /* empty */
+  112 $@16: %empty
 
-  113 @17: /* empty */
+  113 $@17: %empty
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
 
   115 for_elist: expr multi_exprs
-  116          | /* empty */
+  116          | %empty
 
   117 for_cond: expr
 
@@ -244,9 +244,9 @@ program (50)
     on left: 1, on right: 0
 multi_stmts (51)
     on left: 4 5, on right: 1 4 83
-@1 (52)
+$@1 (52)
     on left: 2, on right: 4
-@2 (53)
+$@2 (53)
     on left: 3, on right: 4
 stmt (54)
     on left: 6 7 8 9 10 11 12 13 14 15, on right: 4 104 105 107 114
@@ -254,9 +254,9 @@ expr (55)
     on left: 16 17 18 20 22 23 24, on right: 6 20 22 23 26 27 28 29
     30 31 32 33 34 35 36 38 39 46 57 59 67 69 73 75 81 106 111 115
     117 119
-@3 (56)
+$@3 (56)
     on left: 19, on right: 20
-@4 (57)
+$@4 (57)
     on left: 21, on right: 22
 epsilon (58)
     on left: 25, on right: 20 22
@@ -266,11 +266,11 @@ boolResexpr (60)
     on left: 31 32 33 34 35 36, on right: 17
 term (61)
     on left: 38 39 40 41 42 43 44, on right: 24
-@5 (62)
+$@5 (62)
     on left: 37, on right: 38
 assignmexpr (63)
     on left: 46, on right: 16
-@6 (64)
+$@6 (64)
     on left: 45, on right: 46
 primary (65)
     on left: 47 48 49 50 51, on right: 44
@@ -302,17 +302,17 @@ multi_indexedelem (78)
     on left: 78 79, on right: 77 78
 indexedelem (79)
     on left: 81, on right: 77 78
-@7 (80)
+$@7 (80)
     on left: 80, on right: 81
 block (81)
     on left: 83, on right: 13 86
-@8 (82)
+$@8 (82)
     on left: 82, on right: 83
 funcdef (83)
     on left: 86, on right: 14 50 62
-@9 (84)
+$@9 (84)
     on left: 84, on right: 86
-@10 (85)
+$@10 (85)
     on left: 85, on right: 86
 funcstart (86)
     on left: 87, on right: 86
@@ -324,15 +324,15 @@ number (89)
     on left: 95 96, on right: 90
 idlist (90)
     on left: 98 99, on right: 86
-@11 (91)
+$@11 (91)
     on left: 97, on right: 98
 multi_id (92)
     on left: 101 102, on right: 98 101
-@12 (93)
+$@12 (93)
     on left: 100, on right: 101
 ifstmt (94)
     on left: 104 105, on right: 7
-@13 (95)
+$@13 (95)
     on left: 103, on right: 104
 if_start (96)
     on left: 106, on right: 104 105
@@ -342,15 +342,15 @@ whilestart (98)
     on left: 108, on right: 107
 whilecond (99)
     on left: 111, on right: 107
-@14 (100)
+$@14 (100)
     on left: 109, on right: 111
-@15 (101)
+$@15 (101)
     on left: 110, on right: 111
 forstmt (102)
     on left: 114, on right: 9
-@16 (103)
+$@16 (103)
     on left: 112, on right: 114
-@17 (104)
+$@17 (104)
     on left: 113, on right: 114
 for_elist (105)
     on left: 115 116, on right: 114 118
@@ -362,35 +362,35 @@ returnstmt (108)
     on left: 119 120, on right: 10
 
 
-state 0
+State 0
 
     0 $accept: . program $end
 
     $end      reduce using rule 5 (multi_stmts)
-    $default  reduce using rule 2 (@1)
+    $default  reduce using rule 2 ($@1)
 
     program      go to state 1
     multi_stmts  go to state 2
-    @1           go to state 3
+    $@1          go to state 3
 
 
-state 1
+State 1
 
     0 $accept: program . $end
 
     $end  shift, and go to state 4
 
 
-state 2
+State 2
 
     1 program: multi_stmts .
 
     $default  reduce using rule 1 (program)
 
 
-state 3
+State 3
 
-    4 multi_stmts: @1 . stmt @2 multi_stmts
+    4 multi_stmts: $@1 . stmt $@2 multi_stmts
 
     IF           shift, and go to state 5
     WHILE        shift, and go to state 6
@@ -441,42 +441,42 @@ state 3
     returnstmt   go to state 50
 
 
-state 4
+State 4
 
     0 $accept: program $end .
 
     $default  accept
 
 
-state 5
+State 5
 
   106 if_start: IF . L_PARENTHES expr
 
     L_PARENTHES  shift, and go to state 51
 
 
-state 6
+State 6
 
   108 whilestart: WHILE .
 
     $default  reduce using rule 108 (whilestart)
 
 
-state 7
+State 7
 
-  114 forstmt: FOR . L_PARENTHES @16 for_elist @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR . L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
 
     L_PARENTHES  shift, and go to state 52
 
 
-state 8
+State 8
 
    87 funcstart: FUNCTION .
 
     $default  reduce using rule 87 (funcstart)
 
 
-state 9
+State 9
 
   119 returnstmt: RETURN . expr SEMICOLON
   120           | RETURN . SEMICOLON
@@ -512,21 +512,21 @@ state 9
     number       go to state 44
 
 
-state 10
+State 10
 
    11 stmt: BREAK . SEMICOLON
 
     SEMICOLON  shift, and go to state 55
 
 
-state 11
+State 11
 
    12 stmt: CONTINUE . SEMICOLON
 
     SEMICOLON  shift, and go to state 56
 
 
-state 12
+State 12
 
    23 expr: NOT . expr
 
@@ -560,35 +560,35 @@ state 12
     number       go to state 44
 
 
-state 13
+State 13
 
    53 lvalue: LOCAL . IDENTIFIER
 
     IDENTIFIER  shift, and go to state 58
 
 
-state 14
+State 14
 
    93 const: TRUE .
 
     $default  reduce using rule 93 (const)
 
 
-state 15
+State 15
 
    94 const: FALSE .
 
     $default  reduce using rule 94 (const)
 
 
-state 16
+State 16
 
    92 const: NIL .
 
     $default  reduce using rule 92 (const)
 
 
-state 17
+State 17
 
    39 term: MINUS . expr
 
@@ -622,7 +622,7 @@ state 17
     number       go to state 44
 
 
-state 18
+State 18
 
    40 term: PPLUS . lvalue
 
@@ -636,7 +636,7 @@ state 18
     call    go to state 62
 
 
-state 19
+State 19
 
    42 term: MMINUS . lvalue
 
@@ -650,30 +650,30 @@ state 19
     call    go to state 62
 
 
-state 20
+State 20
 
    15 stmt: SEMICOLON .
 
     $default  reduce using rule 15 (stmt)
 
 
-state 21
+State 21
 
    54 lvalue: DCOLON . IDENTIFIER
 
     IDENTIFIER  shift, and go to state 64
 
 
-state 22
+State 22
 
-   83 block: L_CBRACKET . @8 multi_stmts R_CBRACKET
+   83 block: L_CBRACKET . $@8 multi_stmts R_CBRACKET
 
-    $default  reduce using rule 82 (@8)
+    $default  reduce using rule 82 ($@8)
 
-    @8  go to state 65
+    $@8  go to state 65
 
 
-state 23
+State 23
 
    71 objectdef: L_SBRACKET . elist_for_table R_SBRACKET
    72          | L_SBRACKET . indexed R_SBRACKET
@@ -714,63 +714,63 @@ state 23
     number           go to state 44
 
 
-state 24
+State 24
 
-   38 term: L_PARENTHES . @5 expr R_PARENTHES
+   38 term: L_PARENTHES . $@5 expr R_PARENTHES
    50 primary: L_PARENTHES . funcdef R_PARENTHES
    62 call: L_PARENTHES . funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES
 
     FUNCTION  shift, and go to state 8
 
-    $default  reduce using rule 37 (@5)
+    $default  reduce using rule 37 ($@5)
 
-    @5         go to state 71
+    $@5        go to state 71
     funcdef    go to state 72
     funcstart  go to state 42
 
 
-state 25
+State 25
 
    95 number: INTEGER .
 
     $default  reduce using rule 95 (number)
 
 
-state 26
+State 26
 
    96 number: FLOAT .
 
     $default  reduce using rule 96 (number)
 
 
-state 27
+State 27
 
    91 const: STRING .
 
     $default  reduce using rule 91 (const)
 
 
-state 28
+State 28
 
    52 lvalue: IDENTIFIER .
 
     $default  reduce using rule 52 (lvalue)
 
 
-state 29
+State 29
 
-    4 multi_stmts: @1 stmt . @2 multi_stmts
+    4 multi_stmts: $@1 stmt . $@2 multi_stmts
 
-    $default  reduce using rule 3 (@2)
+    $default  reduce using rule 3 ($@2)
 
-    @2  go to state 73
+    $@2  go to state 73
 
 
-state 30
+State 30
 
     6 stmt: expr . SEMICOLON
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -799,46 +799,46 @@ state 30
     SEMICOLON      shift, and go to state 87
 
 
-state 31
+State 31
 
    18 expr: arexpr .
 
     $default  reduce using rule 18 (expr)
 
 
-state 32
+State 32
 
    17 expr: boolResexpr .
 
     $default  reduce using rule 17 (expr)
 
 
-state 33
+State 33
 
    24 expr: term .
 
     $default  reduce using rule 24 (expr)
 
 
-state 34
+State 34
 
    16 expr: assignmexpr .
 
     $default  reduce using rule 16 (expr)
 
 
-state 35
+State 35
 
    44 term: primary .
 
     $default  reduce using rule 44 (term)
 
 
-state 36
+State 36
 
    41 term: lvalue . PPLUS
    43     | lvalue . MMINUS
-   46 assignmexpr: lvalue . @6 EQ expr
+   46 assignmexpr: lvalue . $@6 EQ expr
    47 primary: lvalue .
    56 member: lvalue . DOT IDENTIFIER
    57       | lvalue . L_SBRACKET expr R_SBRACKET
@@ -851,23 +851,23 @@ state 36
     L_SBRACKET   shift, and go to state 92
     L_PARENTHES  shift, and go to state 93
 
-    EQ        reduce using rule 45 (@6)
+    EQ        reduce using rule 45 ($@6)
     $default  reduce using rule 47 (primary)
 
-    @6          go to state 94
+    $@6         go to state 94
     callsuffix  go to state 95
     normcall    go to state 96
     methodcall  go to state 97
 
 
-state 37
+State 37
 
    55 lvalue: member .
 
     $default  reduce using rule 55 (lvalue)
 
 
-state 38
+State 38
 
    48 primary: call .
    58 member: call . DOT IDENTIFIER
@@ -881,30 +881,30 @@ state 38
     $default  reduce using rule 48 (primary)
 
 
-state 39
+State 39
 
    49 primary: objectdef .
 
     $default  reduce using rule 49 (primary)
 
 
-state 40
+State 40
 
    13 stmt: block .
 
     $default  reduce using rule 13 (stmt)
 
 
-state 41
+State 41
 
    14 stmt: funcdef .
 
     $default  reduce using rule 14 (stmt)
 
 
-state 42
+State 42
 
-   86 funcdef: funcstart . funcname L_PARENTHES @9 idlist R_PARENTHES @10 block
+   86 funcdef: funcstart . funcname L_PARENTHES $@9 idlist R_PARENTHES $@10 block
 
     IDENTIFIER  shift, and go to state 101
 
@@ -913,43 +913,43 @@ state 42
     funcname  go to state 102
 
 
-state 43
+State 43
 
    51 primary: const .
 
     $default  reduce using rule 51 (primary)
 
 
-state 44
+State 44
 
    90 const: number .
 
     $default  reduce using rule 90 (const)
 
 
-state 45
+State 45
 
     7 stmt: ifstmt .
 
     $default  reduce using rule 7 (stmt)
 
 
-state 46
+State 46
 
-  104 ifstmt: if_start . R_PARENTHES stmt ELSE @13 stmt
+  104 ifstmt: if_start . R_PARENTHES stmt ELSE $@13 stmt
   105       | if_start . R_PARENTHES stmt
 
     R_PARENTHES  shift, and go to state 103
 
 
-state 47
+State 47
 
     8 stmt: whilestmt .
 
     $default  reduce using rule 8 (stmt)
 
 
-state 48
+State 48
 
   107 whilestmt: whilestart . whilecond stmt
 
@@ -958,21 +958,21 @@ state 48
     whilecond  go to state 105
 
 
-state 49
+State 49
 
     9 stmt: forstmt .
 
     $default  reduce using rule 9 (stmt)
 
 
-state 50
+State 50
 
    10 stmt: returnstmt .
 
     $default  reduce using rule 10 (stmt)
 
 
-state 51
+State 51
 
   106 if_start: IF L_PARENTHES . expr
 
@@ -1006,26 +1006,26 @@ state 51
     number       go to state 44
 
 
-state 52
+State 52
 
-  114 forstmt: FOR L_PARENTHES . @16 for_elist @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES . $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
 
-    $default  reduce using rule 112 (@16)
+    $default  reduce using rule 112 ($@16)
 
-    @16  go to state 107
+    $@16  go to state 107
 
 
-state 53
+State 53
 
   120 returnstmt: RETURN SEMICOLON .
 
     $default  reduce using rule 120 (returnstmt)
 
 
-state 54
+State 54
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -1055,24 +1055,24 @@ state 54
     SEMICOLON      shift, and go to state 108
 
 
-state 55
+State 55
 
    11 stmt: BREAK SEMICOLON .
 
     $default  reduce using rule 11 (stmt)
 
 
-state 56
+State 56
 
    12 stmt: CONTINUE SEMICOLON .
 
     $default  reduce using rule 12 (stmt)
 
 
-state 57
+State 57
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    23     | NOT expr .
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
@@ -1089,17 +1089,17 @@ state 57
     $default  reduce using rule 23 (expr)
 
 
-state 58
+State 58
 
    53 lvalue: LOCAL IDENTIFIER .
 
     $default  reduce using rule 53 (lvalue)
 
 
-state 59
+State 59
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -1116,7 +1116,7 @@ state 59
     $default  reduce using rule 39 (term)
 
 
-state 60
+State 60
 
    62 call: L_PARENTHES . funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES
 
@@ -1126,7 +1126,7 @@ state 60
     funcstart  go to state 42
 
 
-state 61
+State 61
 
    40 term: PPLUS lvalue .
    56 member: lvalue . DOT IDENTIFIER
@@ -1145,7 +1145,7 @@ state 61
     methodcall  go to state 97
 
 
-state 62
+State 62
 
    58 member: call . DOT IDENTIFIER
    59       | call . L_SBRACKET expr R_SBRACKET
@@ -1156,7 +1156,7 @@ state 62
     L_PARENTHES  shift, and go to state 100
 
 
-state 63
+State 63
 
    42 term: MMINUS lvalue .
    56 member: lvalue . DOT IDENTIFIER
@@ -1175,27 +1175,27 @@ state 63
     methodcall  go to state 97
 
 
-state 64
+State 64
 
    54 lvalue: DCOLON IDENTIFIER .
 
     $default  reduce using rule 54 (lvalue)
 
 
-state 65
+State 65
 
-   83 block: L_CBRACKET @8 . multi_stmts R_CBRACKET
+   83 block: L_CBRACKET $@8 . multi_stmts R_CBRACKET
 
     R_CBRACKET  reduce using rule 5 (multi_stmts)
-    $default    reduce using rule 2 (@1)
+    $default    reduce using rule 2 ($@1)
 
     multi_stmts  go to state 110
-    @1           go to state 3
+    $@1          go to state 3
 
 
-state 66
+State 66
 
-   81 indexedelem: L_CBRACKET . expr @7 COLON expr R_CBRACKET
+   81 indexedelem: L_CBRACKET . expr $@7 COLON expr R_CBRACKET
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -1227,10 +1227,10 @@ state 66
     number       go to state 44
 
 
-state 67
+State 67
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -1264,21 +1264,21 @@ state 67
     multi_exprs_for_table  go to state 113
 
 
-state 68
+State 68
 
    71 objectdef: L_SBRACKET elist_for_table . R_SBRACKET
 
     R_SBRACKET  shift, and go to state 114
 
 
-state 69
+State 69
 
    72 objectdef: L_SBRACKET indexed . R_SBRACKET
 
     R_SBRACKET  shift, and go to state 115
 
 
-state 70
+State 70
 
    77 indexed: indexedelem . multi_indexedelem
 
@@ -1289,9 +1289,9 @@ state 70
     multi_indexedelem  go to state 117
 
 
-state 71
+State 71
 
-   38 term: L_PARENTHES @5 . expr R_PARENTHES
+   38 term: L_PARENTHES $@5 . expr R_PARENTHES
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -1323,7 +1323,7 @@ state 71
     number       go to state 44
 
 
-state 72
+State 72
 
    50 primary: L_PARENTHES funcdef . R_PARENTHES
    62 call: L_PARENTHES funcdef . R_PARENTHES L_PARENTHES elist R_PARENTHES
@@ -1331,37 +1331,37 @@ state 72
     R_PARENTHES  shift, and go to state 119
 
 
-state 73
+State 73
 
-    4 multi_stmts: @1 stmt @2 . multi_stmts
+    4 multi_stmts: $@1 stmt $@2 . multi_stmts
 
     $end        reduce using rule 5 (multi_stmts)
     R_CBRACKET  reduce using rule 5 (multi_stmts)
-    $default    reduce using rule 2 (@1)
+    $default    reduce using rule 2 ($@1)
 
     multi_stmts  go to state 120
-    @1           go to state 3
+    $@1          go to state 3
 
 
-state 74
+State 74
 
-   20 expr: expr AND . @3 epsilon expr
+   20 expr: expr AND . $@3 epsilon expr
 
-    $default  reduce using rule 19 (@3)
+    $default  reduce using rule 19 ($@3)
 
-    @3  go to state 121
-
-
-state 75
-
-   22 expr: expr OR . @4 epsilon expr
-
-    $default  reduce using rule 21 (@4)
-
-    @4  go to state 122
+    $@3  go to state 121
 
 
-state 76
+State 75
+
+   22 expr: expr OR . $@4 epsilon expr
+
+    $default  reduce using rule 21 ($@4)
+
+    $@4  go to state 122
+
+
+State 76
 
    26 arexpr: expr PLUS . expr
 
@@ -1395,7 +1395,7 @@ state 76
     number       go to state 44
 
 
-state 77
+State 77
 
    27 arexpr: expr MINUS . expr
 
@@ -1429,7 +1429,7 @@ state 77
     number       go to state 44
 
 
-state 78
+State 78
 
    28 arexpr: expr MULT . expr
 
@@ -1463,7 +1463,7 @@ state 78
     number       go to state 44
 
 
-state 79
+State 79
 
    29 arexpr: expr DIV . expr
 
@@ -1497,7 +1497,7 @@ state 79
     number       go to state 44
 
 
-state 80
+State 80
 
    30 arexpr: expr MOD . expr
 
@@ -1531,7 +1531,7 @@ state 80
     number       go to state 44
 
 
-state 81
+State 81
 
    35 boolResexpr: expr EQUAL . expr
 
@@ -1565,7 +1565,7 @@ state 81
     number       go to state 44
 
 
-state 82
+State 82
 
    36 boolResexpr: expr NEQUAL . expr
 
@@ -1599,7 +1599,7 @@ state 82
     number       go to state 44
 
 
-state 83
+State 83
 
    31 boolResexpr: expr GREATER . expr
 
@@ -1633,7 +1633,7 @@ state 83
     number       go to state 44
 
 
-state 84
+State 84
 
    33 boolResexpr: expr LESS . expr
 
@@ -1667,7 +1667,7 @@ state 84
     number       go to state 44
 
 
-state 85
+State 85
 
    32 boolResexpr: expr GREATER_EQUAL . expr
 
@@ -1701,7 +1701,7 @@ state 85
     number       go to state 44
 
 
-state 86
+State 86
 
    34 boolResexpr: expr LESS_EQUAL . expr
 
@@ -1735,42 +1735,42 @@ state 86
     number       go to state 44
 
 
-state 87
+State 87
 
     6 stmt: expr SEMICOLON .
 
     $default  reduce using rule 6 (stmt)
 
 
-state 88
+State 88
 
    41 term: lvalue PPLUS .
 
     $default  reduce using rule 41 (term)
 
 
-state 89
+State 89
 
    43 term: lvalue MMINUS .
 
     $default  reduce using rule 43 (term)
 
 
-state 90
+State 90
 
    56 member: lvalue DOT . IDENTIFIER
 
     IDENTIFIER  shift, and go to state 134
 
 
-state 91
+State 91
 
    66 methodcall: DOTS . IDENTIFIER L_PARENTHES elist R_PARENTHES
 
     IDENTIFIER  shift, and go to state 135
 
 
-state 92
+State 92
 
    57 member: lvalue L_SBRACKET . expr R_SBRACKET
 
@@ -1804,7 +1804,7 @@ state 92
     number       go to state 44
 
 
-state 93
+State 93
 
    65 normcall: L_PARENTHES . elist R_PARENTHES
 
@@ -1841,42 +1841,42 @@ state 93
     number       go to state 44
 
 
-state 94
+State 94
 
-   46 assignmexpr: lvalue @6 . EQ expr
+   46 assignmexpr: lvalue $@6 . EQ expr
 
     EQ  shift, and go to state 139
 
 
-state 95
+State 95
 
    61 call: lvalue callsuffix .
 
     $default  reduce using rule 61 (call)
 
 
-state 96
+State 96
 
    63 callsuffix: normcall .
 
     $default  reduce using rule 63 (callsuffix)
 
 
-state 97
+State 97
 
    64 callsuffix: methodcall .
 
     $default  reduce using rule 64 (callsuffix)
 
 
-state 98
+State 98
 
    58 member: call DOT . IDENTIFIER
 
     IDENTIFIER  shift, and go to state 140
 
 
-state 99
+State 99
 
    59 member: call L_SBRACKET . expr R_SBRACKET
 
@@ -1910,7 +1910,7 @@ state 99
     number       go to state 44
 
 
-state 100
+State 100
 
    60 call: call L_PARENTHES . elist R_PARENTHES
 
@@ -1947,23 +1947,23 @@ state 100
     number       go to state 44
 
 
-state 101
+State 101
 
    88 funcname: IDENTIFIER .
 
     $default  reduce using rule 88 (funcname)
 
 
-state 102
+State 102
 
-   86 funcdef: funcstart funcname . L_PARENTHES @9 idlist R_PARENTHES @10 block
+   86 funcdef: funcstart funcname . L_PARENTHES $@9 idlist R_PARENTHES $@10 block
 
     L_PARENTHES  shift, and go to state 143
 
 
-state 103
+State 103
 
-  104 ifstmt: if_start R_PARENTHES . stmt ELSE @13 stmt
+  104 ifstmt: if_start R_PARENTHES . stmt ELSE $@13 stmt
   105       | if_start R_PARENTHES . stmt
 
     IF           shift, and go to state 5
@@ -2015,16 +2015,16 @@ state 103
     returnstmt   go to state 50
 
 
-state 104
+State 104
 
-  111 whilecond: L_PARENTHES . @14 expr @15 R_PARENTHES
+  111 whilecond: L_PARENTHES . $@14 expr $@15 R_PARENTHES
 
-    $default  reduce using rule 109 (@14)
+    $default  reduce using rule 109 ($@14)
 
-    @14  go to state 145
+    $@14  go to state 145
 
 
-state 105
+State 105
 
   107 whilestmt: whilestart whilecond . stmt
 
@@ -2077,10 +2077,10 @@ state 105
     returnstmt   go to state 50
 
 
-state 106
+State 106
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2111,9 +2111,9 @@ state 106
     $default  reduce using rule 106 (if_start)
 
 
-state 107
+State 107
 
-  114 forstmt: FOR L_PARENTHES @16 . for_elist @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 . for_elist $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -2148,31 +2148,31 @@ state 107
     for_elist    go to state 148
 
 
-state 108
+State 108
 
   119 returnstmt: RETURN expr SEMICOLON .
 
     $default  reduce using rule 119 (returnstmt)
 
 
-state 109
+State 109
 
    62 call: L_PARENTHES funcdef . R_PARENTHES L_PARENTHES elist R_PARENTHES
 
     R_PARENTHES  shift, and go to state 149
 
 
-state 110
+State 110
 
-   83 block: L_CBRACKET @8 multi_stmts . R_CBRACKET
+   83 block: L_CBRACKET $@8 multi_stmts . R_CBRACKET
 
     R_CBRACKET  shift, and go to state 150
 
 
-state 111
+State 111
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2184,7 +2184,7 @@ state 111
    34            | expr . LESS_EQUAL expr
    35            | expr . EQUAL expr
    36            | expr . NEQUAL expr
-   81 indexedelem: L_CBRACKET expr . @7 COLON expr R_CBRACKET
+   81 indexedelem: L_CBRACKET expr . $@7 COLON expr R_CBRACKET
 
     AND            shift, and go to state 74
     OR             shift, and go to state 75
@@ -2200,12 +2200,12 @@ state 111
     GREATER_EQUAL  shift, and go to state 85
     LESS_EQUAL     shift, and go to state 86
 
-    $default  reduce using rule 80 (@7)
+    $default  reduce using rule 80 ($@7)
 
-    @7  go to state 151
+    $@7  go to state 151
 
 
-state 112
+State 112
 
    75 multi_exprs_for_table: COMMA . expr multi_exprs_for_table
 
@@ -2239,28 +2239,28 @@ state 112
     number       go to state 44
 
 
-state 113
+State 113
 
    73 elist_for_table: expr multi_exprs_for_table .
 
     $default  reduce using rule 73 (elist_for_table)
 
 
-state 114
+State 114
 
    71 objectdef: L_SBRACKET elist_for_table R_SBRACKET .
 
     $default  reduce using rule 71 (objectdef)
 
 
-state 115
+State 115
 
    72 objectdef: L_SBRACKET indexed R_SBRACKET .
 
     $default  reduce using rule 72 (objectdef)
 
 
-state 116
+State 116
 
    78 multi_indexedelem: COMMA . indexedelem multi_indexedelem
 
@@ -2269,17 +2269,17 @@ state 116
     indexedelem  go to state 153
 
 
-state 117
+State 117
 
    77 indexed: indexedelem multi_indexedelem .
 
     $default  reduce using rule 77 (indexed)
 
 
-state 118
+State 118
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2291,7 +2291,7 @@ state 118
    34            | expr . LESS_EQUAL expr
    35            | expr . EQUAL expr
    36            | expr . NEQUAL expr
-   38 term: L_PARENTHES @5 expr . R_PARENTHES
+   38 term: L_PARENTHES $@5 expr . R_PARENTHES
 
     AND            shift, and go to state 74
     OR             shift, and go to state 75
@@ -2309,7 +2309,7 @@ state 118
     R_PARENTHES    shift, and go to state 154
 
 
-state 119
+State 119
 
    50 primary: L_PARENTHES funcdef R_PARENTHES .
    62 call: L_PARENTHES funcdef R_PARENTHES . L_PARENTHES elist R_PARENTHES
@@ -2319,35 +2319,35 @@ state 119
     $default  reduce using rule 50 (primary)
 
 
-state 120
+State 120
 
-    4 multi_stmts: @1 stmt @2 multi_stmts .
+    4 multi_stmts: $@1 stmt $@2 multi_stmts .
 
     $default  reduce using rule 4 (multi_stmts)
 
 
-state 121
+State 121
 
-   20 expr: expr AND @3 . epsilon expr
+   20 expr: expr AND $@3 . epsilon expr
 
     $default  reduce using rule 25 (epsilon)
 
     epsilon  go to state 156
 
 
-state 122
+State 122
 
-   22 expr: expr OR @4 . epsilon expr
+   22 expr: expr OR $@4 . epsilon expr
 
     $default  reduce using rule 25 (epsilon)
 
     epsilon  go to state 157
 
 
-state 123
+State 123
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    26       | expr PLUS expr .
    27       | expr . MINUS expr
@@ -2368,10 +2368,10 @@ state 123
     $default  reduce using rule 26 (arexpr)
 
 
-state 124
+State 124
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    27       | expr MINUS expr .
@@ -2392,10 +2392,10 @@ state 124
     $default  reduce using rule 27 (arexpr)
 
 
-state 125
+State 125
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2412,10 +2412,10 @@ state 125
     $default  reduce using rule 28 (arexpr)
 
 
-state 126
+State 126
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2432,10 +2432,10 @@ state 126
     $default  reduce using rule 29 (arexpr)
 
 
-state 127
+State 127
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2452,10 +2452,10 @@ state 127
     $default  reduce using rule 30 (arexpr)
 
 
-state 128
+State 128
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2485,10 +2485,10 @@ state 128
     $default  reduce using rule 35 (boolResexpr)
 
 
-state 129
+State 129
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2518,10 +2518,10 @@ state 129
     $default  reduce using rule 36 (boolResexpr)
 
 
-state 130
+State 130
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2549,10 +2549,10 @@ state 130
     $default  reduce using rule 31 (boolResexpr)
 
 
-state 131
+State 131
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2580,10 +2580,10 @@ state 131
     $default  reduce using rule 33 (boolResexpr)
 
 
-state 132
+State 132
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2611,10 +2611,10 @@ state 132
     $default  reduce using rule 32 (boolResexpr)
 
 
-state 133
+State 133
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2642,24 +2642,24 @@ state 133
     $default  reduce using rule 34 (boolResexpr)
 
 
-state 134
+State 134
 
    56 member: lvalue DOT IDENTIFIER .
 
     $default  reduce using rule 56 (member)
 
 
-state 135
+State 135
 
    66 methodcall: DOTS IDENTIFIER . L_PARENTHES elist R_PARENTHES
 
     L_PARENTHES  shift, and go to state 158
 
 
-state 136
+State 136
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2689,10 +2689,10 @@ state 136
     R_SBRACKET     shift, and go to state 159
 
 
-state 137
+State 137
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2726,16 +2726,16 @@ state 137
     multi_exprs  go to state 161
 
 
-state 138
+State 138
 
    65 normcall: L_PARENTHES elist . R_PARENTHES
 
     R_PARENTHES  shift, and go to state 162
 
 
-state 139
+State 139
 
-   46 assignmexpr: lvalue @6 EQ . expr
+   46 assignmexpr: lvalue $@6 EQ . expr
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -2767,17 +2767,17 @@ state 139
     number       go to state 44
 
 
-state 140
+State 140
 
    58 member: call DOT IDENTIFIER .
 
     $default  reduce using rule 58 (member)
 
 
-state 141
+State 141
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2807,25 +2807,25 @@ state 141
     R_SBRACKET     shift, and go to state 164
 
 
-state 142
+State 142
 
    60 call: call L_PARENTHES elist . R_PARENTHES
 
     R_PARENTHES  shift, and go to state 165
 
 
-state 143
+State 143
 
-   86 funcdef: funcstart funcname L_PARENTHES . @9 idlist R_PARENTHES @10 block
+   86 funcdef: funcstart funcname L_PARENTHES . $@9 idlist R_PARENTHES $@10 block
 
-    $default  reduce using rule 84 (@9)
+    $default  reduce using rule 84 ($@9)
 
-    @9  go to state 166
+    $@9  go to state 166
 
 
-state 144
+State 144
 
-  104 ifstmt: if_start R_PARENTHES stmt . ELSE @13 stmt
+  104 ifstmt: if_start R_PARENTHES stmt . ELSE $@13 stmt
   105       | if_start R_PARENTHES stmt .
 
     ELSE  shift, and go to state 167
@@ -2833,9 +2833,9 @@ state 144
     $default  reduce using rule 105 (ifstmt)
 
 
-state 145
+State 145
 
-  111 whilecond: L_PARENTHES @14 . expr @15 R_PARENTHES
+  111 whilecond: L_PARENTHES $@14 . expr $@15 R_PARENTHES
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -2867,17 +2867,17 @@ state 145
     number       go to state 44
 
 
-state 146
+State 146
 
   107 whilestmt: whilestart whilecond stmt .
 
     $default  reduce using rule 107 (whilestmt)
 
 
-state 147
+State 147
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2911,40 +2911,40 @@ state 147
     multi_exprs  go to state 169
 
 
-state 148
+State 148
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist . @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist . $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
 
-    $default  reduce using rule 113 (@17)
+    $default  reduce using rule 113 ($@17)
 
-    @17  go to state 170
+    $@17  go to state 170
 
 
-state 149
+State 149
 
    62 call: L_PARENTHES funcdef R_PARENTHES . L_PARENTHES elist R_PARENTHES
 
     L_PARENTHES  shift, and go to state 155
 
 
-state 150
+State 150
 
-   83 block: L_CBRACKET @8 multi_stmts R_CBRACKET .
+   83 block: L_CBRACKET $@8 multi_stmts R_CBRACKET .
 
     $default  reduce using rule 83 (block)
 
 
-state 151
+State 151
 
-   81 indexedelem: L_CBRACKET expr @7 . COLON expr R_CBRACKET
+   81 indexedelem: L_CBRACKET expr $@7 . COLON expr R_CBRACKET
 
     COLON  shift, and go to state 171
 
 
-state 152
+State 152
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -2978,7 +2978,7 @@ state 152
     multi_exprs_for_table  go to state 172
 
 
-state 153
+State 153
 
    78 multi_indexedelem: COMMA indexedelem . multi_indexedelem
 
@@ -2989,14 +2989,14 @@ state 153
     multi_indexedelem  go to state 173
 
 
-state 154
+State 154
 
-   38 term: L_PARENTHES @5 expr R_PARENTHES .
+   38 term: L_PARENTHES $@5 expr R_PARENTHES .
 
     $default  reduce using rule 38 (term)
 
 
-state 155
+State 155
 
    62 call: L_PARENTHES funcdef R_PARENTHES L_PARENTHES . elist R_PARENTHES
 
@@ -3033,9 +3033,9 @@ state 155
     number       go to state 44
 
 
-state 156
+State 156
 
-   20 expr: expr AND @3 epsilon . expr
+   20 expr: expr AND $@3 epsilon . expr
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -3067,9 +3067,9 @@ state 156
     number       go to state 44
 
 
-state 157
+State 157
 
-   22 expr: expr OR @4 epsilon . expr
+   22 expr: expr OR $@4 epsilon . expr
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -3101,7 +3101,7 @@ state 157
     number       go to state 44
 
 
-state 158
+State 158
 
    66 methodcall: DOTS IDENTIFIER L_PARENTHES . elist R_PARENTHES
 
@@ -3138,14 +3138,14 @@ state 158
     number       go to state 44
 
 
-state 159
+State 159
 
    57 member: lvalue L_SBRACKET expr R_SBRACKET .
 
     $default  reduce using rule 57 (member)
 
 
-state 160
+State 160
 
    69 multi_exprs: COMMA . expr multi_exprs
 
@@ -3179,24 +3179,24 @@ state 160
     number       go to state 44
 
 
-state 161
+State 161
 
    67 elist: expr multi_exprs .
 
     $default  reduce using rule 67 (elist)
 
 
-state 162
+State 162
 
    65 normcall: L_PARENTHES elist R_PARENTHES .
 
     $default  reduce using rule 65 (normcall)
 
 
-state 163
+State 163
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3208,7 +3208,7 @@ state 163
    34            | expr . LESS_EQUAL expr
    35            | expr . EQUAL expr
    36            | expr . NEQUAL expr
-   46 assignmexpr: lvalue @6 EQ expr .
+   46 assignmexpr: lvalue $@6 EQ expr .
 
     AND            shift, and go to state 74
     OR             shift, and go to state 75
@@ -3227,23 +3227,23 @@ state 163
     $default  reduce using rule 46 (assignmexpr)
 
 
-state 164
+State 164
 
    59 member: call L_SBRACKET expr R_SBRACKET .
 
     $default  reduce using rule 59 (member)
 
 
-state 165
+State 165
 
    60 call: call L_PARENTHES elist R_PARENTHES .
 
     $default  reduce using rule 60 (call)
 
 
-state 166
+State 166
 
-   86 funcdef: funcstart funcname L_PARENTHES @9 . idlist R_PARENTHES @10 block
+   86 funcdef: funcstart funcname L_PARENTHES $@9 . idlist R_PARENTHES $@10 block
 
     IDENTIFIER  shift, and go to state 179
 
@@ -3252,19 +3252,19 @@ state 166
     idlist  go to state 180
 
 
-state 167
+State 167
 
-  104 ifstmt: if_start R_PARENTHES stmt ELSE . @13 stmt
+  104 ifstmt: if_start R_PARENTHES stmt ELSE . $@13 stmt
 
-    $default  reduce using rule 103 (@13)
+    $default  reduce using rule 103 ($@13)
 
-    @13  go to state 181
+    $@13  go to state 181
 
 
-state 168
+State 168
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3276,7 +3276,7 @@ state 168
    34            | expr . LESS_EQUAL expr
    35            | expr . EQUAL expr
    36            | expr . NEQUAL expr
-  111 whilecond: L_PARENTHES @14 expr . @15 R_PARENTHES
+  111 whilecond: L_PARENTHES $@14 expr . $@15 R_PARENTHES
 
     AND            shift, and go to state 74
     OR             shift, and go to state 75
@@ -3292,28 +3292,28 @@ state 168
     GREATER_EQUAL  shift, and go to state 85
     LESS_EQUAL     shift, and go to state 86
 
-    $default  reduce using rule 110 (@15)
+    $default  reduce using rule 110 ($@15)
 
-    @15  go to state 182
+    $@15  go to state 182
 
 
-state 169
+State 169
 
   115 for_elist: expr multi_exprs .
 
     $default  reduce using rule 115 (for_elist)
 
 
-state 170
+State 170
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 . SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 . SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt
 
     SEMICOLON  shift, and go to state 183
 
 
-state 171
+State 171
 
-   81 indexedelem: L_CBRACKET expr @7 COLON . expr R_CBRACKET
+   81 indexedelem: L_CBRACKET expr $@7 COLON . expr R_CBRACKET
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -3345,32 +3345,32 @@ state 171
     number       go to state 44
 
 
-state 172
+State 172
 
    75 multi_exprs_for_table: COMMA expr multi_exprs_for_table .
 
     $default  reduce using rule 75 (multi_exprs_for_table)
 
 
-state 173
+State 173
 
    78 multi_indexedelem: COMMA indexedelem multi_indexedelem .
 
     $default  reduce using rule 78 (multi_indexedelem)
 
 
-state 174
+State 174
 
    62 call: L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist . R_PARENTHES
 
     R_PARENTHES  shift, and go to state 185
 
 
-state 175
+State 175
 
-   20 expr: expr . AND @3 epsilon expr
-   20     | expr AND @3 epsilon expr .
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   20     | expr AND $@3 epsilon expr .
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3398,11 +3398,11 @@ state 175
     $default  reduce using rule 20 (expr)
 
 
-state 176
+State 176
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
-   22     | expr OR @4 epsilon expr .
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
+   22     | expr OR $@4 epsilon expr .
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3431,17 +3431,17 @@ state 176
     $default  reduce using rule 22 (expr)
 
 
-state 177
+State 177
 
    66 methodcall: DOTS IDENTIFIER L_PARENTHES elist . R_PARENTHES
 
     R_PARENTHES  shift, and go to state 186
 
 
-state 178
+State 178
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3475,25 +3475,25 @@ state 178
     multi_exprs  go to state 187
 
 
-state 179
+State 179
 
-   98 idlist: IDENTIFIER . @11 multi_id
+   98 idlist: IDENTIFIER . $@11 multi_id
 
-    $default  reduce using rule 97 (@11)
+    $default  reduce using rule 97 ($@11)
 
-    @11  go to state 188
+    $@11  go to state 188
 
 
-state 180
+State 180
 
-   86 funcdef: funcstart funcname L_PARENTHES @9 idlist . R_PARENTHES @10 block
+   86 funcdef: funcstart funcname L_PARENTHES $@9 idlist . R_PARENTHES $@10 block
 
     R_PARENTHES  shift, and go to state 189
 
 
-state 181
+State 181
 
-  104 ifstmt: if_start R_PARENTHES stmt ELSE @13 . stmt
+  104 ifstmt: if_start R_PARENTHES stmt ELSE $@13 . stmt
 
     IF           shift, and go to state 5
     WHILE        shift, and go to state 6
@@ -3544,16 +3544,16 @@ state 181
     returnstmt   go to state 50
 
 
-state 182
+State 182
 
-  111 whilecond: L_PARENTHES @14 expr @15 . R_PARENTHES
+  111 whilecond: L_PARENTHES $@14 expr $@15 . R_PARENTHES
 
     R_PARENTHES  shift, and go to state 191
 
 
-state 183
+State 183
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON . for_cond SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON . for_cond SEMICOLON for_end R_PARENTHES stmt
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -3586,10 +3586,10 @@ state 183
     for_cond     go to state 193
 
 
-state 184
+State 184
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3601,7 +3601,7 @@ state 184
    34            | expr . LESS_EQUAL expr
    35            | expr . EQUAL expr
    36            | expr . NEQUAL expr
-   81 indexedelem: L_CBRACKET expr @7 COLON expr . R_CBRACKET
+   81 indexedelem: L_CBRACKET expr $@7 COLON expr . R_CBRACKET
 
     AND            shift, and go to state 74
     OR             shift, and go to state 75
@@ -3619,30 +3619,30 @@ state 184
     R_CBRACKET     shift, and go to state 194
 
 
-state 185
+State 185
 
    62 call: L_PARENTHES funcdef R_PARENTHES L_PARENTHES elist R_PARENTHES .
 
     $default  reduce using rule 62 (call)
 
 
-state 186
+State 186
 
    66 methodcall: DOTS IDENTIFIER L_PARENTHES elist R_PARENTHES .
 
     $default  reduce using rule 66 (methodcall)
 
 
-state 187
+State 187
 
    69 multi_exprs: COMMA expr multi_exprs .
 
     $default  reduce using rule 69 (multi_exprs)
 
 
-state 188
+State 188
 
-   98 idlist: IDENTIFIER @11 . multi_id
+   98 idlist: IDENTIFIER $@11 . multi_id
 
     COMMA  shift, and go to state 195
 
@@ -3651,33 +3651,33 @@ state 188
     multi_id  go to state 196
 
 
-state 189
+State 189
 
-   86 funcdef: funcstart funcname L_PARENTHES @9 idlist R_PARENTHES . @10 block
+   86 funcdef: funcstart funcname L_PARENTHES $@9 idlist R_PARENTHES . $@10 block
 
-    $default  reduce using rule 85 (@10)
+    $default  reduce using rule 85 ($@10)
 
-    @10  go to state 197
+    $@10  go to state 197
 
 
-state 190
+State 190
 
-  104 ifstmt: if_start R_PARENTHES stmt ELSE @13 stmt .
+  104 ifstmt: if_start R_PARENTHES stmt ELSE $@13 stmt .
 
     $default  reduce using rule 104 (ifstmt)
 
 
-state 191
+State 191
 
-  111 whilecond: L_PARENTHES @14 expr @15 R_PARENTHES .
+  111 whilecond: L_PARENTHES $@14 expr $@15 R_PARENTHES .
 
     $default  reduce using rule 111 (whilecond)
 
 
-state 192
+State 192
 
-   20 expr: expr . AND @3 epsilon expr
-   22     | expr . OR @4 epsilon expr
+   20 expr: expr . AND $@3 epsilon expr
+   22     | expr . OR $@4 epsilon expr
    26 arexpr: expr . PLUS expr
    27       | expr . MINUS expr
    28       | expr . MULT expr
@@ -3708,46 +3708,46 @@ state 192
     $default  reduce using rule 117 (for_cond)
 
 
-state 193
+State 193
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON for_cond . SEMICOLON for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond . SEMICOLON for_end R_PARENTHES stmt
 
     SEMICOLON  shift, and go to state 198
 
 
-state 194
+State 194
 
-   81 indexedelem: L_CBRACKET expr @7 COLON expr R_CBRACKET .
+   81 indexedelem: L_CBRACKET expr $@7 COLON expr R_CBRACKET .
 
     $default  reduce using rule 81 (indexedelem)
 
 
-state 195
+State 195
 
-  101 multi_id: COMMA . IDENTIFIER @12 multi_id
+  101 multi_id: COMMA . IDENTIFIER $@12 multi_id
 
     IDENTIFIER  shift, and go to state 199
 
 
-state 196
+State 196
 
-   98 idlist: IDENTIFIER @11 multi_id .
+   98 idlist: IDENTIFIER $@11 multi_id .
 
     $default  reduce using rule 98 (idlist)
 
 
-state 197
+State 197
 
-   86 funcdef: funcstart funcname L_PARENTHES @9 idlist R_PARENTHES @10 . block
+   86 funcdef: funcstart funcname L_PARENTHES $@9 idlist R_PARENTHES $@10 . block
 
     L_CBRACKET  shift, and go to state 22
 
     block  go to state 200
 
 
-state 198
+State 198
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON for_cond SEMICOLON . for_end R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON . for_end R_PARENTHES stmt
 
     NOT          shift, and go to state 12
     LOCAL        shift, and go to state 13
@@ -3783,39 +3783,39 @@ state 198
     for_end      go to state 202
 
 
-state 199
+State 199
 
-  101 multi_id: COMMA IDENTIFIER . @12 multi_id
+  101 multi_id: COMMA IDENTIFIER . $@12 multi_id
 
-    $default  reduce using rule 100 (@12)
+    $default  reduce using rule 100 ($@12)
 
-    @12  go to state 203
+    $@12  go to state 203
 
 
-state 200
+State 200
 
-   86 funcdef: funcstart funcname L_PARENTHES @9 idlist R_PARENTHES @10 block .
+   86 funcdef: funcstart funcname L_PARENTHES $@9 idlist R_PARENTHES $@10 block .
 
     $default  reduce using rule 86 (funcdef)
 
 
-state 201
+State 201
 
   118 for_end: for_elist .
 
     $default  reduce using rule 118 (for_end)
 
 
-state 202
+State 202
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON for_cond SEMICOLON for_end . R_PARENTHES stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON for_end . R_PARENTHES stmt
 
     R_PARENTHES  shift, and go to state 204
 
 
-state 203
+State 203
 
-  101 multi_id: COMMA IDENTIFIER @12 . multi_id
+  101 multi_id: COMMA IDENTIFIER $@12 . multi_id
 
     COMMA  shift, and go to state 195
 
@@ -3824,9 +3824,9 @@ state 203
     multi_id  go to state 205
 
 
-state 204
+State 204
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES . stmt
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES . stmt
 
     IF           shift, and go to state 5
     WHILE        shift, and go to state 6
@@ -3877,15 +3877,15 @@ state 204
     returnstmt   go to state 50
 
 
-state 205
+State 205
 
-  101 multi_id: COMMA IDENTIFIER @12 multi_id .
+  101 multi_id: COMMA IDENTIFIER $@12 multi_id .
 
     $default  reduce using rule 101 (multi_id)
 
 
-state 206
+State 206
 
-  114 forstmt: FOR L_PARENTHES @16 for_elist @17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt .
+  114 forstmt: FOR L_PARENTHES $@16 for_elist $@17 SEMICOLON for_cond SEMICOLON for_end R_PARENTHES stmt .
 
     $default  reduce using rule 114 (forstmt)
