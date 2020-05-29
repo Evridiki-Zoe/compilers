@@ -112,7 +112,7 @@ struct instruction**  code = NULL;
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
 
-	 printf("type of vmarg %d %f\n",arg->type,arg->val );
+	 //printf("type of vmarg %d %f\n",arg->type,arg->val );
 	switch (arg->type) {
 		case global_a: return &stack[arg->val];
 		case local_a:	printf("\n\n\nperno local %f\n\n\n",stack[topsp + arg->val].data.numVal );return &stack[topsp + arg->val];
@@ -327,6 +327,7 @@ void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* dat
 if (table->data->type == undef_m) {
 //	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
 //	strcpy(tmp->index ,index);
+	tmp->index = malloc(sizeof(char)*strlen(index)+1);
 	tmp->index= index;
 	tmp->data= tmpdata;
 
@@ -344,6 +345,7 @@ tmp = tmp->next;
 }
 tmp = malloc(sizeof(struct avm_table));
 //strcpy(tmp->index ,index);
+tmp->index = malloc(sizeof(char)*strlen(index)+1);
 tmp->index = index;
 tmp->data= tmpdata;
 tmp->next = table->next;
@@ -378,6 +380,7 @@ void avm_callsaveenviroment(void){
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top-totalActuals - 2);
 	avm_push_envvalue(topsp);
+	printf("telos save env \n" );
 
 }
 
@@ -1406,13 +1409,14 @@ char* table_tostring (struct avm_memcell* cell){
 			case	nil_m	:	elemdata=nil_tostring(tmp->data); break;
 			case	undef_m	:	elemdata=undef_tostring(tmp->data); break;
 		}
-		char* index=malloc(sizeof(char)*strlen(tmp->index));
+		char* index=malloc(sizeof(char)*strlen(tmp->index) +1);
+		assert(index);
 		index = strdup(tmp->index);
 
 		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 12);
+		assert(whole);
 		sprintf(whole,"{ \"%s\" : %s } , ",index,elemdata);
-
-		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole)+1 ); // fixes error 3
+		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole) +2); // fixes error 3
 		strcat(str,whole);
 		tmp=tmp->next;
 	}
