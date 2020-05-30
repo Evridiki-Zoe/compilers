@@ -213,7 +213,10 @@ int stringHandler(){
         if (c == '\"') {
             add_alpha_token(++token_count, "STRING", buff, yylineno);
 			Lex_string = malloc(baseofre*sizeof(char));
-			strcpy(Lex_string,buff);
+			Lex_string = strdup(buff);
+//			strcpy(Lex_string,buff);
+//      Lex_string[length+1] = '\0';
+	
             return 1;
         }
 
@@ -226,7 +229,9 @@ int stringHandler(){
               strcat(buff, "\t");
 
             } else if (tmp == 'n') {
-              strcat(buff, "\n");
+//              strcat(buff, "\n");
+                buff[length] = 10;
+
 
             } else if (tmp == '\\') {
               strcat(buff, "\\");
