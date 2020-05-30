@@ -1,2 +1,22 @@
-t = [  {"kappa" :    [ {1 : (function(){print("kappa");} )  } ]      }  ];
-print(t.kappa[1]());
+t = [ { "key1" : 1 }, { "key2" : 2 }, { "key3" : "tria" }, { "key4" : true }, { "key5" : [ nil, 3, 4, nil, 5 ] } ];
+
+//print("Table t is: ", t, "\n");
+//print("Lenght of table t is (must be 5):", objecttotalmembers(t),"\n");
+
+function foo() {
+    function lala() {
+        function prnt() {
+            local t = [ ::t, 2, 3.14, "4", true, false ];
+            print("Table t in prnt is: ", t, "\n");
+        }
+        print("Function prnt printing: ", prnt, " and print: ", print, "\n");
+        prnt();
+    }
+    return lala;
+}
+
+f = foo();
+//f();
+
+print("Table indices of global t: ", ind, " which has length: ", objecttotalmembers(ind), "\n");
+

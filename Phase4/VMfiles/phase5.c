@@ -611,6 +611,8 @@ void libfunc_objecttotalmembers(){
 				tmp = tmp->next;
 
 			}
+			retval.type = number_m;
+			retval.data.numVal = counter;
 			printf("objecttotalmembers: %d!\n", counter);
 		}
 		else{
@@ -1332,14 +1334,15 @@ void execute_tablegetelem	(struct instruction* ins){
 			case number_m:	sprintf(res , "%f",i->data.numVal); break;
 			case string_m:	res=strdup(i->data.strVal); break;
                                 case userfunc_m: {
-                                        printf("eimai mia loulou %f %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
+                                        printf("eimai mia loulou %d %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
                                         char* tmp = malloc(10);
-                                        sprintf(tmp,"%f",i->data.funcVal);
+                                        sprintf(tmp,"%f",(double)i->data.funcVal);
                                         res=strdup(tmp);
                                         free(tmp);
                                         break;
 
                                 }
+								case bool_m : res = strdup(bool_tostring(i)); break;
                                 case table_m: printf("EIMAI TABLEEEE\n"); res = strdup(table_tostring(i)); break;
                                 case lib_func_m: res = strdup(i->data.libfuncVal); break;
 			default : 	res=strdup(i->data.strVal); break;
@@ -1398,14 +1401,15 @@ void execute_tablesetelem	(struct instruction* ins){
 				}
 				case string_m:	res=strdup(i->data.strVal); break;
 				case userfunc_m: {
-					printf("eimai mia loulou %f %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
+					printf("eimai mia loulou %d %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
 					char* tmp = malloc(10);
-					sprintf(tmp,"%f",i->data.funcVal);
+					sprintf(tmp,"%f",(double)i->data.funcVal);
 	                                res=strdup(tmp);
         	                        free(tmp);
 					break;
 
 				}
+				case bool_m : res = strdup(bool_tostring(i)); break;
 				case table_m: printf("EIMAI TABLEEEE\n"); res = strdup(table_tostring(i)); break;
                                 case lib_func_m: res = strdup(i->data.libfuncVal); break;
 				default :   res=strdup(i->data.strVal); break;
@@ -1887,4 +1891,3 @@ char* enum_toString_opCodes_v(vmopcode sym) {
 
 
 	*/
-
