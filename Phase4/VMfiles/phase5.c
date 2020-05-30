@@ -112,7 +112,7 @@ struct instruction**  code = NULL;
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
 
-	 //printf("type of vmarg %d %f\n",arg->type,arg->val );
+	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a: return &stack[arg->val];
 		case local_a:	printf("\n\n\nperno local %f\n\n\n",stack[topsp + arg->val].data.numVal );return &stack[topsp + arg->val];
@@ -184,7 +184,7 @@ void avm_initstack(){
 
 }
 
-double	consts_getnumber(unsigned index){return numConsts[index];}
+double	consts_getnumber(unsigned index){return numConsts[index];} //TODO
 char*	consts_getstring(unsigned index){return stringConsts[index];}
 char*	libfuncs_getused(unsigned index){return namedLibfuncs[index];}
 
@@ -226,8 +226,9 @@ void execute_cycle	(void){
 		assert(pc < AVM_ENDING_PC);
 
 
-		struct instruction* instr = (struct instruction*)malloc(sizeof(struct instruction));
+		struct instruction* instr = malloc(sizeof(struct instruction));
 		memcpy(instr,code[pc],sizeof(struct instruction));
+
 		printf("now running ins(%s) %d \n", enum_toString_opCodes_v(code[pc]->opcode), instr->opcode);
 
 		assert(instr->opcode>=0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
@@ -241,9 +242,9 @@ void execute_cycle	(void){
 
 			++pc;
 		}
-			 free(instr);
-
+		free(instr);
 	}
+
 }
 
 //-----------Cell cleaning----------------------------------
@@ -305,7 +306,7 @@ struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 	printf("psaxno gia %s\n",index );
 	while (tmp) {
 		if(tmp->index){
-
+			printf("%s , %s \n",index,tmp->index);
 			if (strcmp(tmp->index,index)==0) {
 				return tmp->data;
 			}
@@ -327,8 +328,8 @@ void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* dat
 if (table->data->type == undef_m) {
 //	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
 //	strcpy(tmp->index ,index);
-	tmp->index = malloc(sizeof(char)*strlen(index)+1);
-	tmp->index= index;
+	tmp->index=malloc(sizeof(index)+1);
+	strcpy(tmp->index ,index);
 	tmp->data= tmpdata;
 
 	return;
@@ -344,9 +345,8 @@ while (tmp) {
 tmp = tmp->next;
 }
 tmp = malloc(sizeof(struct avm_table));
-//strcpy(tmp->index ,index);
-tmp->index = malloc(sizeof(char)*strlen(index)+1);
-tmp->index = index;
+ tmp->index=malloc(sizeof(index)+1);
+strcpy(tmp->index ,index);
 tmp->data= tmpdata;
 tmp->next = table->next;
 table->next = tmp;
@@ -380,7 +380,6 @@ void avm_callsaveenviroment(void){
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top-totalActuals - 2);
 	avm_push_envvalue(topsp);
-	printf("telos save env \n" );
 
 }
 
@@ -479,7 +478,7 @@ void libfunc_print(){
 		free(s);
 	}
 	printf("\n" );
-	//printStack();
+	printStack();
 }
 
 void libfunc_input(){
@@ -636,6 +635,7 @@ void libfunc_objectcopy(){
 }
 
 void libfunc_totalarguments(void){
+//TODO ? an kalesoume thn function me ligotera arguments apo osa exei h dhlwsh poia #args prepei na epistrepsei?
 	unsigned p_topsp = avm_get_envvalue(topsp   AVM_SAVEDTOPSP_OFFSET);
 	avm_memcellclear(&retval);
 
@@ -706,7 +706,7 @@ void  libfunc_typeof(){
 
 }
 
-
+//TODO oles oi lib func theloun allages
 
 void libfunc_strtonum(){
 	double tonum;
@@ -815,7 +815,8 @@ void libfunc_sin( ){
 
 }
 
-void avm_registerlibfunc (char* id , library_funcs_t addr){}
+void avm_registerlibfunc (char* id , library_funcs_t addr){} // TODO
+
 //------------------------------------------
 
 
@@ -1269,6 +1270,8 @@ void execute_tablegetelem	(struct instruction* ins){
 
 	struct avm_memcell* i = avm_translate_operand(ins->arg2, &ax);
 
+	//assert(lv && &stack[N - 1] >= lv && &stack[top] < lv || lv == &retval);// TODO N
+	//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
 	assert(i);
 
 	//avm_memcellclear(lv);
@@ -1321,19 +1324,22 @@ void execute_tablesetelem	(struct instruction* ins){
 		if(t->type != table_m)	{	avm_error("illegal use of variable as a table in setelem! \n"); exit(0);}
 		else {
 
-			char* res=malloc(sizeof(char));
+			char* res=malloc(5);
 
 			switch (i->type) {
-				case number_m: {
+
+
+				case number_m:{
 				char* tmp = malloc(6);
-				 sprintf(tmp , "%f",i->data.numVal); //break;
-				res = strdup(tmp);
+				sprintf(tmp,"%f",i->data.numVal);
+				res=strdup(tmp);
 				break;
-}
+				}
 				case string_m:	res=strdup(i->data.strVal); break;
-				default : 	res=strdup(i->data.strVal); break;
+				default : 	assert(0);//res=strdup(i->data.strVal); break;
 			}
 
+			printf("\n\n\nres =%s \n\n\n",res );
 			avm_setelem(t->data.tableVal, res, c);
 			free(res);
 		}
@@ -1409,14 +1415,13 @@ char* table_tostring (struct avm_memcell* cell){
 			case	nil_m	:	elemdata=nil_tostring(tmp->data); break;
 			case	undef_m	:	elemdata=undef_tostring(tmp->data); break;
 		}
-		char* index=malloc(sizeof(char)*strlen(tmp->index) +1);
-		assert(index);
+		char* index=malloc(sizeof(char)*strlen(tmp->index));
 		index = strdup(tmp->index);
 
 		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 12);
-		assert(whole);
 		sprintf(whole,"{ \"%s\" : %s } , ",index,elemdata);
-		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole) +2); // fixes error 3
+
+		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole)+1 ); // fixes error 3
 		strcat(str,whole);
 		tmp=tmp->next;
 	}
