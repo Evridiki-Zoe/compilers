@@ -293,7 +293,7 @@ struct avm_table* avm_tablenew(){
 	tmp->data= malloc(sizeof(struct avm_memcell));
 	tmp->data->type=undef_m;
 //	tmp->index = malloc(sizeof(struct avm_memcell));
-	tmp->index=NULL;
+	tmp->index="";
 	tmp->next=NULL;
 
 	return tmp;
@@ -329,16 +329,20 @@ if (table->data->type == undef_m) {
 //	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
 //	strcpy(tmp->index ,index);
 	tmp->index=malloc(sizeof(index)+1);
-	strcpy(tmp->index ,index);
-	tmp->data= tmpdata;
-
+	tmp->index = strdup(index);
+	tmp->data= malloc(sizeof(struct avm_memcell));
+	memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
+	free(tmpdata);
 	return;
 }
 
 while (tmp) {
 	if(tmp->index){
 		if (strcmp(tmp->index,index)==0) {
-			tmp->data= tmpdata;
+			tmp->data= malloc(sizeof(struct avm_memcell));
+        memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
+        free(tmpdata);
+
 			return;
 		}
  }
@@ -346,10 +350,15 @@ tmp = tmp->next;
 }
 tmp = malloc(sizeof(struct avm_table));
  tmp->index=malloc(sizeof(index)+1);
-strcpy(tmp->index ,index);
-tmp->data= tmpdata;
+//strcpy(tmp->index ,index);
+tmp->index = strdup(index);
+tmp->data= malloc(sizeof(struct avm_memcell));
+        memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
+
 tmp->next = table->next;
 table->next = tmp;
+
+free(tmpdata);
 }
 
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
@@ -478,7 +487,7 @@ void libfunc_print(){
 		free(s);
 	}
 	printf("\n" );
-	printStack();
+	//printStack();
 }
 
 void libfunc_input(){
@@ -928,7 +937,7 @@ void execute_jeq	(struct instruction* ins){
 			}
 			if( rv1->type == table_m && rv2->type == table_m){
 				printf("JEQ 2 table  \n");
-				//TODO result = table_equal(rv1,rv2);
+				result = table_equal(rv1,rv2);
 				printf("result is %d\n",result );
 
 			}
@@ -941,6 +950,40 @@ void execute_jeq	(struct instruction* ins){
 			}
 }
 
+
+int table_equal(struct avm_memcell* rv1,struct avm_memcell* rv2){
+		struct avm_table* table1 = rv1->data.tableVal;
+		struct avm_table* table2 = rv2->data.tableVal;
+		printf("eimai %d\n", table1->data->type);
+		int flag = 0;
+
+		while(table1 ){
+			flag = 0;
+			table2 = rv2->data.tableVal;
+			while( table2){
+
+				if(strcmp(table1->index,table2->index) == 0 ){
+					if(table1->data->type != table2->data->type) return 0;
+					switch (table1->data->type) {
+						case  number_m: 	if(table1->data->data.numVal == table2->data->data.numVal) {flag = 1; break;} else{ return 0;}
+						case	string_m:	if( strcmp( table1->data->data.strVal, table2->data->data.strVal)) {flag = 1; break;} else{ return 0;}
+						case 	bool_m	: if(table1->data->data.bool == table2->data->data.bool) {flag = 1; break;} else{ return 0;}
+						case	table_m	:	 if(table_equal(table1->data, table2->data) == 0) return 0; else {flag = 1; break;}
+						case	userfunc_m	:	 if(table1->data->data.funcVal == table2->data->data.funcVal) {flag = 1; break;} else{ return 0;}
+						case	lib_func_m	:	 if( strcmp( table1->data->data.libfuncVal, table2->data->data.libfuncVal)) {flag = 1; break;} else{ return 0;}
+						case	nil_m	: flag = 1; break;
+						case	undef_m	:	flag = 1;  break;
+					}
+				}
+				table2 = table2->next;
+
+			}
+			if(flag  == 0 ) return 0;
+			table1 = table1->next;
+		}
+
+return 1;
+}
 
 void execute_jne	(struct instruction* ins){
 
@@ -1288,6 +1331,17 @@ void execute_tablegetelem	(struct instruction* ins){
 
 			case number_m:	sprintf(res , "%f",i->data.numVal); break;
 			case string_m:	res=strdup(i->data.strVal); break;
+                                case userfunc_m: {
+                                        printf("eimai mia loulou %f %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
+                                        char* tmp = malloc(10);
+                                        sprintf(tmp,"%f",i->data.funcVal);
+                                        res=strdup(tmp);
+                                        free(tmp);
+                                        break;
+
+                                }
+                                case table_m: printf("EIMAI TABLEEEE\n"); res = strdup(table_tostring(i)); break;
+                                case lib_func_m: res = strdup(i->data.libfuncVal); break;
 			default : 	res=strdup(i->data.strVal); break;
 		}
 
@@ -1323,25 +1377,45 @@ void execute_tablesetelem	(struct instruction* ins){
 		printf("dssss\n" );
 		if(t->type != table_m)	{	avm_error("illegal use of variable as a table in setelem! \n"); exit(0);}
 		else {
-
+			printf("edwww\n");
 			char* res=malloc(5);
+                        printf("edwwwqqqq\n");
+
 
 			switch (i->type) {
 
 
 				case number_m:{
-				char* tmp = malloc(6);
+                        printf("edwwwweafd\n");
+
+				char* tmp = malloc(10);
+                        printf("edwww number\n");
+
 				sprintf(tmp,"%f",i->data.numVal);
 				res=strdup(tmp);
+				free(tmp);
 				break;
 				}
 				case string_m:	res=strdup(i->data.strVal); break;
-				default : 	assert(0);//res=strdup(i->data.strVal); break;
+				case userfunc_m: {
+					printf("eimai mia loulou %f %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
+					char* tmp = malloc(10);
+					sprintf(tmp,"%f",i->data.funcVal);
+	                                res=strdup(tmp);
+        	                        free(tmp);
+					break;
+
+				}
+				case table_m: printf("EIMAI TABLEEEE\n"); res = strdup(table_tostring(i)); break;
+                                case lib_func_m: res = strdup(i->data.libfuncVal); break;
+				default :   res=strdup(i->data.strVal); break;
 			}
 
 			printf("\n\n\nres =%s \n\n\n",res );
 			avm_setelem(t->data.tableVal, res, c);
+printf("prin ffree\n");
 			free(res);
+printf("meta free\n");
 		}
 }
 
@@ -1418,7 +1492,7 @@ char* table_tostring (struct avm_memcell* cell){
 		char* index=malloc(sizeof(char)*strlen(tmp->index));
 		index = strdup(tmp->index);
 
-		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 12);
+		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 14);
 		sprintf(whole,"{ \"%s\" : %s } , ",index,elemdata);
 
 		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole)+1 ); // fixes error 3
@@ -1629,7 +1703,7 @@ void printStack(){
 			case string_m:	printf("%s\n", stack[i].data.strVal );	break;
 			case bool_m:	if(stack[i].data.bool) printf(" true \n"); else printf(" false \n"); 	break;
 			case lib_func_m:printf("%s\n",stack[i].data.libfuncVal);break;
-			case userfunc_m:printf("%.1u\n", stack[i].data.funcVal);break;
+			case userfunc_m:printf("%.s\n", userFuncs[stack[i].data.funcVal]->id);break;
 			case undef_m:	printf("undef\n" ); break;
 			case nil_m:		printf("nilllllll\n" );break;
 			case table_m:{
@@ -1751,3 +1825,66 @@ char* enum_toString_opCodes_v(vmopcode sym) {
 
 		}
 	}
+	/*
+	void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
+		struct avm_table* tmp=table;
+		struct avm_memcell* tmpdata=malloc(sizeof(struct avm_memcell));
+
+		memcpy(tmpdata, data, sizeof(struct avm_memcell));
+	if(tmpdata->type ==userfunc_m) printf("EEE EIMAI SUNARTHSH me name %s\n", userFuncs[tmpdata->data.funcVal]->id );
+
+	if (table->data->type == undef_m) {
+	//	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
+	//	strcpy(tmp->index ,index);
+		//tmp->index = malloc(sizeof(char)*strlen(index)+1);
+
+		tmp->index= index;
+		printf("sset elem :( %s)\n", tmp->index );
+		//edww
+		tmp->data= malloc(sizeof(struct avm_memcell));
+	if(tmpdata->type == 1)
+			tmp->data->data.strVal= malloc(sizeof(char)*10);
+	else if( tmpdata->type == 5)
+			tmp->data->data.libfuncVal= malloc(sizeof(char)*10);
+	else if( tmpdata->type == 3)
+			tmp->data->data.tableVal= malloc(sizeof(struct avm_table));
+
+		tmp->data= tmpdata;
+
+		return;
+	}
+
+	while (tmp) {
+		if(tmp->index){
+			if (strcmp(tmp->index,index)==0) {
+				tmp->data= tmpdata;
+				return;
+			}
+	 }
+	tmp = tmp->next;
+	}
+	tmp = malloc(sizeof(struct avm_table));
+	//strcpy(tmp->index ,index);
+	//tmp->index = malloc(sizeof(char)*strlen(index)+1);
+	printf("set elem :( %s)\n", index );
+	tmp->index = index;
+
+	//edww
+	tmp->data= malloc(sizeof(struct avm_memcell));
+	if(tmpdata->type == 1)
+		tmp->data->data.strVal= malloc(sizeof(char)*10);
+	else if( tmpdata->type == 5)
+		tmp->data->data.libfuncVal= malloc(sizeof(char)*10);
+	else if( tmpdata->type == 3)
+		tmp->data->data.tableVal= malloc(sizeof(struct avm_table));
+
+
+
+	tmp->data= tmpdata;
+	tmp->next = table->next;
+	table->next = tmp;
+	}
+
+
+	*/
+

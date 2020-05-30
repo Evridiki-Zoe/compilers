@@ -254,9 +254,7 @@ void libfunc_sqrt();
 void libfunc_cos();
 void libfunc_sin();
 
-
-
-
+int table_equal(struct avm_memcell* rv1,struct avm_memcell* rv2);
 void read_binfile();
 void printStack();
 void print_tables(struct avm_memcell);
