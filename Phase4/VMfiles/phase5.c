@@ -480,11 +480,12 @@ void libfunc_print(){
 	unsigned i=0;
 
 	for (; i < n; i++) {
-		char* s = malloc(sizeof(char)*10);
-		s = avm_tostring(avm_getactual(i));
+		retval.type = string_m;
+		retval.data.strVal = malloc(sizeof(char)*10);
+		retval.data.strVal = avm_tostring(avm_getactual(i));
 //strcpy(s, avm_tostring(avm_getactual(i)));
-		printf("PRINT: %s ",s);
-		free(s);
+		printf("PRINT: %s ",retval.data.strVal);
+		//free(s);
 	}
 	printf("\n" );
 	//printStack();
@@ -571,7 +572,7 @@ void libfunc_objectmemberkeys(){
 	if(n != 1) avm_error("libfunc objectmemberkeys: error arguments");
 	else{
 		if(avm_getactual(0)->type == 3){ //table
-			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			struct avm_table*tmp = avm_getactual(0)->data.tableVal;
 			int counter = 0;
 			while (tmp) {
 					if(tmp->index){
@@ -583,10 +584,14 @@ void libfunc_objectmemberkeys(){
 					}
 				tmp = tmp->next;
 			}
+			retval.type = table_m;
+			//retval.data.tableVal = &tmp;
+			//todo
+			/*
 			while (table_objectkeys) {
 					printf("test new table: %s \n",table_objectkeys->data->data.strVal );
 					table_objectkeys = table_objectkeys->next;
-			}
+			}*/
 			printf("objectmemberkeys done!\n");
 		}
 		else{
@@ -604,7 +609,7 @@ void libfunc_objecttotalmembers(){
 	else{
 		if(avm_getactual(0)->type == 3){ //table
 			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
-			int counter = 0;
+			double counter = 0;
 
 			while (tmp) {
 				if(tmp->index)	counter++;
@@ -613,7 +618,7 @@ void libfunc_objecttotalmembers(){
 			}
 			retval.type = number_m;
 			retval.data.numVal = counter;
-			printf("objecttotalmembers: %d!\n", counter);
+			printf("objecttotalmembers: %f!\n", retval.data.numVal);
 		}
 		else{
 			avm_error("libfunc objecttotalmembers: error: not valid variable type!");
@@ -628,8 +633,9 @@ void libfunc_objectcopy(){
 	if(n != 1) avm_error("libfunc objectcopy: error arguments");
 	else{
 		if(avm_getactual(0)->type == 3){ //table
-			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
-
+			//struct avm_table* tmp = avm_getactual(0)->data.tableVal;
+			retval.type = table_m;
+			retval.data.tableVal = avm_getactual(0)->data.tableVal;
 			//gia test oti mphkan swsta
 			/*while (tmp) {
 				printf("objectcopy lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
@@ -686,9 +692,9 @@ void libfunc_argument(){
 						  	avm_error("number of argument you gave is bigger than total arguments of function\n");
 						}
 						else {
-
+							retval.type = number_m;
 							retval.data.numVal = avm_get_envvalue(p_topsp -4 - i);
-						 	printf("argument:: get %d at stack %d \n",i ,(p_topsp  AVM_NUMACTUALS_OFFSET - i));
+						 	printf("argument:: at stack %d is %f\n",(p_topsp  AVM_NUMACTUALS_OFFSET - i), retval.data.numVal);
 
 
 						}
@@ -717,7 +723,6 @@ void  libfunc_typeof(){
 
 }
 
-//TODO oles oi lib func theloun allages
 
 void libfunc_strtonum(){
 	double tonum;
@@ -737,14 +742,15 @@ void libfunc_strtonum(){
 		}
 	}
 	tonum = atoi(str);
-	printf("strtonum: %f\n", tonum);
+	retval.type = number_m;
+	retval.data.numVal =  tonum;
+	printf("strtonum: %f\n", retval.data.numVal);
 
 	//if(atoi(str) == 0) avm_error("cannot convert string to number! \n" ); //????? gamw
 	//todo to nil !!!
 
 }
 
-//thelei check gia -1, ekei pou kaleitai!!!
 void libfunc_sqrt(){
 	double num;
 	unsigned n = avm_totalactuals();
@@ -768,7 +774,9 @@ void libfunc_sqrt(){
 				avm_error("Cannot calculate sqrt of subzero number!\n");
 				return;
 		}
-		printf("sqrt: %f\n", sqrt(num));
+		retval.type = number_m;
+		retval.data.numVal =  sqrt(num);
+		printf("sqrt: %f\n", retval.data.numVal);
 	}
 }
 
@@ -794,7 +802,10 @@ void libfunc_cos( ){
 
 	// Converting to radian
 	  rad = (rad * 3.14159265) / 180;
-		printf("cos: %f\n", cos(rad));
+		retval.type = number_m;
+		retval.data.numVal =  cos(rad);
+		printf("cos: %f\n",retval.data.numVal);
+
 	}
 }
 
@@ -821,7 +832,10 @@ void libfunc_sin( ){
 
 	// Converting to radian
 		rad = (rad * 3.14159265) / 180;
-		printf("sin: %f\n", sin(rad));
+		retval.type = number_m;
+		retval.data.numVal =  sin(rad);
+		printf("sin: %f\n", retval.data.numVal );
+
 	}
 
 }

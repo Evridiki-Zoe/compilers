@@ -1,22 +1,43 @@
-t = [ { "key1" : 1 }, { "key2" : 2 }, { "key3" : "tria" }, { "key4" : true }, { "key5" : [ nil, 3, 4, nil, 5 ] } ];
+/*t = [4,2];
+sqrt(-4);
+*/
 
-//print("Table t is: ", t, "\n");
-//print("Lenght of table t is (must be 5):", objecttotalmembers(t),"\n");
+/*
+t = [180,90];
+cos(90);
+cos(t[0]);
+sin(t[1]);
+sin(180);
+*/
 
-function foo() {
-    function lala() {
-        function prnt() {
-            local t = [ ::t, 2, 3.14, "4", true, false ];
-            print("Table t in prnt is: ", t, "\n");
-        }
-        print("Function prnt printing: ", prnt, " and print: ", print, "\n");
-        prnt();
-    }
-    return lala;
+/*strtonum("7");
+
+x = 7;
+typeof(x);
+*/
+
+/*t = [{1:2},{3:9}];
+print(objectcopy(t));
+*/
+
+/*
+t = [1,7, [1,2]];
+objecttotalmembers(t[3]);
+*/
+
+/*
+function f(a,b,c){
+  argument(2);
 }
 
-f = foo();
-//f();
+f(11,22,33);
+*/
 
-print("Table indices of global t: ", ind, " which has length: ", objecttotalmembers(ind), "\n");
+print("lalala", "56", 8);
 
+/*
+t3 = [{0:1},{8:88}, {"strindex": "strvalue"}, {6: 14}];
+print(objectmemberkeys(t3));
+*/
+
+//input();
