@@ -348,15 +348,22 @@ while (tmp) {
  }
 tmp = tmp->next;
 }
+struct avm_table* tmp_table = table;
+while (tmp_table->next) {
+	tmp_table = tmp_table->next;
+}
+
 tmp = malloc(sizeof(struct avm_table));
  tmp->index=malloc(sizeof(index)+1);
 //strcpy(tmp->index ,index);
 tmp->index = strdup(index);
 tmp->data= malloc(sizeof(struct avm_memcell));
-        memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
+memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
 
-tmp->next = table->next;
-table->next = tmp;
+
+tmp_table->next = tmp;
+// tmp->next = table->next;
+// table->next = tmp;
 
 free(tmpdata);
 }
@@ -408,7 +415,6 @@ void avm_push_envvalue (unsigned val) {
 }
 
 unsigned avm_get_envvalue(unsigned i){
-printf("my type is %d\n", stack[i].type);
 
 	assert(stack[i].type == number_m);
 	unsigned val = (unsigned) stack[i].data.numVal;
@@ -893,7 +899,7 @@ void execute_assign (struct instruction* ins){
 
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
 	avm_assign(lv,rv);
-	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
+//	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
 
 }
 
@@ -1038,7 +1044,7 @@ void execute_jne	(struct instruction* ins){
 		if( rv1->type == number_m &&  rv2->type == number_m ){
 				printf("JNE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
-				if(fabs(rv1->data.numVal - rv2->data.numVal) < 0.0000 ) result = 0;
+				if(fabs(rv1->data.numVal - rv2->data.numVal) < 0.00001 ) result = 0;
 				else result = 1;
 
 				printf("FABS result is %d\n",result );
@@ -1769,6 +1775,7 @@ void print_tables(struct avm_memcell stack){
 				case userfunc_m:	printf("%1u,\t",tmp->data->data.funcVal ); break;
 				case nil_m:		printf("nil\t" );break;
 				case table_m:	print_tables(*tmp->data); break;
+				case undef_m:	printf("undef\n" );
 			}
 		}
 		tmp=tmp->next;

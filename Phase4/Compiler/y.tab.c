@@ -601,13 +601,13 @@ static const yytype_uint16 yyrline[] =
      372,   382,   395,   411,   426,   441,   456,   474,   499,   499,
      519,   532,   558,   590,   619,   652,   655,   655,   692,   698,
      701,   705,   706,   709,   717,   722,   733,   739,   742,   750,
-     768,   789,   797,   810,   818,   822,   827,   837,   846,   874,
-     881,   900,   909,   949,   976,   993,  1001,  1020,  1029,  1039,
-    1047,  1054,  1054,  1084,  1084,  1087,  1087,  1087,  1103,  1106,
-    1115,  1128,  1129,  1137,  1138,  1139,  1142,  1154,  1167,  1167,
-    1168,  1171,  1171,  1172,  1175,  1175,  1189,  1197,  1216,  1224,
-    1227,  1227,  1227,  1251,  1251,  1251,  1266,  1267,  1271,  1290,
-    1296,  1315
+     768,   789,   797,   810,   818,   822,   827,   837,   846,   875,
+     882,   911,   920,   960,   987,  1004,  1012,  1031,  1040,  1050,
+    1058,  1065,  1065,  1095,  1095,  1098,  1098,  1098,  1114,  1117,
+    1126,  1139,  1140,  1148,  1149,  1150,  1153,  1165,  1178,  1178,
+    1179,  1182,  1182,  1183,  1186,  1186,  1200,  1208,  1227,  1235,
+    1238,  1238,  1238,  1262,  1262,  1262,  1277,  1278,  1282,  1301,
+    1307,  1326
 };
 #endif
 
@@ -2660,6 +2660,7 @@ yyreduce:
 
           (yyval.expression) = (yyvsp[(1) - (2)].expression);
           (yyval.expression)->next = (yyvsp[(2) - (2)].expression); ///edw
+
 		  if (exprflag) {
 			 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -2674,7 +2675,7 @@ yyreduce:
     break;
 
   case 69:
-#line 874 "syntax.y"
+#line 875 "syntax.y"
     { printf(RED "elist:: empty\n" RESET);
                 args = 0;
                 struct expr* temp_elem = new_expr(var_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
@@ -2683,7 +2684,7 @@ yyreduce:
     break;
 
   case 70:
-#line 881 "syntax.y"
+#line 882 "syntax.y"
     {
 					args++;
 
@@ -2699,6 +2700,16 @@ yyreduce:
           struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',(yyvsp[(3) - (3)].expression));
           // bazw sto next to epomeno stoixeio
 
+                  if (exprflag) {
+                         struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+                         struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+                         emit(assign,true_expr,NULL,(yyvsp[(2) - (3)].expression),yylineno,0);
+                         emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+                         emit(assign,false_expr,NULL,(yyvsp[(2) - (3)].expression),yylineno,0);
+                         exprflag=0;
+                        patchLists(((yyvsp[(2) - (3)].expression)),(int)QuadNo-2,(int)QuadNo);
+                 }
 
           (yyval.expression) = (yyvsp[(2) - (3)].expression);
           (yyval.expression)->next = (yyvsp[(3) - (3)].expression); ///edw
@@ -2706,7 +2717,7 @@ yyreduce:
     break;
 
   case 71:
-#line 900 "syntax.y"
+#line 911 "syntax.y"
     { printf(RED "multi exprsessions: empty\n" RESET);
                   args = 0; //mallon eixe ksexastei ayto
                   struct expr* temp_elem = new_expr(var_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
@@ -2715,7 +2726,7 @@ yyreduce:
     break;
 
   case 72:
-#line 909 "syntax.y"
+#line 920 "syntax.y"
     {
                   printf(RED "objectdef:: elist\n" RESET);
 
@@ -2759,7 +2770,7 @@ yyreduce:
     break;
 
   case 73:
-#line 949 "syntax.y"
+#line 960 "syntax.y"
     {
 
                    printf(RED "objectdef:: indexed\n" RESET);
@@ -2785,7 +2796,7 @@ yyreduce:
     break;
 
   case 74:
-#line 976 "syntax.y"
+#line 987 "syntax.y"
     {
                 args++;
                 // //adespoto symbol pou den prepei na mpei sto hash!
@@ -2806,7 +2817,7 @@ yyreduce:
     break;
 
   case 75:
-#line 993 "syntax.y"
+#line 1004 "syntax.y"
     {
           struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
           (yyval.expression) = temp_elem;
@@ -2816,7 +2827,7 @@ yyreduce:
     break;
 
   case 76:
-#line 1001 "syntax.y"
+#line 1012 "syntax.y"
     {
                              args++;
 
@@ -2839,7 +2850,7 @@ yyreduce:
     break;
 
   case 77:
-#line 1020 "syntax.y"
+#line 1031 "syntax.y"
     {
                               struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
                               (yyval.expression) = NULL;//temp_elem;
@@ -2847,7 +2858,7 @@ yyreduce:
     break;
 
   case 78:
-#line 1029 "syntax.y"
+#line 1040 "syntax.y"
     {
 
                 printf(RED "indexed:: indexedelement multi\n" RESET);
@@ -2859,7 +2870,7 @@ yyreduce:
     break;
 
   case 79:
-#line 1039 "syntax.y"
+#line 1050 "syntax.y"
     {
                          printf(RED "multi_indexedelem:: comma indelem multi\n" RESET);
 						//
@@ -2871,7 +2882,7 @@ yyreduce:
     break;
 
   case 80:
-#line 1047 "syntax.y"
+#line 1058 "syntax.y"
     {
                         printf(RED "multi_indexedelem:: empty\n" RESET);
                     //    struct expr* temp_elem = new_expr(tableitem_e,NULL,NULL,0,"",'\0',NULL); //to teleutaio eina null
@@ -2880,7 +2891,7 @@ yyreduce:
     break;
 
   case 81:
-#line 1054 "syntax.y"
+#line 1065 "syntax.y"
     {
 	if (exprflag) {
 	   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
@@ -2896,7 +2907,7 @@ yyreduce:
     break;
 
   case 82:
-#line 1066 "syntax.y"
+#line 1077 "syntax.y"
     {
 					if (exprflag) {
 					   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
@@ -2916,27 +2927,27 @@ yyreduce:
     break;
 
   case 83:
-#line 1084 "syntax.y"
+#line 1095 "syntax.y"
     { scope++; if(scope > maxScope) maxScope = scope; }
     break;
 
   case 84:
-#line 1084 "syntax.y"
+#line 1095 "syntax.y"
     {hide_symbols(scope); scope--;  printf( RED "block:: {stmt multi stmt}\n" RESET ); }
     break;
 
   case 85:
-#line 1087 "syntax.y"
+#line 1098 "syntax.y"
     {push_SP(tmpoffset); tmpoffset=0; insideFunc++;}
     break;
 
   case 86:
-#line 1087 "syntax.y"
+#line 1098 "syntax.y"
     {  (yyvsp[(2) - (6)].expression)->sym->value.func->totalArgs=tmpoffset; tmpoffset=0; make_not_accessible(scope+1);  push_E(exprflag); exprflag=0; }
     break;
 
   case 87:
-#line 1087 "syntax.y"
+#line 1098 "syntax.y"
     {
 			  make_accessible_again(scope+1);
 			  insideFunc--;
@@ -2954,12 +2965,12 @@ yyreduce:
     break;
 
   case 88:
-#line 1103 "syntax.y"
+#line 1114 "syntax.y"
     { emit(jump,NULL,NULL,NULL,yylineno,999); (yyval.intValue)=QuadNo-1; }
     break;
 
   case 89:
-#line 1106 "syntax.y"
+#line 1117 "syntax.y"
     {
 					tmpnode=malloc(sizeof(struct symbol_table_binding));
 					tmpnode= newFunction( (yyvsp[(1) - (1)].stringValue), yylineno, scope);
@@ -2972,7 +2983,7 @@ yyreduce:
     break;
 
   case 90:
-#line 1115 "syntax.y"
+#line 1126 "syntax.y"
     {
 					 result = malloc(2 * sizeof(char)); sprintf(result, "^%d", unnamedFuncs++);
 					 tmpnode=malloc(sizeof(struct symbol_table_binding));
@@ -2988,12 +2999,12 @@ yyreduce:
     break;
 
   case 91:
-#line 1128 "syntax.y"
+#line 1139 "syntax.y"
     {		(yyval.expression)=(yyvsp[(1) - (1)].expression); 	}
     break;
 
   case 92:
-#line 1129 "syntax.y"
+#line 1140 "syntax.y"
     {
 				tmpnode=malloc(sizeof(struct symbol_table_binding));
 				tmpnode->value.var = malloc(sizeof(struct variable));
@@ -3005,22 +3016,22 @@ yyreduce:
     break;
 
   case 93:
-#line 1137 "syntax.y"
+#line 1148 "syntax.y"
     { (yyval.expression) = new_expr(nil_e,nil_expr_sym,NULL,0,"",'\0',NULL); }
     break;
 
   case 94:
-#line 1138 "syntax.y"
+#line 1149 "syntax.y"
     { (yyval.expression) = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );  }
     break;
 
   case 95:
-#line 1139 "syntax.y"
+#line 1150 "syntax.y"
     { (yyval.expression) = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL ); }
     break;
 
   case 96:
-#line 1142 "syntax.y"
+#line 1153 "syntax.y"
     {
      					result = malloc(50 * sizeof(char)); sprintf(result,"%f", ((yyvsp[(1) - (1)].intValue)));
 
@@ -3036,7 +3047,7 @@ yyreduce:
     break;
 
   case 97:
-#line 1154 "syntax.y"
+#line 1165 "syntax.y"
     {
 			            result = malloc(50 * sizeof(char)); sprintf(result,"%f", ((yyvsp[(1) - (1)].floatValue)));
 			            struct symbol_table_binding* newnode = malloc(sizeof(struct symbol_table_binding));
@@ -3051,27 +3062,27 @@ yyreduce:
     break;
 
   case 98:
-#line 1167 "syntax.y"
+#line 1178 "syntax.y"
     { argumentF( (yyvsp[(1) - (1)].stringValue), yylineno, (scope + 1)); }
     break;
 
   case 100:
-#line 1168 "syntax.y"
+#line 1179 "syntax.y"
     { printf(RED "idlist:: empty\n" RESET); }
     break;
 
   case 101:
-#line 1171 "syntax.y"
+#line 1182 "syntax.y"
     { argumentF(((yyvsp[(2) - (2)].stringValue)), yylineno, (scope+1)); }
     break;
 
   case 103:
-#line 1172 "syntax.y"
+#line 1183 "syntax.y"
     { printf(RED "multi_idlists:: empty\n" RESET); }
     break;
 
   case 104:
-#line 1175 "syntax.y"
+#line 1186 "syntax.y"
     {
 
 				emit(jump,NULL,NULL,NULL,yylineno,999); /*Sto telos tis else*/
@@ -3084,7 +3095,7 @@ yyreduce:
     break;
 
   case 105:
-#line 1183 "syntax.y"
+#line 1194 "syntax.y"
     {
 				//Pigenoume sto quad tis jump pano apo tin else kai kanoume patch to label sto quad kato apo tin
    			 	//teleftaia entoli toy stmt tis else !!!
@@ -3094,7 +3105,7 @@ yyreduce:
     break;
 
   case 106:
-#line 1189 "syntax.y"
+#line 1200 "syntax.y"
     {
 			 printf(RED "if(exprsession) stmt\n" RESET);
 			 //Pigenoume sto quad tis jump kai kanoume patch to label sto quad kato apo tin
@@ -3104,7 +3115,7 @@ yyreduce:
     break;
 
   case 107:
-#line 1197 "syntax.y"
+#line 1208 "syntax.y"
     {
 
 				if (exprflag) {
@@ -3126,7 +3137,7 @@ yyreduce:
     break;
 
   case 108:
-#line 1216 "syntax.y"
+#line 1227 "syntax.y"
     {
 					insideLoop--;
 					emit(jump,NULL,NULL,NULL,yylineno,(yyvsp[(1) - (3)].intValue)); //$1 quadno stin arxi tou sxpr tis while
@@ -3137,17 +3148,17 @@ yyreduce:
     break;
 
   case 109:
-#line 1224 "syntax.y"
+#line 1235 "syntax.y"
     {(yyval.intValue)=QuadNo+1;}
     break;
 
   case 110:
-#line 1227 "syntax.y"
+#line 1238 "syntax.y"
     { insideLoop++; }
     break;
 
   case 111:
-#line 1227 "syntax.y"
+#line 1238 "syntax.y"
     {
 
 						if (exprflag) {
@@ -3171,23 +3182,23 @@ yyreduce:
     break;
 
   case 112:
-#line 1247 "syntax.y"
+#line 1258 "syntax.y"
     {(yyval.intValue)=QuadNo-1;
             }
     break;
 
   case 113:
-#line 1251 "syntax.y"
+#line 1262 "syntax.y"
     { insideLoop++; push_E(exprflag); exprflag=0; }
     break;
 
   case 114:
-#line 1251 "syntax.y"
+#line 1262 "syntax.y"
     {exprflag=pop_E();}
     break;
 
   case 115:
-#line 1251 "syntax.y"
+#line 1262 "syntax.y"
     {
 
 				printf(RED "for(elist; expr;elist) stmt\n" RESET);
@@ -3203,17 +3214,17 @@ yyreduce:
     break;
 
   case 116:
-#line 1266 "syntax.y"
+#line 1277 "syntax.y"
     {printf(RED "for_elist:: \n" RESET); (yyval.intValue)=QuadNo;  }
     break;
 
   case 117:
-#line 1267 "syntax.y"
+#line 1278 "syntax.y"
     { printf(RED "for_elist:: empty\n" RESET); }
     break;
 
   case 118:
-#line 1271 "syntax.y"
+#line 1282 "syntax.y"
     {
 						if (exprflag) {
 						   struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
@@ -3235,7 +3246,7 @@ yyreduce:
     break;
 
   case 119:
-#line 1290 "syntax.y"
+#line 1301 "syntax.y"
     {
 
                   emit(jump,NULL,NULL,NULL,yylineno,999); //Kanonika stin arxi tis for
@@ -3244,7 +3255,7 @@ yyreduce:
     break;
 
   case 120:
-#line 1296 "syntax.y"
+#line 1307 "syntax.y"
     {
 				if (exprflag) {
 
@@ -3267,7 +3278,7 @@ yyreduce:
     break;
 
   case 121:
-#line 1315 "syntax.y"
+#line 1326 "syntax.y"
     {
                         printf(RED "return; \n" RESET);
                         emit(ret,NULL,NULL,NULL,yylineno,0);
@@ -3277,7 +3288,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 3281 "y.tab.c"
+#line 3292 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3491,6 +3502,6 @@ yyreturn:
 }
 
 
-#line 1322 "syntax.y"
+#line 1333 "syntax.y"
 
 
