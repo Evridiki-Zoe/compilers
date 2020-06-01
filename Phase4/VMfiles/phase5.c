@@ -408,6 +408,8 @@ void avm_push_envvalue (unsigned val) {
 }
 
 unsigned avm_get_envvalue(unsigned i){
+printf("my type is %d\n", stack[i].type);
+
 	assert(stack[i].type == number_m);
 	unsigned val = (unsigned) stack[i].data.numVal;
 
@@ -480,11 +482,10 @@ void libfunc_print(){
 	unsigned i=0;
 
 	for (; i < n; i++) {
-		retval.type = string_m;
-		retval.data.strVal = malloc(sizeof(char)*10);
-		retval.data.strVal = avm_tostring(avm_getactual(i));
-//strcpy(s, avm_tostring(avm_getactual(i)));
-		printf("PRINT: %s ",retval.data.strVal);
+		char * s = malloc(sizeof(char)*10);
+		//s = avm_tostring(avm_getactual(i));
+		strcpy(s, avm_tostring(avm_getactual(i)));
+		printf("PRINT: %s ",s);
 		//free(s);
 	}
 	printf("\n" );
@@ -537,35 +538,6 @@ void libfunc_input(){
 
 }
 
-struct avm_table* table_objectkeys = NULL;
-
-void avm_newnode(struct avm_table** head, char* index, char* data){
-	struct avm_table* newnode = NULL, *last = NULL;
-	if(*head == NULL){
-		*head = malloc(sizeof(struct avm_table));
-		(*head)->index = index;
-		(*head)->data->data.strVal = malloc(100* sizeof(char));
-		(*head)->data->data.strVal= data;
-		(*head)->next = NULL;
-		return;
-	}
-	else{
-			newnode = malloc(sizeof(struct avm_table));
-			newnode->index = malloc(100* sizeof(char));
-			newnode->index = index;
-			newnode->data->data.strVal = malloc(100* sizeof(char));
-			newnode->data->data.strVal= data;
-			newnode->next = NULL;
-	}
-	last = *head;
-	while (last->next !=NULL) {
-		  //printf("while (telos) %s\n",last->data->data.strVal );
-			last = last->next;
-	}
-	last->next = newnode;
-	return;
-}
-
 void libfunc_objectmemberkeys(){
 
 	unsigned n = avm_totalactuals();
@@ -574,32 +546,35 @@ void libfunc_objectmemberkeys(){
 	else{
 		if(avm_getactual(0)->type == 3){ //table
 			struct avm_table*tmp = avm_getactual(0)->data.tableVal;
-			int counter = 1;
+			double counter = 0;
+			char* index = malloc(5*sizeof(char));
+			sprintf(index,"%f",counter);
 
 			retval.type = table_m;
 
 			retval.data.tableVal = malloc(sizeof(struct avm_table));
 			retval.data.tableVal->index = malloc(sizeof(char));
-			retval.data.tableVal->index = "0";
+			retval.data.tableVal->index = strdup(index);
 			retval.data.tableVal->data = malloc(sizeof(struct avm_memcell));
-			retval.data.tableVal->data->data.strVal = malloc(sizeof(char)*10);
-
+			retval.data.tableVal->data->data.strVal = malloc(sizeof(char)*strlen(tmp->index)+1);
+			retval.data.tableVal->data->type =  string_m;
 			retval.data.tableVal->data->data.strVal = tmp->index;
 			//retval.data.tableVal->next = malloc(sizeof(struct avm_table));
 			retval.data.tableVal->next = NULL;
 
+			counter++;
 			tmp = tmp->next; //epeidh exw hdh valei to prwto
 			while (tmp) {
 					if(tmp->index){
-						char* index = malloc(5*sizeof(char));
-						sprintf(index,"%d",counter);
+						sprintf(index,"%f",counter);
 						printf("objectmemberkeys lib func:(%s) (%s)\n",index, tmp->index);
 
 						if(retval.data.tableVal->next == NULL){
-						  retval.data.tableVal->next= malloc(sizeof(struct avm_table));
-							retval.data.tableVal->next->index = index;
+						  	retval.data.tableVal->next= malloc(sizeof(struct avm_table));
+							retval.data.tableVal->next->index = strdup(index);
 							retval.data.tableVal->next->data = malloc(sizeof(struct avm_memcell));
-							retval.data.tableVal->next->data->data.strVal = malloc(sizeof(char)*10);
+							retval.data.tableVal->next->data->data.strVal = malloc(sizeof(char)*strlen(tmp->index)+1);
+							retval.data.tableVal->next->data->type = string_m;
 							retval.data.tableVal->next->data->data.strVal= tmp->index;
 							retval.data.tableVal->next->next = NULL;
 						}
@@ -611,9 +586,10 @@ void libfunc_objectmemberkeys(){
 									//kai sto next tou poy einai null vazw to new node
 									last->next = malloc(sizeof(struct avm_table));
 									last->next->index = malloc(sizeof(char));
-									last->next->index = index;
+									last->next->index = strdup(index);
 									last->next->data = malloc(sizeof(struct avm_memcell));
-									last->next->data->data.strVal = malloc(sizeof(char)*10);
+									last->next->data->type =  string_m;
+									last->next->data->data.strVal = malloc(sizeof(char)*strlen(tmp->index)+1);
 
 									last->next->data->data.strVal = tmp->index;
 									last->next->next = NULL;
@@ -623,10 +599,7 @@ void libfunc_objectmemberkeys(){
 					}
 				tmp = tmp->next;
 			}
-			while (retval.data.tableVal) {
-					printf("test new table: (%s,%s) \n",retval.data.tableVal->index, retval.data.tableVal->data->data.strVal );
-					retval.data.tableVal = retval.data.tableVal->next;
-			}
+
 			printf("objectmemberkeys done!\n");
 		}
 		else{
@@ -691,7 +664,7 @@ void libfunc_totalarguments(void){
 	avm_memcellclear(&retval);
 
 	if (!p_topsp) {
-		avm_error("'totalarguments' called outside a function!");
+//		avm_error("'totalarguments' called outside a function!");
 		retval.type=nil_m;
 	}else {
 		retval.type = number_m;
@@ -708,7 +681,7 @@ void libfunc_argument(){
 	avm_memcellclear(&retval);
 	int i;
 	if (!p_topsp) {
-		avm_error("'libfunc arguments' called outside a function!");
+//		avm_error("'libfunc arguments' called outside a function!");
 		retval.type=nil_m;
 	}else {
 		unsigned n = avm_totalactuals();
@@ -725,12 +698,8 @@ void libfunc_argument(){
 						if(i < 0 || i > totalArgs) {
 						  	avm_error("number of argument you gave is bigger than total arguments of function\n");
 						}
-						else {
-							retval.type = number_m;
-							retval.data.numVal = avm_get_envvalue(p_topsp -4 - i);
-						 	printf("argument:: at stack %d is %f\n",(p_topsp  AVM_NUMACTUALS_OFFSET - i), retval.data.numVal);
-
-
+						else{
+							retval = stack[ p_topsp -4 - i];
 						}
 				}
 				else{
@@ -775,14 +744,21 @@ void libfunc_strtonum(){
 			return;
 		}
 	}
-	tonum = atoi(str);
-	retval.type = number_m;
-	retval.data.numVal =  tonum;
-	printf("strtonum: %f\n", retval.data.numVal);
+printf("str is %s \n",str);
+	char *ptr;
+	tonum = strtod(str, &ptr);
+printf("ptr is %s \n",ptr);
 
-	//if(atoi(str) == 0) avm_error("cannot convert string to number! \n" ); //????? gamw
-	//todo to nil !!!
+	if(strcmp(ptr,"") == 0) {
+		retval.type = number_m;
+		retval.data.numVal =  tonum;
+		printf("strtonum: %f\n", retval.data.numVal);
+	}
+	else{
+	printf("strtonum nil\n");
+	retval.type = nil_m;
 
+	}
 }
 
 void libfunc_sqrt(){
@@ -805,7 +781,8 @@ void libfunc_sqrt(){
 			return;
 		}
 		if(num < 0 ) {
-				avm_error("Cannot calculate sqrt of subzero number!\n");
+				retval.type = nil_m;
+//				avm_error("Cannot calculate sqrt of subzero number!\n");
 				return;
 		}
 		retval.type = number_m;
@@ -1047,23 +1024,24 @@ void execute_jne	(struct instruction* ins){
 			executionFinished = 1;
 	}
 	else if( rv1->type == nil_m  || rv2->type == nil_m ){
-			result = (rv1->type == nil_m  && rv2->type == nil_m );
+			if(rv1->type == nil_m  && rv2->type == nil_m ) result = 0;
+			else result = 1;
 
 	}
 	else if ( rv1->type == bool_m  || rv2->type == bool_m ){
 			result = (avm_tobool(rv1) && avm_tobool(rv2)  );
 	}
 	else if ( rv1->type !=rv2->type ){
-			avm_error("illegal types in jeq!\n");
+			avm_error("illegal types in jne!\n");
 	}
 	else{
 		if( rv1->type == number_m &&  rv2->type == number_m ){
 				printf("JNE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
-				if(rv1->data.numVal != rv2->data.numVal ) result = 1;
-				else result = 0;
+				if(fabs(rv1->data.numVal - rv2->data.numVal) < 0.0000 ) result = 0;
+				else result = 1;
 
-				printf("result is %d\n",result );
+				printf("FABS result is %d\n",result );
 				}
 		if( rv1->type == string_m &&  rv2->type == string_m ){
 				printf("JNE 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
@@ -1085,6 +1063,13 @@ void execute_jne	(struct instruction* ins){
 			if(strcmp(userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id) == 0) result = 0;
 			else result = 1;
 			printf("result is %d\n",result );
+
+		}
+		if( rv1->type == table_m && rv2->type == table_m){
+				printf("JEQ 2 table  \n");
+				if(table_equal(rv1,rv2) == 1) result = 0;
+				else result = 1;
+				printf("result is %d\n",result );
 
 		}
 
@@ -1497,7 +1482,11 @@ char* number_tostring (struct avm_memcell* cell){
     	sprintf(str,"%.2f",cell->data.numVal );
 		return str;
 	}
-char* string_tostring (struct avm_memcell* cell){return cell->data.strVal;}
+char* string_tostring (struct avm_memcell* cell){
+		char* str=malloc(sizeof(char)*strlen(cell->data.strVal)+1);
+		str = strdup(cell->data.strVal);
+		return str;
+}
 char* bool_tostring (struct avm_memcell* cell){
 	char* str=malloc(sizeof(char)*6);
 
@@ -1538,14 +1527,14 @@ char* table_tostring (struct avm_memcell* cell){
 			case	lib_func_m	:	elemdata=libfunc_tostring(tmp->data); break;
 			case	nil_m	:	elemdata=nil_tostring(tmp->data); break;
 			case	undef_m	:	elemdata=undef_tostring(tmp->data); break;
+			default: printf("\n\ndefault in table to string\n");
 		}
 		char* index=malloc(sizeof(char)*strlen(tmp->index));
 		index = strdup(tmp->index);
 
 		char* whole=malloc(sizeof(char)*strlen(index) + sizeof(char)*strlen(elemdata) + 14);
 		sprintf(whole,"{ \"%s\" : %s } , ",index,elemdata);
-
-		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole)+1 ); // fixes error 3
+		str=realloc(str,sizeof(char)*strlen(str) + sizeof(char)*strlen(whole)+3 ); // fixes error 3
 		strcat(str,whole);
 		tmp=tmp->next;
 	}
