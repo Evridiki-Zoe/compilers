@@ -860,6 +860,7 @@ elist : expr multi_exprs {
 
           $$ = $1;
           $$->next = $2; ///edw
+
 		  if (exprflag) {
 			 struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
@@ -893,6 +894,16 @@ multi_exprs	:  COMMA expr multi_exprs {
           struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$3);
           // bazw sto next to epomeno stoixeio
 
+                  if (exprflag) {
+                         struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
+                         struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
+
+                         emit(assign,true_expr,NULL,$2,yylineno,0);
+                         emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
+                         emit(assign,false_expr,NULL,$2,yylineno,0);
+                         exprflag=0;
+                        patchLists(($2),(int)QuadNo-2,(int)QuadNo);
+                 }
 
           $$ = $2;
           $$->next = $3; ///edw
