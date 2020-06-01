@@ -551,6 +551,7 @@ void avm_newnode(struct avm_table** head, char* index, char* data){
 	}
 	else{
 			newnode = malloc(sizeof(struct avm_table));
+			newnode->index = malloc(100* sizeof(char));
 			newnode->index = index;
 			newnode->data->data.strVal = malloc(100* sizeof(char));
 			newnode->data->data.strVal= data;
@@ -558,7 +559,7 @@ void avm_newnode(struct avm_table** head, char* index, char* data){
 	}
 	last = *head;
 	while (last->next !=NULL) {
-		  printf("while %s\n",last->data->data.strVal );
+		  //printf("while (telos) %s\n",last->data->data.strVal );
 			last = last->next;
 	}
 	last->next = newnode;
@@ -573,25 +574,59 @@ void libfunc_objectmemberkeys(){
 	else{
 		if(avm_getactual(0)->type == 3){ //table
 			struct avm_table*tmp = avm_getactual(0)->data.tableVal;
-			int counter = 0;
+			int counter = 1;
+
+			retval.type = table_m;
+
+			retval.data.tableVal = malloc(sizeof(struct avm_table));
+			retval.data.tableVal->index = malloc(sizeof(char));
+			retval.data.tableVal->index = "0";
+			retval.data.tableVal->data = malloc(sizeof(struct avm_memcell));
+			retval.data.tableVal->data->data.strVal = malloc(sizeof(char)*10);
+
+			retval.data.tableVal->data->data.strVal = tmp->index;
+			//retval.data.tableVal->next = malloc(sizeof(struct avm_table));
+			retval.data.tableVal->next = NULL;
+
+			tmp = tmp->next; //epeidh exw hdh valei to prwto
 			while (tmp) {
 					if(tmp->index){
 						char* index = malloc(5*sizeof(char));
 						sprintf(index,"%d",counter);
-   					printf("objectmemberkeys lib func:(%d) (%s)\n",n, tmp->index);
-					  avm_newnode(&table_objectkeys, index,tmp->index );
+						printf("objectmemberkeys lib func:(%s) (%s)\n",index, tmp->index);
+
+						if(retval.data.tableVal->next == NULL){
+						  retval.data.tableVal->next= malloc(sizeof(struct avm_table));
+							retval.data.tableVal->next->index = index;
+							retval.data.tableVal->next->data = malloc(sizeof(struct avm_memcell));
+							retval.data.tableVal->next->data->data.strVal = malloc(sizeof(char)*10);
+							retval.data.tableVal->next->data->data.strVal= tmp->index;
+							retval.data.tableVal->next->next = NULL;
+						}
+						else{
+								struct avm_table *last =retval.data.tableVal->next;
+								while (last->next) { //paw sto telos,
+										last = last->next;
+									}
+									//kai sto next tou poy einai null vazw to new node
+									last->next = malloc(sizeof(struct avm_table));
+									last->next->index = malloc(sizeof(char));
+									last->next->index = index;
+									last->next->data = malloc(sizeof(struct avm_memcell));
+									last->next->data->data.strVal = malloc(sizeof(char)*10);
+
+									last->next->data->data.strVal = tmp->index;
+									last->next->next = NULL;
+
+						}
 						counter++;
 					}
 				tmp = tmp->next;
 			}
-			retval.type = table_m;
-			//retval.data.tableVal = &tmp;
-			//todo
-			/*
-			while (table_objectkeys) {
-					printf("test new table: %s \n",table_objectkeys->data->data.strVal );
-					table_objectkeys = table_objectkeys->next;
-			}*/
+			while (retval.data.tableVal) {
+					printf("test new table: (%s,%s) \n",retval.data.tableVal->index, retval.data.tableVal->data->data.strVal );
+					retval.data.tableVal = retval.data.tableVal->next;
+			}
 			printf("objectmemberkeys done!\n");
 		}
 		else{
@@ -652,7 +687,6 @@ void libfunc_objectcopy(){
 }
 
 void libfunc_totalarguments(void){
-//TODO ? an kalesoume thn function me ligotera arguments apo osa exei h dhlwsh poia #args prepei na epistrepsei?
 	unsigned p_topsp = avm_get_envvalue(topsp   AVM_SAVEDTOPSP_OFFSET);
 	avm_memcellclear(&retval);
 
@@ -840,7 +874,7 @@ void libfunc_sin( ){
 
 }
 
-void avm_registerlibfunc (char* id , library_funcs_t addr){} // TODO
+void avm_registerlibfunc (char* id , library_funcs_t addr){}
 
 //------------------------------------------
 
@@ -1329,8 +1363,6 @@ void execute_tablegetelem	(struct instruction* ins){
 
 	struct avm_memcell* i = avm_translate_operand(ins->arg2, &ax);
 
-	//assert(lv && &stack[N - 1] >= lv && &stack[top] < lv || lv == &retval);// TODO N
-	//assert(t && &stack[N - 1] >= t && t > &stack[top] ); //TODO
 	assert(i);
 
 	//avm_memcellclear(lv);
@@ -1843,65 +1875,3 @@ char* enum_toString_opCodes_v(vmopcode sym) {
 
 		}
 	}
-	/*
-	void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* data){
-		struct avm_table* tmp=table;
-		struct avm_memcell* tmpdata=malloc(sizeof(struct avm_memcell));
-
-		memcpy(tmpdata, data, sizeof(struct avm_memcell));
-	if(tmpdata->type ==userfunc_m) printf("EEE EIMAI SUNARTHSH me name %s\n", userFuncs[tmpdata->data.funcVal]->id );
-
-	if (table->data->type == undef_m) {
-	//	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
-	//	strcpy(tmp->index ,index);
-		//tmp->index = malloc(sizeof(char)*strlen(index)+1);
-
-		tmp->index= index;
-		printf("sset elem :( %s)\n", tmp->index );
-		//edww
-		tmp->data= malloc(sizeof(struct avm_memcell));
-	if(tmpdata->type == 1)
-			tmp->data->data.strVal= malloc(sizeof(char)*10);
-	else if( tmpdata->type == 5)
-			tmp->data->data.libfuncVal= malloc(sizeof(char)*10);
-	else if( tmpdata->type == 3)
-			tmp->data->data.tableVal= malloc(sizeof(struct avm_table));
-
-		tmp->data= tmpdata;
-
-		return;
-	}
-
-	while (tmp) {
-		if(tmp->index){
-			if (strcmp(tmp->index,index)==0) {
-				tmp->data= tmpdata;
-				return;
-			}
-	 }
-	tmp = tmp->next;
-	}
-	tmp = malloc(sizeof(struct avm_table));
-	//strcpy(tmp->index ,index);
-	//tmp->index = malloc(sizeof(char)*strlen(index)+1);
-	printf("set elem :( %s)\n", index );
-	tmp->index = index;
-
-	//edww
-	tmp->data= malloc(sizeof(struct avm_memcell));
-	if(tmpdata->type == 1)
-		tmp->data->data.strVal= malloc(sizeof(char)*10);
-	else if( tmpdata->type == 5)
-		tmp->data->data.libfuncVal= malloc(sizeof(char)*10);
-	else if( tmpdata->type == 3)
-		tmp->data->data.tableVal= malloc(sizeof(struct avm_table));
-
-
-
-	tmp->data= tmpdata;
-	tmp->next = table->next;
-	table->next = tmp;
-	}
-
-
-	*/

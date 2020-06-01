@@ -33,11 +33,11 @@ function f(a,b,c){
 f(11,22,33);
 */
 
-print("lalala", "56", 8);
+//print("lalala", "56", 8);
 
-/*
+
 t3 = [{0:1},{8:88}, {"strindex": "strvalue"}, {6: 14}];
-print(objectmemberkeys(t3));
-*/
+objectmemberkeys(t3);
+//TODO print(objectmemberkeys(t3);)
 
 //input();
