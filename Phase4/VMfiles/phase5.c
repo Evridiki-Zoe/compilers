@@ -403,6 +403,7 @@ void avm_dec_top (void){
 
 	if (top >1024 ) { // na ginei max
 		avm_error("Stack overflow\n");
+		exit(0);
 		executionFinished=1;
 	} else ++top;
 }
@@ -941,10 +942,16 @@ void execute_jeq	(struct instruction* ins){
 			if( rv1->type == number_m &&  rv2->type == number_m ){
 					printf("JEQ 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
-					if(rv1->data.numVal == rv2->data.numVal ) result = 1;
+/*					if(rv1->data.numVal == rv2->data.numVal ) result = 1;
 					else result = 0;
 
-					printf("result is %d\n",result );
+					printf("result is %d\n",result );*/
+
+					if(fabs(rv1->data.numVal - rv2->data.numVal) < 0.00001 ) result = 1;
+					else result = 0;
+
+					printf("FABS result is %d\n",result );
+
 					}
 			if( rv1->type == string_m &&  rv2->type == string_m ){
 					printf("JEQ 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
