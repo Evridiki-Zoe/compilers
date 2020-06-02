@@ -501,7 +501,7 @@ term  : L_PARENTHES {
 } expr R_PARENTHES { printf(RED " (expression) \n" RESET);
 
           $$ = $3;
-		  if (exprflag == 1) {
+/*		  if (exprflag == 1) {
 			  struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 			 struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
@@ -512,7 +512,7 @@ term  : L_PARENTHES {
   			patchLists(($$),(int)QuadNo-2,(int)QuadNo);
   		}
 
-
+*/
 		 exprflag=pop_E();
 
       }
@@ -979,6 +979,7 @@ objectdef   :  L_SBRACKET elist_for_table R_SBRACKET  {
                           tmp = tmp->next;
                           i++;
                     }
+rvalues++;
             }
             ;
 
