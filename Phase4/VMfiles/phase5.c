@@ -112,18 +112,16 @@ struct instruction**  code = NULL;
 
 struct avm_memcell*	avm_translate_operand(struct vmarg* arg , struct avm_memcell* reg){
 
-	 printf("type of vmarg %d\n",arg->type );
 	switch (arg->type) {
 		case global_a: return &stack[arg->val];
-		case local_a:	printf("\n\n\nperno local %f\n\n\n",stack[topsp + arg->val].data.numVal );return &stack[topsp + arg->val];
+		case local_a: return &stack[topsp + arg->val];
 		case formal_a: {
-			printf("AVM_NUMACTUALS_OFFSET %f \n",stack[topsp AVM_NUMACTUALS_OFFSET].data.numVal );
+
 			if (arg->val > stack[topsp AVM_NUMACTUALS_OFFSET].data.numVal) {
 				printf("This argument was not pushed in stack. \n" );
 				executionFinished=1;
 				exit(0);
 			}
-			printf("%d\n",topsp - AVM_STACKENV_SIZE - 1 - arg->val );
 			return &stack[topsp - AVM_STACKENV_SIZE - 1 - arg->val];
 		}
 		case retval_a:	return &retval;
@@ -229,14 +227,13 @@ void execute_cycle	(void){
 		struct instruction* instr = malloc(sizeof(struct instruction));
 		memcpy(instr,code[pc],sizeof(struct instruction));
 
-		printf("now running ins(%s) %d \n", enum_toString_opCodes_v(code[pc]->opcode), instr->opcode);
+//		printf("now running ins(%s) %d \n", enum_toString_opCodes_v(code[pc]->opcode), instr->opcode);
 
 		assert(instr->opcode>=0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
 		if (instr->srcLine) currLine = instr->srcLine; //todo mallon ??
 		unsigned oldPC = pc;
 
 
-	//	printf("instr type %d\n",instr->opcode);
 		(*executeFuncs[instr->opcode]) (instr);
 		if (pc == oldPC) { // an DEN  htan jump
 
@@ -302,18 +299,14 @@ struct avm_table* avm_tablenew(){
 //----------------------------------------------------------
 struct avm_memcell* avm_tablegetelem(struct avm_table* table , char* index ){
 	struct avm_table* tmp = table;
-	//printStack();
-	printf("psaxno gia %s\n",index );
 	while (tmp) {
 		if(tmp->index){
-			printf("%s , %s \n",index,tmp->index);
 			if (strcmp(tmp->index,index)==0) {
 				return tmp->data;
 			}
 	}
 		tmp = tmp->next;
 	}
-	printf("nullll\n" );
 	return  NULL;
 
 }
@@ -371,7 +364,6 @@ free(tmpdata);
 void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 	if (lv == rv) return;
 
-	printf("avm assign types(%d,)\n", rv->type);
 
 
 
@@ -391,7 +383,6 @@ void avm_assign(struct avm_memcell*	lv,struct avm_memcell*	rv){
 }
 
 void avm_callsaveenviroment(void){
-	printf("call save env:: totalActuals(%d), pc+1(%d), top+totalActuals+2(%d), topsp(%d)\n",totalActuals, pc+1, (top+totalActuals + 2), topsp );
 	avm_push_envvalue(totalActuals);
 	avm_push_envvalue(pc+1);
 	avm_push_envvalue(top-totalActuals - 2);
@@ -492,52 +483,45 @@ void libfunc_print(){
 		char * s = malloc(sizeof(char)*10);
 		//s = avm_tostring(avm_getactual(i));
 		strcpy(s, avm_tostring(avm_getactual(i)));
-		printf("PRINT: %s ",s);
+		printf("%s ",s);
 		//free(s);
 	}
-	printf("\n" );
-	//printStack();
+
 }
 
 void libfunc_input(){
 	avm_memcellclear(&retval);
 	char* str = malloc(sizeof(char)*100);
 
-	printf( "Enter a value :");
 	fgets( str, 100, stdin );
 	strtok(str, "\n"); //gia na afairesw ton \n xarakthra pou bazei sto telos h fgets
 
-	printf( "\nYou entered: ");
 	puts( str );
 
 	if(strcmp(str, "true") == 0){
 		retval.type = bool_m;
 		retval.data.bool = 1;
-		printf("input: type: %d, value: true\n",retval.type);
 
 	}
 	else if(strcmp(str, "false") == 0 ){
 		retval.type = bool_m;
 		retval.data.bool = 0;
-		printf("input: type: %d, value: false\n",retval.type);
 	}
 	else if(strcmp(str, "nil") == 0 ){
 		retval.type = nil_m;
 		retval.data.strVal = "nil";
-		printf("input: type: %d, value: nil\n",retval.type);
 	}
 	else if(strncmp(str,"\"", 1) == 0 && str[strlen(str-1)] == '\"'){
 // 		printf("prwto %c, teleutaio %c\n",str[0], str[strlen(str-1)] );
-		printf("its a string\n" );
 		retval.type = string_m;
-		retval.data.strVal = str;
-		printf("input: type: %d, value: %s\n",retval.type, retval.data.strVal );
+		char tmpstr[strlen(str)];
+		mem(tmpstr, &str[1], strlen(str));
+		tmpstr[strlen(tmpstr)] = '\0';
+		retval.data.strVal =  strdup(tmpstr);
 	}
 	else if( atoi(str) != 0 ){
-		printf("number \n" );
 		retval.type = number_m;
 		retval.data.numVal = atoi(str);
-		printf("input: type: %d, value %f\n",retval.type, retval.data.numVal );
 	}
 	else{
 
@@ -698,8 +682,6 @@ void libfunc_argument(){
 		else{
 				if(avm_getactual(0)->type == 0){ //num type
 						i = avm_getactual(0)->data.numVal+1;
-						printf("i =%d\n",i );
-						printf("kappa %d\n",p_topsp -4 - i );
 						retval.type = number_m;
 						double totalArgs = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
 						if(i < 0 || i > totalArgs) {
@@ -900,7 +882,6 @@ void execute_assign (struct instruction* ins){
 
 // ??	assert(lv && (&stack[N-1] >= lv && lv > &stack[top] || lv == &retval ))
 	avm_assign(lv,rv);
-//	printf("in assign after avmassign %f kai rv %f\n", lv->data.numVal, rv->data.numVal );
 
 }
 
@@ -918,7 +899,6 @@ void execute_not 	(struct instruction* ins){}//XXXXXXXXXXXX NO USE
 //oles oi jump if kati exoun sto value to jump label, bazoume -1
 void execute_jeq	(struct instruction* ins){
 		assert(ins->result->type == label_a);
-		printf("arxh jeq\n" );
 		struct avm_memcell* rv1 = avm_translate_operand(ins->arg1, &ax);
 		struct avm_memcell* rv2 = avm_translate_operand(ins->arg2, &bx);
 
@@ -940,7 +920,6 @@ void execute_jeq	(struct instruction* ins){
 				  }
 		else{
 			if( rv1->type == number_m &&  rv2->type == number_m ){
-					printf("JEQ 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
 /*					if(rv1->data.numVal == rv2->data.numVal ) result = 1;
 					else result = 0;
@@ -950,43 +929,32 @@ void execute_jeq	(struct instruction* ins){
 					if(fabs(rv1->data.numVal - rv2->data.numVal) < 0.00001 ) result = 1;
 					else result = 0;
 
-					printf("FABS result is %d\n",result );
 
 					}
 			if( rv1->type == string_m &&  rv2->type == string_m ){
-					printf("JEQ 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
 
 				  if(strcmp(rv1->data.strVal,rv2->data.strVal) == 0 ) result = 1;
 					else result = 0;
 
-					printf("result is %d\n",result );
 			}
 			if( rv1->type == lib_func_m &&  rv2->type == lib_func_m ){
-				printf("JEQ 2 lib funcs  %s   kai %s \n", rv1->data.libfuncVal,  rv2->data.libfuncVal );
 
 				if(strcmp( rv1->data.libfuncVal,  rv2->data.libfuncVal ) == 0 ) result = 1;
 				else result = 0;
-				printf("result is %d\n",result );
 			}
 			if( rv1->type == userfunc_m && rv2->type == userfunc_m){
-				printf("JEQ 2 userfuncs %s  kai %s \n", userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id );
 				if(strcmp(userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id) == 0) result = 1;
 				else result = 0;
-				printf("result is %d\n",result );
 
 			}
 			if( rv1->type == table_m && rv2->type == table_m){
-				printf("JEQ 2 table  \n");
 				result = table_equal(rv1,rv2);
-				printf("result is %d\n",result );
 
 			}
-			printf("\n\n->>>%d %d\n\n",rv1->type , rv2->type );
 		}
 
 		if(!executionFinished && result ){
    			execute_jump(ins);
-				printf("if result is 1, pc is %d\n\n",pc  );
 			}
 }
 
@@ -994,7 +962,6 @@ void execute_jeq	(struct instruction* ins){
 int table_equal(struct avm_memcell* rv1,struct avm_memcell* rv2){
 		struct avm_table* table1 = rv1->data.tableVal;
 		struct avm_table* table2 = rv2->data.tableVal;
-		printf("eimai %d\n", table1->data->type);
 		int flag = 0;
 
 		while(table1 ){
@@ -1049,40 +1016,40 @@ void execute_jne	(struct instruction* ins){
 	}
 	else{
 		if( rv1->type == number_m &&  rv2->type == number_m ){
-				printf("JNE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
+
 
 				if(fabs(rv1->data.numVal - rv2->data.numVal) < 0.00001 ) result = 0;
 				else result = 1;
 
-				printf("FABS result is %d\n",result );
+
 				}
 		if( rv1->type == string_m &&  rv2->type == string_m ){
-				printf("JNE 2 strings  %s and %s \n", rv1->data.strVal, rv2->data.strVal );
+
 
 				if(strcmp(rv1->data.strVal,rv2->data.strVal) == 0 ) result = 0;
 				else result = 1;
 
-				printf("result is %d\n",result );
+
 		}
 		if( rv1->type == lib_func_m &&  rv2->type == lib_func_m ){
-			printf("JNE 2 lib funcs  %s kai %s \n", rv1->data.libfuncVal,  rv2->data.libfuncVal );
+
 
 			if(strcmp( rv1->data.libfuncVal,  rv2->data.libfuncVal ) == 0 ) result = 0;
 			else result = 1;
-			printf("result is %d\n",result );
+
 		}
 		if( rv1->type == userfunc_m && rv2->type == userfunc_m){
-			printf("JNE 2 userfuncs %s  kai %s \n", userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id );
+
 			if(strcmp(userFuncs[rv1->data.funcVal]->id,  userFuncs[rv2->data.funcVal]->id) == 0) result = 0;
 			else result = 1;
-			printf("result is %d\n",result );
+
 
 		}
 		if( rv1->type == table_m && rv2->type == table_m){
-				printf("JEQ 2 table  \n");
+
 				if(table_equal(rv1,rv2) == 1) result = 0;
 				else result = 1;
-				printf("result is %d\n",result );
+
 
 		}
 
@@ -1114,12 +1081,10 @@ void execute_jle	(struct instruction* ins){
 	}
 	else{
 		if( rv1->type == number_m &&  rv2->type == number_m ){
-				printf("JLE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
 				if(rv1->data.numVal <= rv2->data.numVal ) result = 1;
 				else result = 0;
 
-				printf("result is %d\n",result );
 				}
 	}
 
@@ -1150,12 +1115,10 @@ void execute_jge	(struct instruction* ins){
 	}
 	else{
 		if( rv1->type == number_m &&  rv2->type == number_m ){
-				printf("JGE 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
 				if(rv1->data.numVal >= rv2->data.numVal ) result = 1;
 				else result = 0;
 
-				printf("result is %d\n",result );
 			}
 	}
 
@@ -1186,12 +1149,9 @@ void execute_jlt	(struct instruction* ins){
 	}
 	else{
 		if( rv1->type == number_m &&  rv2->type == number_m ){
-				printf("JLT 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
 				if(rv1->data.numVal < rv2->data.numVal ) result = 1;
 				else result = 0;
-
-				printf("result is %d\n",result );
 			}
 	}
 
@@ -1221,12 +1181,9 @@ void execute_jgt(struct instruction* ins){
 	}
 	else{
 		if( rv1->type == number_m &&  rv2->type == number_m ){
-				printf("JGT 2 numbers %f and %f \n", rv1->data.numVal, rv2->data.numVal );
 
 				if(rv1->data.numVal > rv2->data.numVal ) result = 1;
 				else result = 0;
-
-				printf("result is %d\n",result );
 			}
 	}
 
@@ -1248,7 +1205,6 @@ void execute_call		(struct instruction* ins){
 				struct userfunc* tmpFunc = avm_getfuncinfo(func->data.funcVal);
 				pc = tmpFunc->address;
 
-				printf("user func call pc %d ending %d\n", pc,AVM_ENDING_PC);
 				assert(pc < AVM_ENDING_PC);
 				if (code[pc]->opcode != funcenter_v){
 					  //funcenter_v is funcstart
@@ -1261,19 +1217,17 @@ void execute_call		(struct instruction* ins){
 
 				break;
 			}
-			case string_m:		printf("STRING\n" );avm_calllibfunc(func->data.strVal); break;
+			case string_m:		avm_calllibfunc(func->data.strVal); break;
 			case lib_func_m:	avm_calllibfunc(func->data.libfuncVal); break;
 			case table_m:	{
 
 						switch (func->data.tableVal->data->type) {
-							case string_m:		printf("TABLE => STRING\n" );avm_calllibfunc(func->data.strVal); break;
+							case string_m:		avm_calllibfunc(func->data.strVal); break;
 							case lib_func_m:	avm_calllibfunc(func->data.libfuncVal); break;
 							case userfunc_m:	{
 								struct userfunc* tmpFunc = avm_getfuncinfo(func->data.tableVal->data->data.funcVal);
 								pc = tmpFunc->address;
-								printf("%d\n",func->data.tableVal->data->data.funcVal );
 
-								printf("user func call pc %d ending %d\n", pc,AVM_ENDING_PC);
 								assert(pc < AVM_ENDING_PC);
 								if (code[pc]->opcode != funcenter_v){
 									  //funcenter_v is funcstart
@@ -1299,30 +1253,25 @@ void execute_call		(struct instruction* ins){
 			}
 }
 void execute_pusharg	(struct instruction* ins){
-	//printf("push: type %d val %d \n",ins->arg1->type , ins->arg1->val  );
 	struct avm_memcell* arg = avm_translate_operand(ins->arg1,&ax);
 	assert(arg);
-	//printf("arg is %d\n", arg->type );
 	stack[top] = *(struct avm_memcell*) malloc(sizeof(struct avm_memcell));
 	avm_assign(&stack[top],arg);
 	++totalActuals;
 	avm_dec_top();
-	 printf("stack after push arg\n" );
 
 }
 
 void execute_funcenter	(struct instruction* ins){
-	printf("funcenter!! \n" );
 	struct avm_memcell* func = avm_translate_operand(ins->result , &ax);
 	assert(func);
-	printf("pc is %d and funcval address  is %d\n",pc, userFuncs[func->data.funcVal]->address );
+
 	assert(pc == userFuncs[func->data.funcVal]->address );
 
 	totalActuals = 0;
 
 //	struct userfunc* funcInfo = avm_getfuncinfo(userFuncs[func->data.funcVal]->address );
 //	assert(funcInfo);
-	printf("in funcenter top is %d and function size is %d\n", top, userFuncs[func->data.funcVal]->localSize);
 	topsp=top;
 	top = top + userFuncs[func->data.funcVal]->localSize;
 
@@ -1334,7 +1283,6 @@ void execute_funcexit	(struct instruction* ins){
 	top = avm_get_envvalue	(topsp  AVM_SAVEDTOP_OFFSET);
 	pc 	= avm_get_envvalue	(topsp  AVM_SAVEDPC_OFFSET);
 	topsp = avm_get_envvalue(topsp AVM_SAVEDTOPSP_OFFSET);
-	printf("\n\n\n\n%d %d %d \n\n\n",top,pc,topsp );
 
 	while (--oldTop >= top) {
 
@@ -1378,7 +1326,6 @@ void execute_tablegetelem	(struct instruction* ins){
 			case number_m:	sprintf(res , "%f",i->data.numVal); break;
 			case string_m:	res=strdup(i->data.strVal); break;
                                 case userfunc_m: {
-                                        printf("eimai mia loulou %d %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
                                         char* tmp = malloc(10);
                                         sprintf(tmp,"%f",(double)i->data.funcVal);
                                         res=strdup(tmp);
@@ -1387,7 +1334,7 @@ void execute_tablegetelem	(struct instruction* ins){
 
                                 }
 								case bool_m : res = strdup(bool_tostring(i)); break;
-                                case table_m: printf("EIMAI TABLEEEE\n"); res = strdup(table_tostring(i)); break;
+                                case table_m:  res = strdup(table_tostring(i)); break;
                                 case lib_func_m: res = strdup(i->data.libfuncVal); break;
 			default : 	res=strdup(i->data.strVal); break;
 		}
@@ -1420,23 +1367,19 @@ void execute_tablesetelem	(struct instruction* ins){
 
 
 		assert(i && c);
-		printf("%d\n", t->type );
-		printf("dssss\n" );
+
 		if(t->type != table_m)	{	avm_error("illegal use of variable as a table in setelem! \n"); exit(0);}
 		else {
-			printf("edwww\n");
 			char* res=malloc(5);
-                        printf("edwwwqqqq\n");
-
 
 			switch (i->type) {
 
 
 				case number_m:{
-                        printf("edwwwweafd\n");
+
 
 				char* tmp = malloc(10);
-                        printf("edwww number\n");
+
 
 				sprintf(tmp,"%f",i->data.numVal);
 				res=strdup(tmp);
@@ -1445,7 +1388,6 @@ void execute_tablesetelem	(struct instruction* ins){
 				}
 				case string_m:	res=strdup(i->data.strVal); break;
 				case userfunc_m: {
-					printf("eimai mia loulou %d %s", i->data.funcVal, userFuncs[i->data.funcVal]->id);
 					char* tmp = malloc(10);
 					sprintf(tmp,"%f",(double)i->data.funcVal);
 	                                res=strdup(tmp);
@@ -1454,12 +1396,11 @@ void execute_tablesetelem	(struct instruction* ins){
 
 				}
 				case bool_m : res = strdup(bool_tostring(i)); break;
-				case table_m: printf("EIMAI TABLEEEE\n"); res = strdup(table_tostring(i)); break;
+				case table_m: res = strdup(table_tostring(i)); break;
                                 case lib_func_m: res = strdup(i->data.libfuncVal); break;
 				default :   res=strdup(i->data.strVal); break;
 			}
 
-			printf("\n\n\nres =%s \n\n\n",res );
 			avm_setelem(t->data.tableVal, res, c);
 			free(res);
 		}
@@ -1468,7 +1409,7 @@ void execute_tablesetelem	(struct instruction* ins){
 void execute_nop	(struct instruction* ins){}
 void execute_jump	(struct instruction* ins){
 	  // to jump quad exei sto value to label poy kanei jump, prepei na einai -1
-		pc = ins->result->val -1; printf("jumping to %d \n", pc );
+		pc = ins->result->val -1;
 	}
 
 //den exw balei to executon executionFinished =1 edw, na to bazoume kathe fora pou thn  kaloume
@@ -1563,16 +1504,13 @@ void read_binfile(){
 				FILE *fp = NULL;
 				int i =0;
 		 		//   fputs("2", fp);
-				//printf("ff\n" );
 	   			fp = fopen("test.bin", "rb");
 		 		int magic;
 		 		unsigned int totalStr, totalNums, totaluserF, totallibF, totalins;
 	      		fread(&magic, sizeof(int), 1, fp);
-	      		//printf("\nmagic number is: %d \n", magic);
 		  		fread(&globals,sizeof(unsigned int),1,fp);
 
 				fread(&totalStr, sizeof(unsigned int), 1, fp);
-				//printf("\ntotal string is %d \n", totalStr);
 				totalNumConsts=totalStringConsts=totalNamedLibfuncs=totalUserFuncs=0;
 				stringConsts = malloc(sizeof(char*) * totalStr);
 
@@ -1581,7 +1519,6 @@ void read_binfile(){
 
 							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
-							//printf("size (%d)  ",len );
 							char* str = malloc(sizeof(char) *len);
 							int i = 0;
 							for ( ;i < len; i++) {
@@ -1589,24 +1526,18 @@ void read_binfile(){
 									printf("Error reading file \n");
 							}
 							add_consts_string(str);
-
-							//printf("str: %s\n",str );
 		    }
 
 				fread(&totalNums, sizeof(unsigned int), 1, fp);
-			//	printf("\ntotal nums is %d \n", totalNums);
 				numConsts = malloc(sizeof(double)* totalNums);
 				for(i=0; i<totalNums; i++){
 			        double num;
 			        fread(&num,sizeof(double), 1, fp);
-			       // printf("num:%f\n", num);
 				 add_consts_num(num);
-				// printf("fasd\n" );
 
 				}
 
 				fread(&totaluserF, sizeof(unsigned int), 1, fp);
-				//printf("\ntotal userfuncs is %d \n", totaluserF);
 				userFuncs = malloc(sizeof(struct userfunc)* totaluserF);
 
 	 	    	for(i=0; i<totaluserF; i++){
@@ -1621,13 +1552,11 @@ void read_binfile(){
 										if(fread(&id[i],sizeof(char ) , 1, fp)!= 1)
 											printf("Error reading file \n");
 									}
-	   							printf("size (%d) of %s, with address %d and localsize %d\n",len,id,  addr, localsize );
 								add_consts_userfuncs(id,addr,localsize,-1);
 
 
 	 	    }
 				fread(&totallibF, sizeof(unsigned int), 1, fp);
-				printf("\ntotal libfuncs is %d \n", totallibF);
 				//namedLibfuncs=malloc(sizeof(char*)*totaluserF);
 				for(i=0; i<totallibF; i++){
 								unsigned int len;
@@ -1641,11 +1570,11 @@ void read_binfile(){
 								}
 							//	add_consts_libfuncs(libF);
 
-								printf("size (%d) of libF: %s\n",len, libF );
+
+
 		    }
 
 				fread(&totalins, sizeof(unsigned int), 1, fp);
-				//printf("\ntotal instructions is %d \n", totalins);
 
 				codeSize = totalins;
 					 for (i = 0; i < totalins; i++) {
@@ -1655,7 +1584,6 @@ void read_binfile(){
 									 if(code == NULL) code = malloc(sizeof(struct instruction *)*codeSize);
 									 	  code[i] = malloc(sizeof(struct instruction));
 											code[i]->opcode = opcode;
-										//	printf("opcode %d kai code opcode %d\n",opcode , code[i]->opcode );
 									 // result
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
@@ -1668,9 +1596,6 @@ void read_binfile(){
 												  code[i]->result->type = type;
 												  code[i]->result->val = val;
 											 }
-
-								//	 printf("%d) opcode(%d) RESULT: type(%d), value(%d) \n",i+1, opcode, type, val );
-
 									 // arg1
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
@@ -1684,9 +1609,6 @@ void read_binfile(){
 													  code[i]->arg1->type = type;
 													  code[i]->arg1->val = val;
 												 }
-
-								//	 printf("\tARG1: type(%d), value(%d) \n", type, val );
-
 									 // arg2
 									 fread(&type,sizeof( int), 1, fp);
 					 			   fread(&val,sizeof( int), 1, fp);
@@ -1703,8 +1625,6 @@ void read_binfile(){
 												  code[i]->arg2->type = type;
 												  code[i]->arg2->val = val;
 											 }
-
-								//	 printf("\tARG2: type(%d), value(%d) \n", type, val );
 
 					}
 				fclose(fp);
