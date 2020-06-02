@@ -324,7 +324,6 @@ void avm_setelem(struct avm_table* table , char* index , struct avm_memcell* dat
 
 	memcpy(tmpdata, data, sizeof(struct avm_memcell));
 
-
 if (table->data->type == undef_m) {
 //	printf("if to prwto table set(%s,%f)\n", index, data->data.numVal);
 //	strcpy(tmp->index ,index);
@@ -332,17 +331,16 @@ if (table->data->type == undef_m) {
 	tmp->index = strdup(index);
 	tmp->data= malloc(sizeof(struct avm_memcell));
 	memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
+	tmp->next = NULL;
 	free(tmpdata);
 	return;
 }
-
 while (tmp) {
 	if(tmp->index){
 		if (strcmp(tmp->index,index)==0) {
 			tmp->data= malloc(sizeof(struct avm_memcell));
-        memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
-        free(tmpdata);
-
+ 			memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
+                        free(tmpdata);
 			return;
 		}
  }
@@ -352,6 +350,7 @@ struct avm_table* tmp_table = table;
 while (tmp_table->next) {
 	tmp_table = tmp_table->next;
 }
+free(tmp);
 
 tmp = malloc(sizeof(struct avm_table));
  tmp->index=malloc(sizeof(index)+1);
@@ -359,10 +358,11 @@ tmp = malloc(sizeof(struct avm_table));
 tmp->index = strdup(index);
 tmp->data= malloc(sizeof(struct avm_memcell));
 memcpy(tmp->data, tmpdata,sizeof(struct avm_memcell));
-
-
-tmp_table->next = tmp;
+tmp_table->next = malloc(sizeof(struct avm_table));
+tmp->next = NULL;
+memcpy(tmp_table->next, tmp, sizeof(struct avm_table));
 // tmp->next = table->next;
+
 // table->next = tmp;
 
 free(tmpdata);
@@ -1461,9 +1461,7 @@ void execute_tablesetelem	(struct instruction* ins){
 
 			printf("\n\n\nres =%s \n\n\n",res );
 			avm_setelem(t->data.tableVal, res, c);
-printf("prin ffree\n");
 			free(res);
-printf("meta free\n");
 		}
 }
 
