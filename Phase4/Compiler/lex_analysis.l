@@ -137,8 +137,8 @@ STRING				\"
 "/*"  { commentHandler(yylineno);	}
 
 [ \t]+            { }
+\n 				{}
 . 				yywarning("Undefined character");
-\n				{ }
 
 %%
 

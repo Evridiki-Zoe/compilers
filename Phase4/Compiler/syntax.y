@@ -893,8 +893,9 @@ multi_exprs	:  COMMA expr multi_exprs {
 
           struct expr* temp_elem = new_expr(var_e,newnode,NULL,0,"",'\0',$3);
           // bazw sto next to epomeno stoixeio
-
                   if (exprflag) {
+printf("GIATY\n");
+
                          struct expr* true_expr = new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
                          struct expr* false_expr = new_expr(constbool_e,false_expr_sym,NULL,0,"",0,NULL );
 
@@ -902,7 +903,7 @@ multi_exprs	:  COMMA expr multi_exprs {
                          emit(jump,NULL,NULL,NULL,yylineno,QuadNo+3);
                          emit(assign,false_expr,NULL,$2,yylineno,0);
                          exprflag=0;
-                        patchLists(($2),(int)QuadNo-2,(int)QuadNo);
+                         patchLists(($2),(int)QuadNo-2,(int)QuadNo);
                  }
 
           $$ = $2;
