@@ -29,9 +29,9 @@ avm_initstack();
 	while (!executionFinished) {
 	//	printf("executionFinished 0\n" );
 		execute_cycle();
-		printf("pc is now %d\n",pc );
+//		printf("pc is now %d\n",pc );
 	}
-	printStack();
+//	printStack();
 
 	return 0;
 }

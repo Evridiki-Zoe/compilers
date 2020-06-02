@@ -486,7 +486,7 @@ void libfunc_print(){
 		printf("%s ",s);
 		//free(s);
 	}
-
+printf("\n");
 }
 
 void libfunc_input(){
@@ -511,13 +511,20 @@ void libfunc_input(){
 		retval.type = nil_m;
 		retval.data.strVal = "nil";
 	}
-	else if(strncmp(str,"\"", 1) == 0 && str[strlen(str-1)] == '\"'){
+	else if(strncmp(str,"\"", 1) == 0 && str[strlen(str)-1] == '\"'){
 // 		printf("prwto %c, teleutaio %c\n",str[0], str[strlen(str-1)] );
+/*		retval.type = string_m;
+
+
+		retval.data.strVal = str;*/
+
 		retval.type = string_m;
-		char tmpstr[strlen(str)];
-		mem(tmpstr, &str[1], strlen(str));
-		tmpstr[strlen(tmpstr)] = '\0';
+		char* tmpstr = malloc(strlen(str)-2);
+		memcpy(tmpstr, &str[1], strlen(str)-1);
+		tmpstr[strlen(tmpstr)-1] = '\0';
+
 		retval.data.strVal =  strdup(tmpstr);
+
 	}
 	else if( atoi(str) != 0 ){
 		retval.type = number_m;
@@ -932,7 +939,6 @@ void execute_jeq	(struct instruction* ins){
 
 					}
 			if( rv1->type == string_m &&  rv2->type == string_m ){
-
 				  if(strcmp(rv1->data.strVal,rv2->data.strVal) == 0 ) result = 1;
 					else result = 0;
 
@@ -1796,3 +1802,4 @@ char* enum_toString_opCodes_v(vmopcode sym) {
 
 		}
 	}
+
