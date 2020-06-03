@@ -44,7 +44,7 @@ int checkTypes(struct expr *op1, struct expr *op2) {
             && ((op2)->type == 0 || (op2)->type == 1 || (op2)->type == 8  || (op2)->type == 4) ) {
 			return 1;
 	}
-	else return 0;
+	else return 1;
 }
 
 struct expr* smallFunc(expr_t expr) {
@@ -275,7 +275,7 @@ struct expr* emit_iftable_item(struct expr* exp){
       sprintf(name,"_%d",rvalues++);
       struct symbol_table_binding* newnode =insertVar(name,yylineno,scope);
      	struct expr* result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
-			printf("pernao apo edo\n\n\n\n\n" );
+
 //mporei na thelei result = new_expr(var_e,newnode,exp->index,0,"",'\0',NULL);
 			emit(tablegetelem,exp,exp->index,result,yylineno,0);
 			return result;
@@ -314,11 +314,11 @@ struct expr* apotimhsh_seboolean(struct expr* expr){
 				        */
 				}
 				else if(expr->type == 2){
-					printf("bool\n");
+
 				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				}
 				else if(expr->type == 3){
-					printf("const_bool\n");
+
 				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 
 				}
@@ -329,12 +329,12 @@ struct expr* apotimhsh_seboolean(struct expr* expr){
 				            //todo
 				}
 				else if(expr->type == 7){ //new table
-					printf("const_bool\n");
+
 				          expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 				}
 				else if(expr->type == 8){
 				        int arithmos =atoi(expr->sym->value.var->name);
-				        printf("o arithmos einai: %d\n", arithmos);
+
 				        if(arithmos!=0) {
 				        	expr_apotimhsh_seboolean= new_expr(constbool_e,true_expr_sym,NULL,0,"",1,NULL );
 						} else {

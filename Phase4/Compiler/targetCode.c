@@ -390,7 +390,7 @@ void emitIns(struct instruction* ins){
 
 struct vmarg* make_operand(struct expr* expr){
 	 	struct vmarg* arg= malloc(sizeof(struct vmarg));
-	printf(" type of %s  is %d \n" , expr->sym->value.var->name , expr->type );
+
 	switch (expr->type) {
 		case var_e:
 		case tableitem_e:
@@ -447,7 +447,7 @@ unsigned add_rval_string(char * str){
 			}
 			stringConsts[totalStringConsts] = (char*) malloc(sizeof(char) * strlen(str));
 			strcpy(stringConsts[totalStringConsts] , str);
-			printf("string: %s\n", stringConsts[totalStringConsts] );
+
 			return totalStringConsts++;
 }
 
@@ -459,7 +459,7 @@ unsigned add_rval_num(double number){ // xanei pshfia meta to 6o
 	}
 
 	numConsts[totalNumConsts] = number;
-	printf("num: %f\n", number );	//to epsaksa giati typwnei mono 6 psifia. Auto einai to default tou %f
+
 	// alla an to allakseis den ksereis posa psifia exeis esy kai mporei na typwnei midenika
 	return totalNumConsts++;
 
@@ -476,7 +476,6 @@ unsigned add_rval_libfuncs(char * libfunc){
 	namedLibfuncs[totalNamedLibfuncs] = (char*) malloc(sizeof(char) * strlen(libfunc));
 	//strcpy(namedLibfuncs[totalNamedLibfuncs] , libfunc);
 	namedLibfuncs[totalNamedLibfuncs] = strdup(libfunc);
-	printf("libfunc: %s\n", namedLibfuncs[totalNamedLibfuncs] );
 	return totalNamedLibfuncs++;
 }
 
@@ -499,7 +498,6 @@ unsigned add_rval_userfuncs(char * userfunc,unsigned int address, unsigned int l
 	strcpy(newnode->id, userfunc);
 
 	userFuncs[totalUserFuncs]  = newnode;
-	printf("userfunc: %s\n", userFuncs[totalUserFuncs] ->id );
 	return totalUserFuncs++;
 }
 
@@ -537,7 +535,6 @@ void make_revaloperand(struct vmarg *arg) {
 int create_bin(){
 
 	FILE *fp = NULL;
-	printf("globals are %d\n",tmpoffset );
    	fp = fopen("../VMfiles/test.bin", "wb");
    	int magicnum = 340200501;
 	int i =0; //counter
@@ -641,7 +638,7 @@ void read_binfile(){
 								unsigned int len = 0;
 								char * str = (char *)malloc(sizeof(char )*5);
 								assert(str);
-								printf("edw erxesai?\n" );
+
 							 if(fread(&len,sizeof(unsigned int), 1, fp) != 1) //length of each string
 							 		printf("Error reading file \n");
 							printf("size (%d)  ",len );

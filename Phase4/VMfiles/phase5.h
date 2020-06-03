@@ -276,3 +276,5 @@ void add_consts_userfuncs(char * userfunc,unsigned int address, unsigned int loc
 
 char* enum_toString_opCodes_v(vmopcode sym);
 ///----------------------------------
+
+	char *concat_strings(char* str1,char* str2);

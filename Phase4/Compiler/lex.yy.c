@@ -387,7 +387,7 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[109] =
     {   0,
-       44,   44,   52,   49,   48,   50,   49,   46,   22,   41,
+       44,   44,   52,   50,   48,   49,   50,   46,   22,   41,
        42,   20,   18,   32,   19,   35,   21,   44,   33,   31,
        28,   17,   27,   45,   39,   40,   45,   45,   45,   45,
        45,   45,   45,   45,   45,   45,   45,   45,   37,   38,
@@ -523,7 +523,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[52] =
     {   0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,     };
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -1085,15 +1085,15 @@ YY_RULE_SETUP
 { }
 	YY_BREAK
 case 49:
+/* rule 49 can match eol */
 YY_RULE_SETUP
 #line 140 "lex_analysis.l"
-yywarning("Undefined character");
+{}
 	YY_BREAK
 case 50:
-/* rule 50 can match eol */
 YY_RULE_SETUP
 #line 141 "lex_analysis.l"
-{ }
+yywarning("Undefined character");
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
@@ -2187,7 +2187,7 @@ int stringHandler(){
 			Lex_string = strdup(buff);
 //			strcpy(Lex_string,buff);
 //      Lex_string[length+1] = '\0';
-	
+
             return 1;
         }
 
@@ -2201,7 +2201,7 @@ int stringHandler(){
 
             } else if (tmp == 'n') {
 //              strcat(buff, "\n");
-                buff[length] = 10;
+                buff[length-1] = '\n';
 
 
             } else if (tmp == '\\') {

@@ -216,7 +216,7 @@ int stringHandler(){
 			Lex_string = strdup(buff);
 //			strcpy(Lex_string,buff);
 //      Lex_string[length+1] = '\0';
-	
+
             return 1;
         }
 
@@ -230,7 +230,7 @@ int stringHandler(){
 
             } else if (tmp == 'n') {
 //              strcat(buff, "\n");
-                buff[length] = 10;
+                buff[length-1] = 10;
 
 
             } else if (tmp == '\\') {

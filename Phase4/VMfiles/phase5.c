@@ -861,7 +861,12 @@ void execute_arithmetic(struct instruction* instr){
 
 		//assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval)); ?? slide 25 to exei alliws
 		assert(rv1 && rv2);
-		if( rv1->type != number_m  || rv2->type != number_m ){
+
+		if ((rv1->type == string_m ) &&( rv2->type == string_m)) {
+			lv ->type = string_m;
+			lv->data.strVal = concat_strings(rv1->data.strVal, rv2->data.strVal);
+		}
+		else if( rv1->type != number_m  || rv2->type != number_m ){
 				printf("arithmetic ex:: not a number!%d %d \n",rv1->type,rv2->type);
 				exit(0);
 				executionFinished = 1;
@@ -1634,38 +1639,38 @@ void read_binfile(){
 
 					}
 				fclose(fp);
-				printf("=========strings:============\n" );
-
-					int j=0;
-					while (j< totalStringConsts) {
-						 printf("%s \n", stringConsts[j]);
-						j++;
-					}
-				printf("=========nums:============\n" );
-					j=0;
-					while (j< totalNumConsts) {
-						 printf("%f \n", numConsts[j]);
-						j++;
-					}
-
-					printf("========lib funcs:============\n" );
-					j=0;
-					while (j< 12) {
-						 printf("%s \n", namedLibfuncs[j]);
-						j++;
-					}
-					printf("========user funcs:============\n" );
-					j=0;
-					while (j< totalUserFuncs) {
-						 printf("%s #args %d   locals %d address %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize, userFuncs[j]->address);
-						j++;
-					}
-
-					j=0;
-					while (j< totalins) {
-						 printf("opcode %d\n", code[j]->opcode);
-						j++;
-					}
+				// printf("=========strings:============\n" );
+				//
+				// 	int j=0;
+				// 	while (j< totalStringConsts) {
+				// 		 printf("%s \n", stringConsts[j]);
+				// 		j++;
+				// 	}
+				// printf("=========nums:============\n" );
+				// 	j=0;
+				// 	while (j< totalNumConsts) {
+				// 		 printf("%f \n", numConsts[j]);
+				// 		j++;
+				// 	}
+				//
+				// 	printf("========lib funcs:============\n" );
+				// 	j=0;
+				// 	while (j< 12) {
+				// 		 printf("%s \n", namedLibfuncs[j]);
+				// 		j++;
+				// 	}
+				// 	printf("========user funcs:============\n" );
+				// 	j=0;
+				// 	while (j< totalUserFuncs) {
+				// 		 printf("%s #args %d   locals %d address %d\n", userFuncs[j]->id, userFuncs[j]->totalargs,userFuncs[j]->localSize, userFuncs[j]->address);
+				// 		j++;
+				// 	}
+				//
+				// 	j=0;
+				// 	while (j< totalins) {
+				// 	//	 printf("opcode %d\n", code[j]->opcode);
+				// 		j++;
+				// 	}
 }
 
 
@@ -1803,3 +1808,12 @@ char* enum_toString_opCodes_v(vmopcode sym) {
 		}
 	}
 
+
+	char *concat_strings(char* str1,char* str2){
+		char* retStr = malloc(strlen(str1) + strlen(str2) +1);
+
+		strcpy(retStr , str1);
+		strcat(retStr , str2);
+		return retStr;
+
+	}
