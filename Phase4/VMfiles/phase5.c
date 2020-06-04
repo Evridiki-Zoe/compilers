@@ -486,7 +486,7 @@ void libfunc_print(){
 		printf("%s ",s);
 		//free(s);
 	}
-printf("\n");
+//printf("\n");
 }
 
 void libfunc_input(){
@@ -565,7 +565,7 @@ void libfunc_objectmemberkeys(){
 			while (tmp) {
 					if(tmp->index){
 						sprintf(index,"%f",counter);
-						printf("objectmemberkeys lib func:(%s) (%s)\n",index, tmp->index);
+						//printf("objectmemberkeys lib func:(%s) (%s)\n",index, tmp->index);
 
 						if(retval.data.tableVal->next == NULL){
 						  	retval.data.tableVal->next= malloc(sizeof(struct avm_table));
@@ -598,7 +598,7 @@ void libfunc_objectmemberkeys(){
 				tmp = tmp->next;
 			}
 
-			printf("objectmemberkeys done!\n");
+//			printf("objectmemberkeys done!\n");
 		}
 		else{
 			avm_error("libfunc objectmemberkeys: error: not valid variable type!");
@@ -624,7 +624,7 @@ void libfunc_objecttotalmembers(){
 			}
 			retval.type = number_m;
 			retval.data.numVal = counter;
-			printf("objecttotalmembers: %f!\n", retval.data.numVal);
+			//printf("objecttotalmembers: %f!\n", retval.data.numVal);
 		}
 		else{
 			avm_error("libfunc objecttotalmembers: error: not valid variable type!");
@@ -648,7 +648,7 @@ void libfunc_objectcopy(){
 				tmp = tmp->next;
 
 			}*/
-			printf("objectcopy done!\n");
+//			printf("objectcopy done!\n");
 		}
 		else{
 			avm_error("libfunc objectcopy: error: not valid variable type!");
@@ -667,7 +667,7 @@ void libfunc_totalarguments(void){
 	}else {
 		retval.type = number_m;
 		retval.data.numVal = avm_get_envvalue(p_topsp  AVM_NUMACTUALS_OFFSET);
-		printf("totalarguments: %f\n",	retval.data.numVal );
+//		printf("totalarguments: %f\n",	retval.data.numVal );
 	}
 
 
@@ -675,7 +675,7 @@ void libfunc_totalarguments(void){
 
 void libfunc_argument(){
 	unsigned p_topsp = avm_get_envvalue(topsp  + AVM_SAVEDTOPSP_OFFSET);
-	printf("p_topsp = %u\n",p_topsp );
+//	printf("p_topsp = %u\n",p_topsp );
 	avm_memcellclear(&retval);
 	int i;
 	if (!p_topsp) {
@@ -717,7 +717,7 @@ void  libfunc_typeof(){
 			avm_memcellclear(&retval);
 			retval.type = string_m;
 			retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
-			printf("typeof: %s\n", retval.data.strVal);
+		//	printf("typeof: %s\n", retval.data.strVal);
 		}
 
 }
@@ -731,7 +731,7 @@ void libfunc_strtonum(){
 	if(n != 1) avm_error("libfunc strtonum: error arguments");
 	else{
 		if(avm_getactual(0)->type == 1){ //str type
-				printf("str to  num lib func:(%d) (%s)\n",n, avm_getactual(0)->data.strVal );
+				//printf("str to  num lib func:(%d) (%s)\n",n, avm_getactual(0)->data.strVal );
 				str = avm_getactual(0)->data.strVal;
 		}
 		else{ //todo ??
@@ -740,18 +740,18 @@ void libfunc_strtonum(){
 			return;
 		}
 	}
-printf("str is %s \n",str);
+//printf("str is %s \n",str);
 	char *ptr;
 	tonum = strtod(str, &ptr);
-printf("ptr is %s \n",ptr);
+//printf("ptr is %s \n",ptr);
 
 	if(strcmp(ptr,"") == 0) {
 		retval.type = number_m;
 		retval.data.numVal =  tonum;
-		printf("strtonum: %f\n", retval.data.numVal);
+		//printf("strtonum: %f\n", retval.data.numVal);
 	}
 	else{
-	printf("strtonum nil\n");
+//	printf("strtonum nil\n");
 	retval.type = nil_m;
 
 	}
@@ -764,12 +764,12 @@ void libfunc_sqrt(){
 	if(n != 1) avm_error("libfunc sqrt: error arguments");
 	else{
 		if(avm_getactual(0)->type == 0){
-				printf("sqrt lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
+			//	printf("sqrt lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
 				num = avm_getactual(0)->data.numVal;
 		}
 		else if(avm_getactual(0)->type == 3){
 			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
-			printf("sqrt lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+			//printf("sqrt lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
 			num = tmp->data->data.numVal;
 		}
 		else{
@@ -783,7 +783,7 @@ void libfunc_sqrt(){
 		}
 		retval.type = number_m;
 		retval.data.numVal =  sqrt(num);
-		printf("sqrt: %f\n", retval.data.numVal);
+//		printf("sqrt: %f\n", retval.data.numVal);
 	}
 }
 
@@ -799,7 +799,7 @@ void libfunc_cos( ){
 		}
 		else if(avm_getactual(0)->type == 3){
 			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
-			printf("cos lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+//			printf("cos lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
 			rad = tmp->data->data.numVal;
 		}
 		else{
@@ -811,7 +811,7 @@ void libfunc_cos( ){
 	  rad = (rad * 3.14159265) / 180;
 		retval.type = number_m;
 		retval.data.numVal =  cos(rad);
-		printf("cos: %f\n",retval.data.numVal);
+//		printf("cos: %f\n",retval.data.numVal);
 
 	}
 }
@@ -824,12 +824,12 @@ void libfunc_sin( ){
 	if(n != 1) avm_error("libfunc sin: error arguments");
 	else{
 		if(avm_getactual(0)->type == 0){
-				printf("sin lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
+			//	printf("sin lib func:(%d) (%f)\n",n, avm_getactual(0)->data.numVal );
 				rad = avm_getactual(0)->data.numVal;
 		}
 		else if(avm_getactual(0)->type == 3){ //table
 			struct avm_table* tmp = avm_getactual(0)->data.tableVal;
-			printf("sin lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
+			//printf("sin lib func:(%d) (%f)\n",n, tmp->data->data.numVal);
 			rad = tmp->data->data.numVal;
 		}
 		else{
@@ -841,7 +841,7 @@ void libfunc_sin( ){
 		rad = (rad * 3.14159265) / 180;
 		retval.type = number_m;
 		retval.data.numVal =  sin(rad);
-		printf("sin: %f\n", retval.data.numVal );
+//		printf("sin: %f\n", retval.data.numVal );
 
 	}
 
