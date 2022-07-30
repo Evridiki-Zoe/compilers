@@ -1,4 +1,0 @@
-1) gia tin antistoixia koitaksa to quads.h . Genika ginetai kai pio oraia an vgaloyme ta and , or , not giati stin
-	meriki den ta xrisimopoioume
-
-2) ta prints einai okey afoy antistoixoyn sto katalilo generate i guess

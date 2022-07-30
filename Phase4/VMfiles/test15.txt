@@ -1,3 +1,0 @@
-table = [{"prwto": [{"kapos": 1}]}, {"deytero":3}];
-
-print(table.prwto.kapos);
